@@ -1,0 +1,5 @@
+digraph "CFG for 'jzero_far' function" {
+	label="CFG for 'jzero_far' function";
+
+	Node0x57f4260 [shape=record,label="{entry:\l  tail call void @llvm.memset.p0i8.i64(i8* %target, i8 0, i64 %bytestozero,\l... i32 1, i1 false)\l  ret void\l}"];
+}

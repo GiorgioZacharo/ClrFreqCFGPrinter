@@ -1,0 +1,5 @@
+digraph "CFG for 'noop_upsample' function" {
+	label="CFG for 'noop_upsample' function";
+
+	Node0x5cc0900 [shape=record,label="{entry:\l  store i8** null, i8*** %output_data_ptr, align 8, !tbaa !2\l  ret void\l}"];
+}

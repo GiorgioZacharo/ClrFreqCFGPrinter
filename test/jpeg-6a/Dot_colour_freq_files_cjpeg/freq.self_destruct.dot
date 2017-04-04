@@ -1,0 +1,5 @@
+digraph "CFG for 'self_destruct' function" {
+	label="CFG for 'self_destruct' function";
+
+	Node0x57a23e0 [shape=record, style = filled, fillcolor = skyblue, label="{entry:\l  tail call void @free_pool(%struct.jpeg_common_struct* %cinfo, i32 1)\l  tail call void @free_pool(%struct.jpeg_common_struct* %cinfo, i32 0)\l  %mem = getelementptr inbounds %struct.jpeg_common_struct,\l... %struct.jpeg_common_struct* %cinfo, i64 0, i32 1\l  %0 = bitcast %struct.jpeg_memory_mgr** %mem to i8**\l  %1 = load i8*, i8** %0, align 8, !tbaa !3\l  tail call void @jpeg_free_small(%struct.jpeg_common_struct* %cinfo, i8* %1,\l... i64 160) #5\l  store %struct.jpeg_memory_mgr* null, %struct.jpeg_memory_mgr** %mem, align\l... 8, !tbaa !3\l  tail call void @jpeg_mem_term(%struct.jpeg_common_struct* %cinfo) #5\l  ret void\l}"];
+}

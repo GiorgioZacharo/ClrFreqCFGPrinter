@@ -1,0 +1,30 @@
+digraph "CFG for 'keymatch' function" {
+	label="CFG for 'keymatch' function";
+
+	Node0x643fee0 [shape=record, style = filled, fillcolor = cyan, label="{entry:\l  %0 = load i8, i8* %arg, align 1, !tbaa !3\l  %cmp31 = icmp eq i8 %0, 0\l  br i1 %cmp31, label %while.end, label %while.body.preheader, !prof !6\l|{<s0>T|<s1>F}}"];
+	Node0x643fee0:s0 -> Node0x64417e0;
+	Node0x643fee0:s1 -> Node0x64418f0;
+	Node0x64418f0 [shape=record, style = filled, fillcolor = cyan, label="{while.body.preheader:                             \l  br label %while.body\l}"];
+	Node0x64418f0 -> Node0x6441bb0;
+	Node0x6441bb0 [shape=record, style = filled, fillcolor = cyan, label="{while.body:                                       \l  %conv35.in = phi i8 [ %7, %if.end13 ], [ %0, %while.body.preheader ]\l  %incdec.ptr34.pn = phi i8* [ %incdec.ptr34, %if.end13 ], [ %arg,\l... %while.body.preheader ]\l  %nmatched.033 = phi i32 [ %inc, %if.end13 ], [ 0, %while.body.preheader ]\l  %keyword.addr.032 = phi i8* [ %incdec.ptr2, %if.end13 ], [ %keyword,\l... %while.body.preheader ]\l  %incdec.ptr34 = getelementptr inbounds i8, i8* %incdec.ptr34.pn, i64 1\l  %conv35 = sext i8 %conv35.in to i32\l  %incdec.ptr2 = getelementptr inbounds i8, i8* %keyword.addr.032, i64 1\l  %1 = load i8, i8* %keyword.addr.032, align 1, !tbaa !3\l  %conv3 = sext i8 %1 to i32\l  %cmp4 = icmp eq i8 %1, 0\l  br i1 %cmp4, label %cleanup.loopexit, label %if.end, !prof !7\l|{<s0>T|<s1>F}}"];
+	Node0x6441bb0:s0 -> Node0x6442d00;
+	Node0x6441bb0:s1 -> Node0x6442de0;
+	Node0x6442de0 [shape=record, style = filled, fillcolor = cyan, label="{if.end:                                           \l  %idxprom = sext i8 %conv35.in to i64\l  %call = tail call i16** @__ctype_b_loc() #3\l  %2 = load i16*, i16** %call, align 8, !tbaa !8\l  %arrayidx = getelementptr inbounds i16, i16* %2, i64 %idxprom\l  %3 = load i16, i16* %arrayidx, align 2, !tbaa !10\l  %and = and i16 %3, 256\l  %tobool = icmp ne i16 %and, 0\l  %__c.off.i = add nsw i32 %conv35, 128\l  %4 = icmp ult i32 %__c.off.i, 384\l  %or.cond = and i1 %4, %tobool\l  br i1 %or.cond, label %cond.true.i, label %if.end9\l|{<s0>T|<s1>F}}"];
+	Node0x6442de0:s0 -> Node0x6443c60;
+	Node0x6442de0:s1 -> Node0x6443d10;
+	Node0x6443c60 [shape=record, style = filled, fillcolor = cyan, label="{cond.true.i:                                      \l  %call.i = tail call i32** @__ctype_tolower_loc() #3\l  %5 = load i32*, i32** %call.i, align 8, !tbaa !8\l  %arrayidx.i = getelementptr inbounds i32, i32* %5, i64 %idxprom\l  %6 = load i32, i32* %arrayidx.i, align 4, !tbaa !12\l  br label %if.end9\l}"];
+	Node0x6443c60 -> Node0x6443d10;
+	Node0x6443d10 [shape=record, style = filled, fillcolor = cyan, label="{if.end9:                                          \l  %ca.0 = phi i32 [ %conv35, %if.end ], [ %6, %cond.true.i ]\l  %cmp10 = icmp eq i32 %ca.0, %conv3\l  br i1 %cmp10, label %if.end13, label %cleanup.loopexit, !prof !14\l|{<s0>T|<s1>F}}"];
+	Node0x6443d10:s0 -> Node0x6441d10;
+	Node0x6443d10:s1 -> Node0x6442d00;
+	Node0x6441d10 [shape=record, style = filled, fillcolor = cyan, label="{if.end13:                                         \l  %inc = add nuw nsw i32 %nmatched.033, 1\l  %7 = load i8, i8* %incdec.ptr34, align 1, !tbaa !3\l  %cmp = icmp eq i8 %7, 0\l  br i1 %cmp, label %while.end.loopexit, label %while.body, !prof !6\l|{<s0>T|<s1>F}}"];
+	Node0x6441d10:s0 -> Node0x6444e30;
+	Node0x6441d10:s1 -> Node0x6441bb0;
+	Node0x6444e30 [shape=record, style = filled, fillcolor = skyblue, label="{while.end.loopexit:                               \l  %inc.lcssa = phi i32 [ %inc, %if.end13 ]\l  br label %while.end\l}"];
+	Node0x6444e30 -> Node0x64417e0;
+	Node0x64417e0 [shape=record, style = filled, fillcolor = skyblue, label="{while.end:                                        \l  %nmatched.0.lcssa = phi i32 [ 0, %entry ], [ %inc.lcssa, %while.end.loopexit\l... ]\l  %not.cmp14 = icmp sge i32 %nmatched.0.lcssa, %minchars\l  %. = zext i1 %not.cmp14 to i32\l  br label %cleanup\l}"];
+	Node0x64417e0 -> Node0x6445730;
+	Node0x6442d00 [shape=record, style = filled, fillcolor = cyan, label="{cleanup.loopexit:                                 \l  br label %cleanup\l}"];
+	Node0x6442d00 -> Node0x6445730;
+	Node0x6445730 [shape=record, style = filled, fillcolor = cyan, label="{cleanup:                                          \l  %retval.0 = phi i32 [ %., %while.end ], [ 0, %cleanup.loopexit ]\l  ret i32 %retval.0\l}"];
+}

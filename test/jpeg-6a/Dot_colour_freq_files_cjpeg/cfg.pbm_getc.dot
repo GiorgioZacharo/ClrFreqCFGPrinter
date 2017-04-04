@@ -1,0 +1,16 @@
+digraph "CFG for 'pbm_getc' function" {
+	label="CFG for 'pbm_getc' function";
+
+	Node0x60aed90 [shape=record,label="{entry:\l  %call = tail call i32 @_IO_getc(%struct._IO_FILE* %infile)\l  %cmp = icmp eq i32 %call, 35\l  br i1 %cmp, label %do.body.preheader, label %if.end\l|{<s0>T|<s1>F}}"];
+	Node0x60aed90:s0 -> Node0x60aef90;
+	Node0x60aed90:s1 -> Node0x60af030;
+	Node0x60aef90 [shape=record,label="{do.body.preheader:                                \l  br label %do.body\l}"];
+	Node0x60aef90 -> Node0x60af190;
+	Node0x60af190 [shape=record,label="{do.body:                                          \l  %call1 = tail call i32 @_IO_getc(%struct._IO_FILE* %infile)\l  switch i32 %call1, label %do.body [\l    i32 -1, label %if.end.loopexit\l    i32 10, label %if.end.loopexit\l  ]\l|{<s0>def|<s1>-1|<s2>10}}"];
+	Node0x60af190:s0 -> Node0x60af190;
+	Node0x60af190:s1 -> Node0x60af340;
+	Node0x60af190:s2 -> Node0x60af340;
+	Node0x60af340 [shape=record,label="{if.end.loopexit:                                  \l  %call1.lcssa = phi i32 [ %call1, %do.body ], [ %call1, %do.body ]\l  br label %if.end\l}"];
+	Node0x60af340 -> Node0x60af030;
+	Node0x60af030 [shape=record,label="{if.end:                                           \l  %ch.0 = phi i32 [ %call, %entry ], [ %call1.lcssa, %if.end.loopexit ]\l  ret i32 %ch.0\l}"];
+}

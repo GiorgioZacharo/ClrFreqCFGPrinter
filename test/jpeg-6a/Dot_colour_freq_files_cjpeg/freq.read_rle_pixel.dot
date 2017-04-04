@@ -1,0 +1,35 @@
+digraph "CFG for 'read_rle_pixel' function" {
+	label="CFG for 'read_rle_pixel' function";
+
+	Node0x4ea73f0 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  %input_file = getelementptr inbounds %struct._tga_source_struct,\l... %struct._tga_source_struct* %sinfo, i64 0, i32 0, i32 3\l  %0 = load %struct._IO_FILE*, %struct._IO_FILE** %input_file, align 8, !tbaa\l... !3\l  %dup_pixel_count = getelementptr inbounds %struct._tga_source_struct,\l... %struct._tga_source_struct* %sinfo, i64 0, i32 9\l  %1 = load i32, i32* %dup_pixel_count, align 4, !tbaa !10\l  %cmp = icmp sgt i32 %1, 0\l  br i1 %cmp, label %if.then, label %if.end\l|{<s0>T|<s1>F}}"];
+	Node0x4ea73f0:s0 -> Node0x4ea7670;
+	Node0x4ea73f0:s1 -> Node0x4ea76e0;
+	Node0x4ea7670 [shape=record, style = filled, fillcolor = blue, label="{if.then:                                          \l  %dec = add nsw i32 %1, -1\l  store i32 %dec, i32* %dup_pixel_count, align 4, !tbaa !10\l  br label %cleanup\l}"];
+	Node0x4ea7670 -> Node0x4ea7900;
+	Node0x4ea76e0 [shape=record, style = filled, fillcolor = blue, label="{if.end:                                           \l  %block_count = getelementptr inbounds %struct._tga_source_struct,\l... %struct._tga_source_struct* %sinfo, i64 0, i32 8\l  %2 = load i32, i32* %block_count, align 8, !tbaa !11\l  %dec2 = add nsw i32 %2, -1\l  store i32 %dec2, i32* %block_count, align 8, !tbaa !11\l  %cmp3 = icmp slt i32 %2, 1\l  br i1 %cmp3, label %if.then4, label %for.cond.preheader\l|{<s0>T|<s1>F}}"];
+	Node0x4ea76e0:s0 -> Node0x4ea7c70;
+	Node0x4ea76e0:s1 -> Node0x4ea7380;
+	Node0x4ea7c70 [shape=record, style = filled, fillcolor = blue, label="{if.then4:                                         \l  %call.i = tail call i32 @_IO_getc(%struct._IO_FILE* %0) #4\l  %cmp.i = icmp eq i32 %call.i, -1\l  br i1 %cmp.i, label %if.then.i, label %read_byte.exit\l|{<s0>T|<s1>F}}"];
+	Node0x4ea7c70:s0 -> Node0x4ea8190;
+	Node0x4ea7c70:s1 -> Node0x4ea81e0;
+	Node0x4ea8190 [shape=record, style = filled, fillcolor = blue, label="{if.then.i:                                        \l  %cinfo.i = getelementptr inbounds %struct._tga_source_struct,\l... %struct._tga_source_struct* %sinfo, i64 0, i32 1\l  %3 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct**\l... %cinfo.i, align 8, !tbaa !12\l  %err.i = getelementptr inbounds %struct.jpeg_compress_struct,\l... %struct.jpeg_compress_struct* %3, i64 0, i32 0\l  %4 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err.i, align 8,\l... !tbaa !13\l  %msg_code.i = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %4, i64 0, i32 5\l  store i32 42, i32* %msg_code.i, align 8, !tbaa !17\l  %error_exit.i = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %4, i64 0, i32 0\l  %5 = load void (%struct.jpeg_common_struct*)*, void\l... (%struct.jpeg_common_struct*)** %error_exit.i, align 8, !tbaa !20\l  %6 = bitcast %struct.jpeg_compress_struct* %3 to %struct.jpeg_common_struct*\l  tail call void %5(%struct.jpeg_common_struct* %6) #4\l  br label %read_byte.exit\l}"];
+	Node0x4ea8190 -> Node0x4ea81e0;
+	Node0x4ea81e0 [shape=record, style = filled, fillcolor = blue, label="{read_byte.exit:                                   \l  %7 = trunc i32 %call.i to i8\l  %tobool = icmp slt i8 %7, 0\l  %and6 = and i32 %call.i, 127\l  br i1 %tobool, label %if.then5, label %if.else\l|{<s0>T|<s1>F}}"];
+	Node0x4ea81e0:s0 -> Node0x4e7ea40;
+	Node0x4ea81e0:s1 -> Node0x4e7ee40;
+	Node0x4e7ea40 [shape=record, style = filled, fillcolor = blue, label="{if.then5:                                         \l  store i32 %and6, i32* %dup_pixel_count, align 4, !tbaa !10\l  store i32 0, i32* %block_count, align 8, !tbaa !11\l  br label %for.cond.preheader\l}"];
+	Node0x4e7ea40 -> Node0x4ea7380;
+	Node0x4e7ee40 [shape=record, style = filled, fillcolor = blue, label="{if.else:                                          \l  store i32 %and6, i32* %block_count, align 8, !tbaa !11\l  br label %for.cond.preheader\l}"];
+	Node0x4e7ee40 -> Node0x4ea7380;
+	Node0x4ea7380 [shape=record, style = filled, fillcolor = blue, label="{for.cond.preheader:                               \l  %pixel_size = getelementptr inbounds %struct._tga_source_struct,\l... %struct._tga_source_struct* %sinfo, i64 0, i32 7\l  %8 = load i32, i32* %pixel_size, align 4, !tbaa !21\l  %cmp1329 = icmp sgt i32 %8, 0\l  br i1 %cmp1329, label %for.body.preheader, label %cleanup\l|{<s0>T|<s1>F}}"];
+	Node0x4ea7380:s0 -> Node0x4ea8530;
+	Node0x4ea7380:s1 -> Node0x4ea7900;
+	Node0x4ea8530 [shape=record, style = filled, fillcolor = blue, label="{for.body.preheader:                               \l  br label %for.body\l}"];
+	Node0x4ea8530 -> Node0x4e97030;
+	Node0x4e97030 [shape=record, style = filled, fillcolor = blue, label="{for.body:                                         \l  %indvars.iv = phi i64 [ %indvars.iv.next, %for.body ], [ 0,\l... %for.body.preheader ]\l  %call14 = tail call i32 @_IO_getc(%struct._IO_FILE* %0)\l  %conv = trunc i32 %call14 to i8\l  %arrayidx = getelementptr inbounds %struct._tga_source_struct,\l... %struct._tga_source_struct* %sinfo, i64 0, i32 6, i64 %indvars.iv\l  store i8 %conv, i8* %arrayidx, align 1, !tbaa !22\l  %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1\l  %9 = load i32, i32* %pixel_size, align 4, !tbaa !21\l  %10 = sext i32 %9 to i64\l  %cmp13 = icmp slt i64 %indvars.iv.next, %10\l  br i1 %cmp13, label %for.body, label %cleanup.loopexit\l|{<s0>T|<s1>F}}"];
+	Node0x4e97030:s0 -> Node0x4e97030;
+	Node0x4e97030:s1 -> Node0x4eaa440;
+	Node0x4eaa440 [shape=record, style = filled, fillcolor = blue, label="{cleanup.loopexit:                                 \l  br label %cleanup\l}"];
+	Node0x4eaa440 -> Node0x4ea7900;
+	Node0x4ea7900 [shape=record, style = filled, fillcolor = blue, label="{cleanup:                                          \l  ret void\l}"];
+}

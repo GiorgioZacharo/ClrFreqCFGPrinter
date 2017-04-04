@@ -1,0 +1,5 @@
+digraph "CFG for 'reset_error_mgr' function" {
+	label="CFG for 'reset_error_mgr' function";
+
+	Node0x53edc30 [shape=record,label="{entry:\l  %err = getelementptr inbounds %struct.jpeg_common_struct,\l... %struct.jpeg_common_struct* %cinfo, i64 0, i32 0\l  %0 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8,\l... !tbaa !3\l  %num_warnings = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %0, i64 0, i32 8\l  store i64 0, i64* %num_warnings, align 8, !tbaa !9\l  %msg_code = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %0, i64 0, i32 5\l  store i32 0, i32* %msg_code, align 8, !tbaa !12\l  ret void\l}"];
+}

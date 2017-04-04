@@ -1,0 +1,12 @@
+digraph "CFG for 'jpeg_quality_scaling' function" {
+	label="CFG for 'jpeg_quality_scaling' function";
+
+	Node0x65fa370 [shape=record, style = filled, fillcolor = skyblue, label="{entry:\l  %cmp = icmp slt i32 %quality, 1\l  %.quality = select i1 %cmp, i32 1, i32 %quality\l  %cmp1 = icmp sgt i32 %.quality, 100\l  %..quality = select i1 %cmp1, i32 100, i32 %.quality\l  %cmp4 = icmp slt i32 %..quality, 50\l  br i1 %cmp4, label %if.then5, label %if.else, !prof !3\l|{<s0>T|<s1>F}}"];
+	Node0x65fa370:s0 -> Node0x65fc500;
+	Node0x65fa370:s1 -> Node0x65fc580;
+	Node0x65fc500 [shape=record, style = filled, fillcolor = blue, label="{if.then5:                                         \l  %div = sdiv i32 5000, %..quality\l  br label %if.end6\l}"];
+	Node0x65fc500 -> Node0x65fc8f0;
+	Node0x65fc580 [shape=record, style = filled, fillcolor = skyblue, label="{if.else:                                          \l  %mul = shl nsw i32 %..quality, 1\l  %sub = sub nsw i32 200, %mul\l  br label %if.end6\l}"];
+	Node0x65fc580 -> Node0x65fc8f0;
+	Node0x65fc8f0 [shape=record, style = filled, fillcolor = skyblue, label="{if.end6:                                          \l  %quality.addr.0 = phi i32 [ %div, %if.then5 ], [ %sub, %if.else ]\l  ret i32 %quality.addr.0\l}"];
+}

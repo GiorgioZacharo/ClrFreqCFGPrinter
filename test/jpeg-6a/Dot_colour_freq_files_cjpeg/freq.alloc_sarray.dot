@@ -1,0 +1,30 @@
+digraph "CFG for 'alloc_sarray' function" {
+	label="CFG for 'alloc_sarray' function";
+
+	Node0x576baf0 [shape=record, style = filled, fillcolor = skyblue, label="{entry:\l  %mem1 = getelementptr inbounds %struct.jpeg_common_struct,\l... %struct.jpeg_common_struct* %cinfo, i64 0, i32 1\l  %0 = bitcast %struct.jpeg_memory_mgr** %mem1 to %struct.my_memory_mgr**\l  %1 = load %struct.my_memory_mgr*, %struct.my_memory_mgr** %0, align 8, !tbaa\l... !3\l  %conv = zext i32 %samplesperrow to i64\l  %div = udiv i64 999999976, %conv\l  %cmp = icmp eq i64 %div, 0\l  br i1 %cmp, label %if.then, label %if.end, !prof !9\l|{<s0>T|<s1>F}}"];
+	Node0x576baf0:s0 -> Node0x576bec0;
+	Node0x576baf0:s1 -> Node0x576bf90;
+	Node0x576bec0 [shape=record, style = filled, fillcolor = blue, label="{if.then:                                          \l  %err = getelementptr inbounds %struct.jpeg_common_struct,\l... %struct.jpeg_common_struct* %cinfo, i64 0, i32 0\l  %2 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8,\l... !tbaa !10\l  %msg_code = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %2, i64 0, i32 5\l  store i32 69, i32* %msg_code, align 8, !tbaa !11\l  %3 = bitcast %struct.jpeg_error_mgr* %2 to void\l... (%struct.jpeg_common_struct*)**\l  %4 = load void (%struct.jpeg_common_struct*)*, void\l... (%struct.jpeg_common_struct*)** %3, align 8, !tbaa !14\l  tail call void %4(%struct.jpeg_common_struct* nonnull %cinfo) #5\l  br label %if.end\l}"];
+	Node0x576bec0 -> Node0x576bf90;
+	Node0x576bf90 [shape=record, style = filled, fillcolor = skyblue, label="{if.end:                                           \l  %conv5 = zext i32 %numrows to i64\l  %cmp6 = icmp ult i64 %div, %conv5\l  %conv9 = trunc i64 %div to i32\l  %rowsperchunk.0 = select i1 %cmp6, i32 %conv9, i32 %numrows\l  %last_rowsperchunk = getelementptr inbounds %struct.my_memory_mgr,\l... %struct.my_memory_mgr* %1, i64 0, i32 6\l  store i32 %rowsperchunk.0, i32* %last_rowsperchunk, align 8, !tbaa !15\l  %mul12 = shl nuw nsw i64 %conv5, 3\l  %call = tail call i8* @alloc_small(%struct.jpeg_common_struct* nonnull\l... %cinfo, i32 %pool_id, i64 %mul12)\l  %5 = bitcast i8* %call to i8**\l  %cmp1361 = icmp eq i32 %numrows, 0\l  br i1 %cmp1361, label %while.end, label %while.body.preheader, !prof !18\l|{<s0>T|<s1>F}}"];
+	Node0x576bf90:s0 -> Node0x577a180;
+	Node0x576bf90:s1 -> Node0x577a260;
+	Node0x577a260 [shape=record, style = filled, fillcolor = skyblue, label="{while.body.preheader:                             \l  br label %while.body\l}"];
+	Node0x577a260 -> Node0x577a520;
+	Node0x577a5d0 [shape=record, style = filled, fillcolor = skyblue, label="{while.cond.loopexit.loopexit:                     \l  %inc.lcssa = phi i32 [ %inc, %for.body ]\l  br label %while.cond.loopexit\l}"];
+	Node0x577a5d0 -> Node0x577aa70;
+	Node0x577aa70 [shape=record, style = filled, fillcolor = skyblue, label="{while.cond.loopexit:                              \l  %currow.1.lcssa = phi i32 [ %currow.063, %while.body ], [ %inc.lcssa,\l... %while.cond.loopexit.loopexit ]\l  %cmp13 = icmp ult i32 %currow.1.lcssa, %numrows\l  br i1 %cmp13, label %while.body, label %while.end.loopexit, !prof !18\l|{<s0>T|<s1>F}}"];
+	Node0x577aa70:s0 -> Node0x577a520;
+	Node0x577aa70:s1 -> Node0x577ad80;
+	Node0x577a520 [shape=record, style = filled, fillcolor = skyblue, label="{while.body:                                       \l  %currow.063 = phi i32 [ %currow.1.lcssa, %while.cond.loopexit ], [ 0,\l... %while.body.preheader ]\l  %rowsperchunk.162 = phi i32 [ %rowsperchunk.1.sub, %while.cond.loopexit ], [\l... %rowsperchunk.0, %while.body.preheader ]\l  %sub = sub i32 %numrows, %currow.063\l  %cmp15 = icmp ult i32 %rowsperchunk.162, %sub\l  %rowsperchunk.1.sub = select i1 %cmp15, i32 %rowsperchunk.162, i32 %sub\l  %conv18 = zext i32 %rowsperchunk.1.sub to i64\l  %mul20 = mul nuw i64 %conv18, %conv\l  %call22 = tail call i8* @alloc_large(%struct.jpeg_common_struct* %cinfo, i32\l... %pool_id, i64 %mul20)\l  %cmp2357 = icmp eq i32 %rowsperchunk.1.sub, 0\l  br i1 %cmp2357, label %while.cond.loopexit, label %for.body.preheader, !prof\l... !19\l|{<s0>T|<s1>F}}"];
+	Node0x577a520:s0 -> Node0x577aa70;
+	Node0x577a520:s1 -> Node0x577bae0;
+	Node0x577bae0 [shape=record, style = filled, fillcolor = skyblue, label="{for.body.preheader:                               \l  br label %for.body\l}"];
+	Node0x577bae0 -> Node0x576c480;
+	Node0x576c480 [shape=record, style = filled, fillcolor = cyan, label="{for.body:                                         \l  %workspace.060 = phi i8* [ %add.ptr, %for.body ], [ %call22,\l... %for.body.preheader ]\l  %i.059 = phi i32 [ %dec, %for.body ], [ %rowsperchunk.1.sub,\l... %for.body.preheader ]\l  %currow.158 = phi i32 [ %inc, %for.body ], [ %currow.063,\l... %for.body.preheader ]\l  %inc = add i32 %currow.158, 1\l  %idxprom = zext i32 %currow.158 to i64\l  %arrayidx = getelementptr inbounds i8*, i8** %5, i64 %idxprom\l  store i8* %workspace.060, i8** %arrayidx, align 8, !tbaa !20\l  %add.ptr = getelementptr inbounds i8, i8* %workspace.060, i64 %conv\l  %dec = add i32 %i.059, -1\l  %cmp23 = icmp eq i32 %dec, 0\l  br i1 %cmp23, label %while.cond.loopexit.loopexit, label %for.body, !prof !19\l|{<s0>T|<s1>F}}"];
+	Node0x576c480:s0 -> Node0x577a5d0;
+	Node0x576c480:s1 -> Node0x576c480;
+	Node0x577ad80 [shape=record, style = filled, fillcolor = skyblue, label="{while.end.loopexit:                               \l  br label %while.end\l}"];
+	Node0x577ad80 -> Node0x577a180;
+	Node0x577a180 [shape=record, style = filled, fillcolor = skyblue, label="{while.end:                                        \l  ret i8** %5\l}"];
+}

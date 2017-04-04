@@ -1,0 +1,5 @@
+digraph "CFG for 'finish_input_tga' function" {
+	label="CFG for 'finish_input_tga' function";
+
+	Node0x4e939f0 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  ret void\l}"];
+}

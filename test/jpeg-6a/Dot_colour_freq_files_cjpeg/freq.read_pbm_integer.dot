@@ -1,0 +1,46 @@
+digraph "CFG for 'read_pbm_integer' function" {
+	label="CFG for 'read_pbm_integer' function";
+
+	Node0x60a53a0 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  br label %do.body\l}"];
+	Node0x60a53a0 -> Node0x60a53f0;
+	Node0x60a53f0 [shape=record, style = filled, fillcolor = blue, label="{do.body:                                          \l  %call.i = tail call i32 @_IO_getc(%struct._IO_FILE* %infile) #2\l  %cmp.i = icmp eq i32 %call.i, 35\l  br i1 %cmp.i, label %do.body.i.preheader, label %pbm_getc.exit\l|{<s0>T|<s1>F}}"];
+	Node0x60a53f0:s0 -> Node0x60abbc0;
+	Node0x60a53f0:s1 -> Node0x60abc30;
+	Node0x60abbc0 [shape=record, style = filled, fillcolor = blue, label="{do.body.i.preheader:                              \l  br label %do.body.i\l}"];
+	Node0x60abbc0 -> Node0x60abd40;
+	Node0x60abd40 [shape=record, style = filled, fillcolor = blue, label="{do.body.i:                                        \l  %call1.i = tail call i32 @_IO_getc(%struct._IO_FILE* %infile) #2\l  switch i32 %call1.i, label %do.body.i [\l    i32 -1, label %pbm_getc.exit.loopexit\l    i32 10, label %pbm_getc.exit.loopexit\l  ]\l|{<s0>def|<s1>-1|<s2>10}}"];
+	Node0x60abd40:s0 -> Node0x60abd40;
+	Node0x60abd40:s1 -> Node0x60abf20;
+	Node0x60abd40:s2 -> Node0x60abf20;
+	Node0x60abf20 [shape=record, style = filled, fillcolor = blue, label="{pbm_getc.exit.loopexit:                           \l  %call1.i.lcssa = phi i32 [ %call1.i, %do.body.i ], [ %call1.i, %do.body.i ]\l  br label %pbm_getc.exit\l}"];
+	Node0x60abf20 -> Node0x60abc30;
+	Node0x60abc30 [shape=record, style = filled, fillcolor = blue, label="{pbm_getc.exit:                                    \l  %ch.0.i = phi i32 [ %call.i, %do.body ], [ %call1.i.lcssa,\l... %pbm_getc.exit.loopexit ]\l  switch i32 %ch.0.i, label %do.end [\l    i32 -1, label %do.end.thread\l    i32 32, label %do.body.backedge\l    i32 13, label %do.body.backedge\l    i32 10, label %do.body.backedge\l    i32 9, label %do.body.backedge\l  ]\l|{<s0>def|<s1>-1|<s2>32|<s3>13|<s4>10|<s5>9}}"];
+	Node0x60abc30:s0 -> Node0x60a52a0;
+	Node0x60abc30:s1 -> Node0x60ac390;
+	Node0x60abc30:s2 -> Node0x60ac470;
+	Node0x60abc30:s3 -> Node0x60ac470;
+	Node0x60abc30:s4 -> Node0x60ac470;
+	Node0x60abc30:s5 -> Node0x60ac470;
+	Node0x60ac470 [shape=record, style = filled, fillcolor = blue, label="{do.body.backedge:                                 \l  br label %do.body\l}"];
+	Node0x60ac470 -> Node0x60a53f0;
+	Node0x60ac390 [shape=record, style = filled, fillcolor = blue, label="{do.end.thread:                                    \l  %err = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 0\l  %0 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8,\l... !tbaa !2\l  %msg_code = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %0, i64 0, i32 5\l  store i32 1038, i32* %msg_code, align 8, !tbaa !10\l  %error_exit = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %0, i64 0, i32 0\l  %1 = load void (%struct.jpeg_common_struct*)*, void\l... (%struct.jpeg_common_struct*)** %error_exit, align 8, !tbaa !13\l  %2 = bitcast %struct.jpeg_decompress_struct* %cinfo to\l... %struct.jpeg_common_struct*\l  tail call void %1(%struct.jpeg_common_struct* %2) #2\l  br label %if.then10\l}"];
+	Node0x60ac390 -> Node0x60acc20;
+	Node0x60a52a0 [shape=record, style = filled, fillcolor = blue, label="{do.end:                                           \l  %ch.0.i.lcssa = phi i32 [ %ch.0.i, %pbm_getc.exit ]\l  %call.off41 = add i32 %ch.0.i.lcssa, -48\l  %3 = icmp ugt i32 %call.off41, 9\l  br i1 %3, label %do.end.if.then10_crit_edge, label %if.end15\l|{<s0>T|<s1>F}}"];
+	Node0x60a52a0:s0 -> Node0x60acfc0;
+	Node0x60a52a0:s1 -> Node0x60ad0e0;
+	Node0x60acfc0 [shape=record, style = filled, fillcolor = blue, label="{do.end.if.then10_crit_edge:                       \l  %.pre = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 0\l  %.pre53 = bitcast %struct.jpeg_decompress_struct* %cinfo to\l... %struct.jpeg_common_struct*\l  br label %if.then10\l}"];
+	Node0x60acfc0 -> Node0x60acc20;
+	Node0x60acc20 [shape=record, style = filled, fillcolor = blue, label="{if.then10:                                        \l  %.pre-phi = phi %struct.jpeg_common_struct* [ %.pre53,\l... %do.end.if.then10_crit_edge ], [ %2, %do.end.thread ]\l  %err11.pre-phi = phi %struct.jpeg_error_mgr** [ %.pre,\l... %do.end.if.then10_crit_edge ], [ %err, %do.end.thread ]\l  %ch.0.i52 = phi i32 [ %ch.0.i.lcssa, %do.end.if.then10_crit_edge ], [ -1,\l... %do.end.thread ]\l  %4 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err11.pre-phi,\l... align 8, !tbaa !2\l  %msg_code12 = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %4, i64 0, i32 5\l  store i32 1038, i32* %msg_code12, align 8, !tbaa !10\l  %error_exit14 = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %4, i64 0, i32 0\l  %5 = load void (%struct.jpeg_common_struct*)*, void\l... (%struct.jpeg_common_struct*)** %error_exit14, align 8, !tbaa !13\l  tail call void %5(%struct.jpeg_common_struct* %.pre-phi) #2\l  br label %if.end15\l}"];
+	Node0x60acc20 -> Node0x60ad0e0;
+	Node0x60ad0e0 [shape=record, style = filled, fillcolor = blue, label="{if.end15:                                         \l  %ch.0.i51 = phi i32 [ %ch.0.i.lcssa, %do.end ], [ %ch.0.i52, %if.then10 ]\l  %sub = add nsw i32 %ch.0.i51, -48\l  %call1646 = tail call fastcc i32 @pbm_getc(%struct._IO_FILE* %infile)\l  %call16.off47 = add i32 %call1646, -48\l  %6 = icmp ult i32 %call16.off47, 10\l  br i1 %6, label %while.body.preheader, label %while.end\l|{<s0>T|<s1>F}}"];
+	Node0x60ad0e0:s0 -> Node0x60ae060;
+	Node0x60ad0e0:s1 -> Node0x60ae140;
+	Node0x60ae060 [shape=record, style = filled, fillcolor = blue, label="{while.body.preheader:                             \l  br label %while.body\l}"];
+	Node0x60ae060 -> Node0x60ae2b0;
+	Node0x60ae2b0 [shape=record, style = filled, fillcolor = blue, label="{while.body:                                       \l  %call1649 = phi i32 [ %call16, %while.body ], [ %call1646,\l... %while.body.preheader ]\l  %val.048 = phi i32 [ %add, %while.body ], [ %sub, %while.body.preheader ]\l  %mul = mul i32 %val.048, 10\l  %sub19 = add nsw i32 %call1649, -48\l  %add = add i32 %sub19, %mul\l  %call16 = tail call fastcc i32 @pbm_getc(%struct._IO_FILE* %infile)\l  %call16.off = add i32 %call16, -48\l  %7 = icmp ult i32 %call16.off, 10\l  br i1 %7, label %while.body, label %while.end.loopexit\l|{<s0>T|<s1>F}}"];
+	Node0x60ae2b0:s0 -> Node0x60ae2b0;
+	Node0x60ae2b0:s1 -> Node0x60aea30;
+	Node0x60aea30 [shape=record, style = filled, fillcolor = blue, label="{while.end.loopexit:                               \l  %add.lcssa = phi i32 [ %add, %while.body ]\l  br label %while.end\l}"];
+	Node0x60aea30 -> Node0x60ae140;
+	Node0x60ae140 [shape=record, style = filled, fillcolor = blue, label="{while.end:                                        \l  %val.0.lcssa = phi i32 [ %sub, %if.end15 ], [ %add.lcssa,\l... %while.end.loopexit ]\l  ret i32 %val.0.lcssa\l}"];
+}

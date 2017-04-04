@@ -1,0 +1,13 @@
+digraph "CFG for 'read_2_bytes' function" {
+	label="CFG for 'read_2_bytes' function";
+
+	Node0x6834d90 [shape=record, style = filled, fillcolor = blue,  style = filled, fillcolor = blue, label="{entry:\l  %0 = load %struct._IO_FILE*, %struct._IO_FILE** @infile, align 8, !tbaa !2\l  %call = tail call i32 @_IO_getc(%struct._IO_FILE* %0)\l  %cmp = icmp eq i32 %call, -1\l  br i1 %cmp, label %if.then, label %if.end\l|{<s0>T|<s1>F}}"];
+	Node0x6834d90:s0 -> Node0x6835080;
+	Node0x6834d90:s1 -> Node0x68350f0;
+	Node0x6835080 [shape=record, style = filled, fillcolor = blue,  style = filled, fillcolor = blue, label="{if.then:                                          \l  %1 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !2\l  %call1 = tail call i32 (%struct._IO_FILE*, i8*, ...)\l... @fprintf(%struct._IO_FILE* %1, i8* nonnull getelementptr inbounds ([4 x i8],\l... [4 x i8]* @.str.6, i64 0, i64 0), i8* nonnull getelementptr inbounds ([27 x\l... i8], [27 x i8]* @.str.32, i64 0, i64 0)) #7\l  tail call void @exit(i32 1) #8\l  unreachable\l}"];
+	Node0x68350f0 [shape=record, style = filled, fillcolor = blue,  style = filled, fillcolor = blue, label="{if.end:                                           \l  %2 = load %struct._IO_FILE*, %struct._IO_FILE** @infile, align 8, !tbaa !2\l  %call2 = tail call i32 @_IO_getc(%struct._IO_FILE* %2)\l  %cmp3 = icmp eq i32 %call2, -1\l  br i1 %cmp3, label %if.then4, label %if.end6\l|{<s0>T|<s1>F}}"];
+	Node0x68350f0:s0 -> Node0x6835610;
+	Node0x68350f0:s1 -> Node0x6835660;
+	Node0x6835610 [shape=record, style = filled, fillcolor = blue,  style = filled, fillcolor = blue, label="{if.then4:                                         \l  %3 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !2\l  %call5 = tail call i32 (%struct._IO_FILE*, i8*, ...)\l... @fprintf(%struct._IO_FILE* %3, i8* nonnull getelementptr inbounds ([4 x i8],\l... [4 x i8]* @.str.6, i64 0, i64 0), i8* nonnull getelementptr inbounds ([27 x\l... i8], [27 x i8]* @.str.32, i64 0, i64 0)) #7\l  tail call void @exit(i32 1) #8\l  unreachable\l}"];
+	Node0x6835660 [shape=record, style = filled, fillcolor = blue,  style = filled, fillcolor = blue, label="{if.end6:                                          \l  %shl = shl i32 %call, 8\l  %add = add i32 %call2, %shl\l  ret i32 %add\l}"];
+}

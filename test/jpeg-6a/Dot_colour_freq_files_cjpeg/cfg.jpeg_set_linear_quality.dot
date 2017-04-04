@@ -1,0 +1,5 @@
+digraph "CFG for 'jpeg_set_linear_quality' function" {
+	label="CFG for 'jpeg_set_linear_quality' function";
+
+	Node0x66001c0 [shape=record,label="{entry:\l  tail call void @jpeg_add_quant_table(%struct.jpeg_compress_struct* %cinfo,\l... i32 0, i32* getelementptr inbounds ([64 x i32], [64 x i32]*\l... @jpeg_set_linear_quality.std_luminance_quant_tbl, i64 0, i64 0), i32\l... %scale_factor, i32 %force_baseline)\l  tail call void @jpeg_add_quant_table(%struct.jpeg_compress_struct* %cinfo,\l... i32 1, i32* getelementptr inbounds ([64 x i32], [64 x i32]*\l... @jpeg_set_linear_quality.std_chrominance_quant_tbl, i64 0, i64 0), i32\l... %scale_factor, i32 %force_baseline)\l  ret void\l}"];
+}

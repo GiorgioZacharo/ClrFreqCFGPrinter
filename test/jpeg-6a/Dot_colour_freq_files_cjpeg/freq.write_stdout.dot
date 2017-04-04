@@ -1,0 +1,5 @@
+digraph "CFG for 'write_stdout' function" {
+	label="CFG for 'write_stdout' function";
+
+	Node0x6446930 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  %0 = load %struct._IO_FILE*, %struct._IO_FILE** @stdout, align 8, !tbaa !3\l  ret %struct._IO_FILE* %0\l}"];
+}

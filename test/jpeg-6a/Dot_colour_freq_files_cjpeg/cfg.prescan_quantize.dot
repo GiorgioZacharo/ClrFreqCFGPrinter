@@ -1,0 +1,20 @@
+digraph "CFG for 'prescan_quantize' function" {
+	label="CFG for 'prescan_quantize' function";
+
+	Node0x6276700 [shape=record,label="{entry:\l  %cquantize1 = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 83\l  %0 = bitcast %struct.jpeg_color_quantizer** %cquantize1 to\l... %struct.my_cquantizer**\l  %1 = load %struct.my_cquantizer*, %struct.my_cquantizer** %0, align 8, !tbaa\l... !2\l  %histogram2 = getelementptr inbounds %struct.my_cquantizer,\l... %struct.my_cquantizer* %1, i64 0, i32 3\l  %2 = load [32 x i16]**, [32 x i16]*** %histogram2, align 8, !tbaa !10\l  %output_width = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 26\l  %3 = load i32, i32* %output_width, align 8, !tbaa !13\l  %cmp50 = icmp slt i32 %num_rows, 1\l  %cmp447 = icmp eq i32 %3, 0\l  %or.cond = or i1 %cmp50, %cmp447\l  br i1 %or.cond, label %for.end25, label %for.body.preheader\l|{<s0>T|<s1>F}}"];
+	Node0x6276700:s0 -> Node0x626afb0;
+	Node0x6276700:s1 -> Node0x626b0c0;
+	Node0x626b0c0 [shape=record,label="{for.body.preheader:                               \l  br label %for.body\l}"];
+	Node0x626b0c0 -> Node0x626b370;
+	Node0x626b370 [shape=record,label="{for.body:                                         \l  %indvars.iv = phi i64 [ %indvars.iv.next, %for.inc23 ], [ 0,\l... %for.body.preheader ]\l  %arrayidx = getelementptr inbounds i8*, i8** %input_buf, i64 %indvars.iv\l  %4 = load i8*, i8** %arrayidx, align 8, !tbaa !14\l  br label %for.body5\l}"];
+	Node0x626b370 -> Node0x626b720;
+	Node0x626b720 [shape=record,label="{for.body5:                                        \l  %ptr.049 = phi i8* [ %4, %for.body ], [ %add.ptr, %for.body5 ]\l  %col.048 = phi i32 [ %3, %for.body ], [ %dec22, %for.body5 ]\l  %arrayidx6 = getelementptr inbounds i8, i8* %ptr.049, i64 2\l  %5 = load i8, i8* %arrayidx6, align 1, !tbaa !15\l  %conv = zext i8 %5 to i64\l  %shr41 = lshr i64 %conv, 3\l  %arrayidx8 = getelementptr inbounds i8, i8* %ptr.049, i64 1\l  %6 = load i8, i8* %arrayidx8, align 1, !tbaa !15\l  %conv9 = zext i8 %6 to i64\l  %shr1043 = lshr i64 %conv9, 2\l  %7 = load i8, i8* %ptr.049, align 1, !tbaa !15\l  %conv13 = zext i8 %7 to i64\l  %shr1445 = lshr i64 %conv13, 3\l  %arrayidx16 = getelementptr inbounds [32 x i16]*, [32 x i16]** %2, i64\l... %shr1445\l  %8 = load [32 x i16]*, [32 x i16]** %arrayidx16, align 8, !tbaa !14\l  %arrayidx18 = getelementptr inbounds [32 x i16], [32 x i16]* %8, i64\l... %shr1043, i64 %shr41\l  %9 = load i16, i16* %arrayidx18, align 2, !tbaa !16\l  %inc = add i16 %9, 1\l  %cmp20 = icmp eq i16 %inc, 0\l  %.inc = select i1 %cmp20, i16 %9, i16 %inc\l  store i16 %.inc, i16* %arrayidx18, align 2, !tbaa !16\l  %add.ptr = getelementptr inbounds i8, i8* %ptr.049, i64 3\l  %dec22 = add i32 %col.048, -1\l  %cmp4 = icmp eq i32 %dec22, 0\l  br i1 %cmp4, label %for.inc23, label %for.body5\l|{<s0>T|<s1>F}}"];
+	Node0x626b720:s0 -> Node0x626b3f0;
+	Node0x626b720:s1 -> Node0x626b720;
+	Node0x626b3f0 [shape=record,label="{for.inc23:                                        \l  %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1\l  %lftr.wideiv = trunc i64 %indvars.iv.next to i32\l  %exitcond53 = icmp eq i32 %lftr.wideiv, %num_rows\l  br i1 %exitcond53, label %for.end25.loopexit, label %for.body\l|{<s0>T|<s1>F}}"];
+	Node0x626b3f0:s0 -> Node0x6280800;
+	Node0x626b3f0:s1 -> Node0x626b370;
+	Node0x6280800 [shape=record,label="{for.end25.loopexit:                               \l  br label %for.end25\l}"];
+	Node0x6280800 -> Node0x626afb0;
+	Node0x626afb0 [shape=record,label="{for.end25:                                        \l  ret void\l}"];
+}

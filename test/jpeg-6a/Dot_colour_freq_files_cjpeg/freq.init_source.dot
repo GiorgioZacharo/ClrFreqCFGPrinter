@@ -1,0 +1,5 @@
+digraph "CFG for 'init_source' function" {
+	label="CFG for 'init_source' function";
+
+	Node0x4e28df0 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  %src1 = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 5\l  %0 = bitcast %struct.jpeg_source_mgr** %src1 to %struct.my_source_mgr**\l  %1 = load %struct.my_source_mgr*, %struct.my_source_mgr** %0, align 8, !tbaa\l... !2\l  %start_of_file = getelementptr inbounds %struct.my_source_mgr,\l... %struct.my_source_mgr* %1, i64 0, i32 3\l  store i32 1, i32* %start_of_file, align 8, !tbaa !10\l  ret void\l}"];
+}

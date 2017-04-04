@@ -1,0 +1,15 @@
+digraph "CFG for 'read_non_rle_pixel' function" {
+	label="CFG for 'read_non_rle_pixel' function";
+
+	Node0x4eaa700 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  %input_file = getelementptr inbounds %struct._tga_source_struct,\l... %struct._tga_source_struct* %sinfo, i64 0, i32 0, i32 3\l  %0 = load %struct._IO_FILE*, %struct._IO_FILE** %input_file, align 8, !tbaa\l... !3\l  %pixel_size = getelementptr inbounds %struct._tga_source_struct,\l... %struct._tga_source_struct* %sinfo, i64 0, i32 7\l  %1 = load i32, i32* %pixel_size, align 4, !tbaa !10\l  %cmp7 = icmp sgt i32 %1, 0\l  br i1 %cmp7, label %for.body.preheader, label %for.end\l|{<s0>T|<s1>F}}"];
+	Node0x4eaa700:s0 -> Node0x4eaa9b0;
+	Node0x4eaa700:s1 -> Node0x4eaaab0;
+	Node0x4eaa9b0 [shape=record, style = filled, fillcolor = blue, label="{for.body.preheader:                               \l  br label %for.body\l}"];
+	Node0x4eaa9b0 -> Node0x4eaac10;
+	Node0x4eaac10 [shape=record, style = filled, fillcolor = blue, label="{for.body:                                         \l  %indvars.iv = phi i64 [ %indvars.iv.next, %for.body ], [ 0,\l... %for.body.preheader ]\l  %call = tail call i32 @_IO_getc(%struct._IO_FILE* %0)\l  %conv = trunc i32 %call to i8\l  %arrayidx = getelementptr inbounds %struct._tga_source_struct,\l... %struct._tga_source_struct* %sinfo, i64 0, i32 6, i64 %indvars.iv\l  store i8 %conv, i8* %arrayidx, align 1, !tbaa !11\l  %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1\l  %2 = load i32, i32* %pixel_size, align 4, !tbaa !10\l  %3 = sext i32 %2 to i64\l  %cmp = icmp slt i64 %indvars.iv.next, %3\l  br i1 %cmp, label %for.body, label %for.end.loopexit\l|{<s0>T|<s1>F}}"];
+	Node0x4eaac10:s0 -> Node0x4eaac10;
+	Node0x4eaac10:s1 -> Node0x4eab380;
+	Node0x4eab380 [shape=record, style = filled, fillcolor = blue, label="{for.end.loopexit:                                 \l  br label %for.end\l}"];
+	Node0x4eab380 -> Node0x4eaaab0;
+	Node0x4eaaab0 [shape=record, style = filled, fillcolor = blue, label="{for.end:                                          \l  ret void\l}"];
+}

@@ -1,0 +1,5 @@
+digraph "CFG for 'new_color_map_2_quant' function" {
+	label="CFG for 'new_color_map_2_quant' function";
+
+	Node0x6272300 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  %cquantize1 = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 83\l  %0 = bitcast %struct.jpeg_color_quantizer** %cquantize1 to\l... %struct.my_cquantizer**\l  %1 = load %struct.my_cquantizer*, %struct.my_cquantizer** %0, align 8, !tbaa\l... !2\l  %needs_zeroed = getelementptr inbounds %struct.my_cquantizer,\l... %struct.my_cquantizer* %1, i64 0, i32 4\l  store i32 1, i32* %needs_zeroed, align 8, !tbaa !10\l  ret void\l}"];
+}

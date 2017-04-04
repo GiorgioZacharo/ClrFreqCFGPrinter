@@ -1,0 +1,5 @@
+digraph "CFG for 'jcopy_block_row' function" {
+	label="CFG for 'jcopy_block_row' function";
+
+	Node0x57f31c0 [shape=record,label="{entry:\l  %0 = bitcast [64 x i16]* %output_row to i8*\l  %1 = bitcast [64 x i16]* %input_row to i8*\l  %conv = zext i32 %num_blocks to i64\l  %mul = shl nuw nsw i64 %conv, 7\l  tail call void @llvm.memcpy.p0i8.p0i8.i64(i8* %0, i8* %1, i64 %mul, i32 1,\l... i1 false)\l  ret void\l}"];
+}

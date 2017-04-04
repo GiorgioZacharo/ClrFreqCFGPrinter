@@ -1,0 +1,10 @@
+digraph "CFG for 'jpeg_destroy' function" {
+	label="CFG for 'jpeg_destroy' function";
+
+	Node0x697e1c0 [shape=record, style = filled, fillcolor = skyblue, label="{entry:\l  %mem = getelementptr inbounds %struct.jpeg_common_struct,\l... %struct.jpeg_common_struct* %cinfo, i64 0, i32 1\l  %0 = load %struct.jpeg_memory_mgr*, %struct.jpeg_memory_mgr** %mem, align 8,\l... !tbaa !3\l  %cmp = icmp eq %struct.jpeg_memory_mgr* %0, null\l  br i1 %cmp, label %if.end, label %if.then, !prof !9\l|{<s0>T|<s1>F}}"];
+	Node0x697e1c0:s0 -> Node0x697ee20;
+	Node0x697e1c0:s1 -> Node0x697eef0;
+	Node0x697eef0 [shape=record, style = filled, fillcolor = blue, label="{if.then:                                          \l  %self_destruct = getelementptr inbounds %struct.jpeg_memory_mgr,\l... %struct.jpeg_memory_mgr* %0, i64 0, i32 10\l  %self_destruct2 = bitcast \{\}** %self_destruct to void\l... (%struct.jpeg_common_struct*)**\l  %1 = load void (%struct.jpeg_common_struct*)*, void\l... (%struct.jpeg_common_struct*)** %self_destruct2, align 8, !tbaa !10\l  tail call void %1(%struct.jpeg_common_struct* nonnull %cinfo) #1\l  br label %if.end\l}"];
+	Node0x697eef0 -> Node0x697ee20;
+	Node0x697ee20 [shape=record, style = filled, fillcolor = skyblue, label="{if.end:                                           \l  store %struct.jpeg_memory_mgr* null, %struct.jpeg_memory_mgr** %mem, align\l... 8, !tbaa !3\l  %global_state = getelementptr inbounds %struct.jpeg_common_struct,\l... %struct.jpeg_common_struct* %cinfo, i64 0, i32 4\l  store i32 0, i32* %global_state, align 4, !tbaa !13\l  ret void\l}"];
+}

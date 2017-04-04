@@ -1,0 +1,15 @@
+digraph "CFG for 'get_8bit_gray_row' function" {
+	label="CFG for 'get_8bit_gray_row' function";
+
+	Node0x4e9c5e0 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  %0 = bitcast %struct.cjpeg_source_struct* %sinfo to\l... %struct._tga_source_struct*\l  %image_width = getelementptr inbounds %struct.jpeg_compress_struct,\l... %struct.jpeg_compress_struct* %cinfo, i64 0, i32 6\l  %1 = load i32, i32* %image_width, align 8, !tbaa !3\l  %cmp10 = icmp eq i32 %1, 0\l  br i1 %cmp10, label %for.end, label %for.body.lr.ph\l|{<s0>T|<s1>F}}"];
+	Node0x4e9c5e0:s0 -> Node0x4e9c770;
+	Node0x4e9c5e0:s1 -> Node0x4e9c840;
+	Node0x4e9c840 [shape=record, style = filled, fillcolor = blue, label="{for.body.lr.ph:                                   \l  %buffer = getelementptr inbounds %struct.cjpeg_source_struct,\l... %struct.cjpeg_source_struct* %sinfo, i64 0, i32 4\l  %2 = load i8**, i8*** %buffer, align 8, !tbaa !11\l  %3 = load i8*, i8** %2, align 8, !tbaa !14\l  %read_pixel = getelementptr inbounds %struct.cjpeg_source_struct,\l... %struct.cjpeg_source_struct* %sinfo, i64 1, i32 4\l  %4 = bitcast i8*** %read_pixel to void (%struct._tga_source_struct*)**\l  %tga_pixel = getelementptr inbounds %struct.cjpeg_source_struct,\l... %struct.cjpeg_source_struct* %sinfo, i64 1, i32 5\l  %arrayidx1 = bitcast i32* %tga_pixel to i8*\l  br label %for.body\l}"];
+	Node0x4e9c840 -> Node0x4e9cdb0;
+	Node0x4e9cdb0 [shape=record, style = filled, fillcolor = blue, label="{for.body:                                         \l  %col.012 = phi i32 [ %1, %for.body.lr.ph ], [ %dec, %for.body ]\l  %ptr.011 = phi i8* [ %3, %for.body.lr.ph ], [ %incdec.ptr, %for.body ]\l  %5 = load void (%struct._tga_source_struct*)*, void\l... (%struct._tga_source_struct*)** %4, align 8, !tbaa !15\l  tail call void %5(%struct._tga_source_struct* nonnull %0) #4\l  %6 = load i8, i8* %arrayidx1, align 8, !tbaa !16\l  %incdec.ptr = getelementptr inbounds i8, i8* %ptr.011, i64 1\l  store i8 %6, i8* %ptr.011, align 1, !tbaa !16\l  %dec = add i32 %col.012, -1\l  %cmp = icmp eq i32 %dec, 0\l  br i1 %cmp, label %for.end.loopexit, label %for.body\l|{<s0>T|<s1>F}}"];
+	Node0x4e9cdb0:s0 -> Node0x4e9d690;
+	Node0x4e9cdb0:s1 -> Node0x4e9cdb0;
+	Node0x4e9d690 [shape=record, style = filled, fillcolor = blue, label="{for.end.loopexit:                                 \l  br label %for.end\l}"];
+	Node0x4e9d690 -> Node0x4e9c770;
+	Node0x4e9c770 [shape=record, style = filled, fillcolor = blue, label="{for.end:                                          \l  ret i32 1\l}"];
+}

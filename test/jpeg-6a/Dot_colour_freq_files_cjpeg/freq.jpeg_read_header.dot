@@ -1,0 +1,25 @@
+digraph "CFG for 'jpeg_read_header' function" {
+	label="CFG for 'jpeg_read_header' function";
+
+	Node0x514d460 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  %global_state = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 4\l  %0 = load i32, i32* %global_state, align 4, !tbaa !2\l  %1 = and i32 %0, -2\l  %switch = icmp eq i32 %1, 200\l  br i1 %switch, label %if.end, label %if.then\l|{<s0>T|<s1>F}}"];
+	Node0x514d460:s0 -> Node0x514dcc0;
+	Node0x514d460:s1 -> Node0x514dd90;
+	Node0x514dd90 [shape=record, style = filled, fillcolor = blue, label="{if.then:                                          \l  %err = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 0\l  %2 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8,\l... !tbaa !10\l  %msg_code = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %2, i64 0, i32 5\l  store i32 18, i32* %msg_code, align 8, !tbaa !11\l  %arrayidx = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %2, i64 0, i32 6, i32 0, i64 0\l  store i32 %0, i32* %arrayidx, align 4, !tbaa !14\l  %error_exit = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %2, i64 0, i32 0\l  %3 = load void (%struct.jpeg_common_struct*)*, void\l... (%struct.jpeg_common_struct*)** %error_exit, align 8, !tbaa !15\l  %4 = bitcast %struct.jpeg_decompress_struct* %cinfo to\l... %struct.jpeg_common_struct*\l  tail call void %3(%struct.jpeg_common_struct* %4) #3\l  br label %if.end\l}"];
+	Node0x514dd90 -> Node0x514dcc0;
+	Node0x514dcc0 [shape=record, style = filled, fillcolor = blue, label="{if.end:                                           \l  %call = tail call i32 @jpeg_consume_input(%struct.jpeg_decompress_struct*\l... nonnull %cinfo)\l  switch i32 %call, label %sw.epilog [\l    i32 1, label %sw.bb\l    i32 2, label %sw.bb6\l  ]\l|{<s0>def|<s1>1|<s2>2}}"];
+	Node0x514dcc0:s0 -> Node0x514e850;
+	Node0x514dcc0:s1 -> Node0x514d390;
+	Node0x514dcc0:s2 -> Node0x514eaa0;
+	Node0x514d390 [shape=record, style = filled, fillcolor = blue, label="{sw.bb:                                            \l  br label %sw.epilog\l}"];
+	Node0x514d390 -> Node0x514e850;
+	Node0x514eaa0 [shape=record, style = filled, fillcolor = blue, label="{sw.bb6:                                           \l  %tobool = icmp eq i32 %require_image, 0\l  br i1 %tobool, label %sw.bb6.if.end12_crit_edge, label %if.then7\l|{<s0>T|<s1>F}}"];
+	Node0x514eaa0:s0 -> Node0x514ed40;
+	Node0x514eaa0:s1 -> Node0x514ee00;
+	Node0x514ed40 [shape=record, style = filled, fillcolor = blue, label="{sw.bb6.if.end12_crit_edge:                        \l  %.pre = bitcast %struct.jpeg_decompress_struct* %cinfo to\l... %struct.jpeg_common_struct*\l  br label %if.end12\l}"];
+	Node0x514ed40 -> Node0x514ef90;
+	Node0x514ee00 [shape=record, style = filled, fillcolor = blue, label="{if.then7:                                         \l  %err8 = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 0\l  %5 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err8, align 8,\l... !tbaa !10\l  %msg_code9 = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %5, i64 0, i32 5\l  store i32 50, i32* %msg_code9, align 8, !tbaa !11\l  %error_exit11 = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %5, i64 0, i32 0\l  %6 = load void (%struct.jpeg_common_struct*)*, void\l... (%struct.jpeg_common_struct*)** %error_exit11, align 8, !tbaa !15\l  %7 = bitcast %struct.jpeg_decompress_struct* %cinfo to\l... %struct.jpeg_common_struct*\l  tail call void %6(%struct.jpeg_common_struct* %7) #3\l  br label %if.end12\l}"];
+	Node0x514ee00 -> Node0x514ef90;
+	Node0x514ef90 [shape=record, style = filled, fillcolor = blue, label="{if.end12:                                         \l  %.pre-phi = phi %struct.jpeg_common_struct* [ %.pre,\l... %sw.bb6.if.end12_crit_edge ], [ %7, %if.then7 ]\l  tail call void @jpeg_abort(%struct.jpeg_common_struct* %.pre-phi) #3\l  br label %sw.epilog\l}"];
+	Node0x514ef90 -> Node0x514e850;
+	Node0x514e850 [shape=record, style = filled, fillcolor = blue, label="{sw.epilog:                                        \l  %retcode.0 = phi i32 [ %call, %if.end ], [ 2, %if.end12 ], [ 1, %sw.bb ]\l  ret i32 %retcode.0\l}"];
+}

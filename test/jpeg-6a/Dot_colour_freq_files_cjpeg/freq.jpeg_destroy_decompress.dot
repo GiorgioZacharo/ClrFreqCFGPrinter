@@ -1,0 +1,5 @@
+digraph "CFG for 'jpeg_destroy_decompress' function" {
+	label="CFG for 'jpeg_destroy_decompress' function";
+
+	Node0x514a060 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  %0 = bitcast %struct.jpeg_decompress_struct* %cinfo to\l... %struct.jpeg_common_struct*\l  tail call void @jpeg_destroy(%struct.jpeg_common_struct* %0) #3\l  ret void\l}"];
+}

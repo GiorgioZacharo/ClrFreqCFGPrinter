@@ -1,0 +1,126 @@
+; ModuleID = 'cdjpeg.c'
+target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+%struct._IO_FILE = type { i32, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i8*, %struct._IO_marker*, %struct._IO_FILE*, i32, i32, i64, i16, i8, [1 x i8], i8*, i64, i8*, i8*, i8*, i8*, i64, i32, [20 x i8] }
+%struct._IO_marker = type { %struct._IO_marker*, %struct._IO_FILE*, i32 }
+
+@stdin = external global %struct._IO_FILE*, align 8
+@stdout = external global %struct._IO_FILE*, align 8
+
+; Function Attrs: nounwind readonly uwtable
+define i32 @keymatch(i8* nocapture readonly %arg, i8* nocapture readonly %keyword, i32 %minchars) #0 !prof !2 {
+entry:
+  %0 = load i8, i8* %arg, align 1, !tbaa !3
+  %cmp31 = icmp eq i8 %0, 0
+  br i1 %cmp31, label %while.end, label %while.body.preheader, !prof !6
+
+while.body.preheader:                             ; preds = %entry
+  br label %while.body
+
+while.body:                                       ; preds = %while.body.preheader, %if.end13
+  %conv35.in = phi i8 [ %7, %if.end13 ], [ %0, %while.body.preheader ]
+  %incdec.ptr34.pn = phi i8* [ %incdec.ptr34, %if.end13 ], [ %arg, %while.body.preheader ]
+  %nmatched.033 = phi i32 [ %inc, %if.end13 ], [ 0, %while.body.preheader ]
+  %keyword.addr.032 = phi i8* [ %incdec.ptr2, %if.end13 ], [ %keyword, %while.body.preheader ]
+  %incdec.ptr34 = getelementptr inbounds i8, i8* %incdec.ptr34.pn, i64 1
+  %conv35 = sext i8 %conv35.in to i32
+  %incdec.ptr2 = getelementptr inbounds i8, i8* %keyword.addr.032, i64 1
+  %1 = load i8, i8* %keyword.addr.032, align 1, !tbaa !3
+  %conv3 = sext i8 %1 to i32
+  %cmp4 = icmp eq i8 %1, 0
+  br i1 %cmp4, label %cleanup.loopexit, label %if.end, !prof !7
+
+if.end:                                           ; preds = %while.body
+  %idxprom = sext i8 %conv35.in to i64
+  %call = tail call i16** @__ctype_b_loc() #3
+  %2 = load i16*, i16** %call, align 8, !tbaa !8
+  %arrayidx = getelementptr inbounds i16, i16* %2, i64 %idxprom
+  %3 = load i16, i16* %arrayidx, align 2, !tbaa !10
+  %and = and i16 %3, 256
+  %tobool = icmp ne i16 %and, 0
+  %__c.off.i = add nsw i32 %conv35, 128
+  %4 = icmp ult i32 %__c.off.i, 384
+  %or.cond = and i1 %4, %tobool
+  br i1 %or.cond, label %cond.true.i, label %if.end9
+
+cond.true.i:                                      ; preds = %if.end
+  %call.i = tail call i32** @__ctype_tolower_loc() #3
+  %5 = load i32*, i32** %call.i, align 8, !tbaa !8
+  %arrayidx.i = getelementptr inbounds i32, i32* %5, i64 %idxprom
+  %6 = load i32, i32* %arrayidx.i, align 4, !tbaa !12
+  br label %if.end9
+
+if.end9:                                          ; preds = %if.end, %cond.true.i
+  %ca.0 = phi i32 [ %conv35, %if.end ], [ %6, %cond.true.i ]
+  %cmp10 = icmp eq i32 %ca.0, %conv3
+  br i1 %cmp10, label %if.end13, label %cleanup.loopexit, !prof !14
+
+if.end13:                                         ; preds = %if.end9
+  %inc = add nuw nsw i32 %nmatched.033, 1
+  %7 = load i8, i8* %incdec.ptr34, align 1, !tbaa !3
+  %cmp = icmp eq i8 %7, 0
+  br i1 %cmp, label %while.end.loopexit, label %while.body, !prof !6
+
+while.end.loopexit:                               ; preds = %if.end13
+  %inc.lcssa = phi i32 [ %inc, %if.end13 ]
+  br label %while.end
+
+while.end:                                        ; preds = %while.end.loopexit, %entry
+  %nmatched.0.lcssa = phi i32 [ 0, %entry ], [ %inc.lcssa, %while.end.loopexit ]
+  %not.cmp14 = icmp sge i32 %nmatched.0.lcssa, %minchars
+  %. = zext i1 %not.cmp14 to i32
+  br label %cleanup
+
+cleanup.loopexit:                                 ; preds = %while.body, %if.end9
+  br label %cleanup
+
+cleanup:                                          ; preds = %cleanup.loopexit, %while.end
+  %retval.0 = phi i32 [ %., %while.end ], [ 0, %cleanup.loopexit ]
+  ret i32 %retval.0
+}
+
+; Function Attrs: nounwind readnone
+declare i16** @__ctype_b_loc() #1
+
+; Function Attrs: norecurse nounwind readonly uwtable
+define %struct._IO_FILE* @read_stdin() #2 !prof !15 {
+entry:
+  %0 = load %struct._IO_FILE*, %struct._IO_FILE** @stdin, align 8, !tbaa !8
+  ret %struct._IO_FILE* %0
+}
+
+; Function Attrs: norecurse nounwind readonly uwtable
+define %struct._IO_FILE* @write_stdout() #2 !prof !15 {
+entry:
+  %0 = load %struct._IO_FILE*, %struct._IO_FILE** @stdout, align 8, !tbaa !8
+  ret %struct._IO_FILE* %0
+}
+
+; Function Attrs: nounwind readnone
+declare i32** @__ctype_tolower_loc() #1
+
+attributes #0 = { nounwind readonly uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #1 = { nounwind readnone "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #2 = { norecurse nounwind readonly uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #3 = { nounwind readnone }
+
+!llvm.module.flags = !{!0}
+!llvm.ident = !{!1}
+
+!0 = !{i32 1, !"MaxFunctionCount", i32 150581}
+!1 = !{!"clang version 3.8.0 (trunk 257473)"}
+!2 = !{!"function_entry_count", i64 72}
+!3 = !{!4, !4, i64 0}
+!4 = !{!"omnipotent char", !5, i64 0}
+!5 = !{!"Simple C/C++ TBAA"}
+!6 = !{!"branch_weights", i32 11, i32 121}
+!7 = !{!"branch_weights", i32 1, i32 121}
+!8 = !{!9, !9, i64 0}
+!9 = !{!"any pointer", !4, i64 0}
+!10 = !{!11, !11, i64 0}
+!11 = !{!"short", !4, i64 0}
+!12 = !{!13, !13, i64 0}
+!13 = !{!"int", !4, i64 0}
+!14 = !{!"branch_weights", i32 59, i32 63}
+!15 = !{!"function_entry_count", i64 0}

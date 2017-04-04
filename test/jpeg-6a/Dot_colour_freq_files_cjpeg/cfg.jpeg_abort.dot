@@ -1,0 +1,5 @@
+digraph "CFG for 'jpeg_abort' function" {
+	label="CFG for 'jpeg_abort' function";
+
+	Node0x697b3f0 [shape=record,label="{entry:\l  %mem = getelementptr inbounds %struct.jpeg_common_struct,\l... %struct.jpeg_common_struct* %cinfo, i64 0, i32 1\l  %0 = load %struct.jpeg_memory_mgr*, %struct.jpeg_memory_mgr** %mem, align 8,\l... !tbaa !3\l  %free_pool = getelementptr inbounds %struct.jpeg_memory_mgr,\l... %struct.jpeg_memory_mgr* %0, i64 0, i32 9\l  %1 = load void (%struct.jpeg_common_struct*, i32)*, void\l... (%struct.jpeg_common_struct*, i32)** %free_pool, align 8, !tbaa !9\l  tail call void %1(%struct.jpeg_common_struct* %cinfo, i32 1) #1\l  %is_decompressor = getelementptr inbounds %struct.jpeg_common_struct,\l... %struct.jpeg_common_struct* %cinfo, i64 0, i32 3\l  %2 = load i32, i32* %is_decompressor, align 8, !tbaa !12\l  %tobool = icmp ne i32 %2, 0\l  %cond = select i1 %tobool, i32 200, i32 100\l  %global_state = getelementptr inbounds %struct.jpeg_common_struct,\l... %struct.jpeg_common_struct* %cinfo, i64 0, i32 4\l  store i32 %cond, i32* %global_state, align 4, !tbaa !13\l  ret void\l}"];
+}

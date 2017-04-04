@@ -1,0 +1,25 @@
+digraph "CFG for 'pass2_no_dither' function" {
+	label="CFG for 'pass2_no_dither' function";
+
+	Node0x627c5a0 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  %cquantize1 = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 83\l  %0 = bitcast %struct.jpeg_color_quantizer** %cquantize1 to\l... %struct.my_cquantizer**\l  %1 = load %struct.my_cquantizer*, %struct.my_cquantizer** %0, align 8, !tbaa\l... !2\l  %histogram2 = getelementptr inbounds %struct.my_cquantizer,\l... %struct.my_cquantizer* %1, i64 0, i32 3\l  %2 = load [32 x i16]**, [32 x i16]*** %histogram2, align 8, !tbaa !10\l  %output_width = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 26\l  %3 = load i32, i32* %output_width, align 8, !tbaa !13\l  %cmp61 = icmp slt i32 %num_rows, 1\l  %cmp657 = icmp eq i32 %3, 0\l  %or.cond = or i1 %cmp61, %cmp657\l  br i1 %or.cond, label %for.end27, label %for.body.preheader\l|{<s0>T|<s1>F}}"];
+	Node0x627c5a0:s0 -> Node0x627cb00;
+	Node0x627c5a0:s1 -> Node0x627cc10;
+	Node0x627cc10 [shape=record, style = filled, fillcolor = blue, label="{for.body.preheader:                               \l  br label %for.body\l}"];
+	Node0x627cc10 -> Node0x627cec0;
+	Node0x627cec0 [shape=record, style = filled, fillcolor = blue, label="{for.body:                                         \l  %indvars.iv = phi i64 [ %indvars.iv.next, %for.inc26 ], [ 0,\l... %for.body.preheader ]\l  %arrayidx = getelementptr inbounds i8*, i8** %input_buf, i64 %indvars.iv\l  %4 = load i8*, i8** %arrayidx, align 8, !tbaa !14\l  %arrayidx4 = getelementptr inbounds i8*, i8** %output_buf, i64 %indvars.iv\l  %5 = load i8*, i8** %arrayidx4, align 8, !tbaa !14\l  br label %for.body7\l}"];
+	Node0x627cec0 -> Node0x627d360;
+	Node0x627d360 [shape=record, style = filled, fillcolor = blue, label="{for.body7:                                        \l  %inptr.060 = phi i8* [ %4, %for.body ], [ %incdec.ptr11, %if.end ]\l  %col.059 = phi i32 [ %3, %for.body ], [ %dec, %if.end ]\l  %outptr.058 = phi i8* [ %5, %for.body ], [ %incdec.ptr25, %if.end ]\l  %incdec.ptr = getelementptr inbounds i8, i8* %inptr.060, i64 1\l  %6 = load i8, i8* %inptr.060, align 1, !tbaa !15\l  %conv = zext i8 %6 to i32\l  %shr51 = lshr i32 %conv, 3\l  %incdec.ptr8 = getelementptr inbounds i8, i8* %inptr.060, i64 2\l  %7 = load i8, i8* %incdec.ptr, align 1, !tbaa !15\l  %conv9 = zext i8 %7 to i32\l  %shr1052 = lshr i32 %conv9, 2\l  %incdec.ptr11 = getelementptr inbounds i8, i8* %inptr.060, i64 3\l  %8 = load i8, i8* %incdec.ptr8, align 1, !tbaa !15\l  %conv12 = zext i8 %8 to i32\l  %shr1353 = lshr i32 %conv12, 3\l  %idxprom1454 = zext i32 %shr1353 to i64\l  %idxprom1555 = zext i32 %shr1052 to i64\l  %idxprom1656 = zext i32 %shr51 to i64\l  %arrayidx17 = getelementptr inbounds [32 x i16]*, [32 x i16]** %2, i64\l... %idxprom1656\l  %9 = load [32 x i16]*, [32 x i16]** %arrayidx17, align 8, !tbaa !14\l  %arrayidx19 = getelementptr inbounds [32 x i16], [32 x i16]* %9, i64\l... %idxprom1555, i64 %idxprom1454\l  %10 = load i16, i16* %arrayidx19, align 2, !tbaa !16\l  %cmp21 = icmp eq i16 %10, 0\l  br i1 %cmp21, label %if.then, label %if.end\l|{<s0>T|<s1>F}}"];
+	Node0x627d360:s0 -> Node0x627d220;
+	Node0x627d360:s1 -> Node0x627d4d0;
+	Node0x627d220 [shape=record, style = filled, fillcolor = blue, label="{if.then:                                          \l  tail call fastcc void @fill_inverse_cmap(%struct.jpeg_decompress_struct*\l... %cinfo, i32 %shr51, i32 %shr1052, i32 %shr1353)\l  %.pre = load i16, i16* %arrayidx19, align 2, !tbaa !16\l  br label %if.end\l}"];
+	Node0x627d220 -> Node0x627d4d0;
+	Node0x627d4d0 [shape=record, style = filled, fillcolor = blue, label="{if.end:                                           \l  %11 = phi i16 [ %.pre, %if.then ], [ %10, %for.body7 ]\l  %conv23 = trunc i16 %11 to i8\l  %sub = add i8 %conv23, -1\l  %incdec.ptr25 = getelementptr inbounds i8, i8* %outptr.058, i64 1\l  store i8 %sub, i8* %outptr.058, align 1, !tbaa !15\l  %dec = add i32 %col.059, -1\l  %cmp6 = icmp eq i32 %dec, 0\l  br i1 %cmp6, label %for.inc26, label %for.body7\l|{<s0>T|<s1>F}}"];
+	Node0x627d4d0:s0 -> Node0x627cf40;
+	Node0x627d4d0:s1 -> Node0x627d360;
+	Node0x627cf40 [shape=record, style = filled, fillcolor = blue, label="{for.inc26:                                        \l  %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1\l  %lftr.wideiv = trunc i64 %indvars.iv.next to i32\l  %exitcond64 = icmp eq i32 %lftr.wideiv, %num_rows\l  br i1 %exitcond64, label %for.end27.loopexit, label %for.body\l|{<s0>T|<s1>F}}"];
+	Node0x627cf40:s0 -> Node0x62acf90;
+	Node0x627cf40:s1 -> Node0x627cec0;
+	Node0x62acf90 [shape=record, style = filled, fillcolor = blue, label="{for.end27.loopexit:                               \l  br label %for.end27\l}"];
+	Node0x62acf90 -> Node0x627cb00;
+	Node0x627cb00 [shape=record, style = filled, fillcolor = blue, label="{for.end27:                                        \l  ret void\l}"];
+}

@@ -1,0 +1,5 @@
+digraph "CFG for 'jround_up' function" {
+	label="CFG for 'jround_up' function";
+
+	Node0x57eeca0 [shape=record,label="{entry:\l  %sub = add i64 %a, -1\l  %add = add i64 %sub, %b\l  %rem = srem i64 %add, %b\l  %sub1 = sub nsw i64 %add, %rem\l  ret i64 %sub1\l}"];
+}

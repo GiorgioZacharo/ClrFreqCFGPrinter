@@ -1,0 +1,5 @@
+digraph "CFG for 'start_pass_downsample' function" {
+	label="CFG for 'start_pass_downsample' function";
+
+	Node0x58aa8b0 [shape=record,label="{entry:\l  ret void\l}"];
+}

@@ -1,0 +1,5 @@
+digraph "CFG for 'fullsize_upsample' function" {
+	label="CFG for 'fullsize_upsample' function";
+
+	Node0x5cb2a30 [shape=record,label="{entry:\l  store i8** %input_data, i8*** %output_data_ptr, align 8, !tbaa !2\l  ret void\l}"];
+}

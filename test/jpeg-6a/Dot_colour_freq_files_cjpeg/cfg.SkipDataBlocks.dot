@@ -1,0 +1,27 @@
+digraph "CFG for 'SkipDataBlocks' function" {
+	label="CFG for 'SkipDataBlocks' function";
+
+	Node0x6a01bd0 [shape=record,label="{entry:\l  %buf = alloca [256 x i8], align 16\l  %0 = getelementptr inbounds [256 x i8], [256 x i8]* %buf, i64 0, i64 0\l  call void @llvm.lifetime.start(i64 256, i8* %0) #4\l  %input_file.i.i = getelementptr inbounds %struct.gif_source_struct,\l... %struct.gif_source_struct* %sinfo, i64 0, i32 0, i32 3\l  %1 = load %struct._IO_FILE*, %struct._IO_FILE** %input_file.i.i, align 8,\l... !tbaa !3\l  %call.i.i2 = tail call i32 @_IO_getc(%struct._IO_FILE* %1) #4\l  %cmp.i.i3 = icmp eq i32 %call.i.i2, -1\l  %.pre = getelementptr inbounds %struct.gif_source_struct,\l... %struct.gif_source_struct* %sinfo, i64 0, i32 1\l  br i1 %cmp.i.i3, label %ReadByte.exit.thread.i, label\l... %ReadByte.exit.i.preheader\l|{<s0>T|<s1>F}}"];
+	Node0x6a01bd0:s0 -> Node0x6a021b0;
+	Node0x6a01bd0:s1 -> Node0x6a02250;
+	Node0x6a02250 [shape=record,label="{ReadByte.exit.i.preheader:                        \l  br label %ReadByte.exit.i\l}"];
+	Node0x6a02250 -> Node0x6a023a0;
+	Node0x6a02450 [shape=record,label="{ReadByte.exit.thread.i.loopexit:                  \l  br label %ReadByte.exit.thread.i\l}"];
+	Node0x6a02450 -> Node0x6a021b0;
+	Node0x6a021b0 [shape=record,label="{ReadByte.exit.thread.i:                           \l  %2 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct**\l... %.pre, align 8, !tbaa !10\l  %err.i.i = getelementptr inbounds %struct.jpeg_compress_struct,\l... %struct.jpeg_compress_struct* %2, i64 0, i32 0\l  %3 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err.i.i, align\l... 8, !tbaa !11\l  %msg_code.i.i = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %3, i64 0, i32 5\l  store i32 42, i32* %msg_code.i.i, align 8, !tbaa !15\l  %error_exit.i.i = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %3, i64 0, i32 0\l  %4 = load void (%struct.jpeg_common_struct*)*, void\l... (%struct.jpeg_common_struct*)** %error_exit.i.i, align 8, !tbaa !18\l  %5 = bitcast %struct.jpeg_compress_struct* %2 to %struct.jpeg_common_struct*\l  tail call void %4(%struct.jpeg_common_struct* %5) #4\l  br label %while.end\l}"];
+	Node0x6a021b0 -> Node0x6a03da0;
+	Node0x6a023a0 [shape=record,label="{ReadByte.exit.i:                                  \l  %call.i.i4 = phi i32 [ %call.i.i, %while.cond.backedge ], [ %call.i.i2,\l... %ReadByte.exit.i.preheader ]\l  %cmp.i = icmp sgt i32 %call.i.i4, 0\l  br i1 %cmp.i, label %if.then.i, label %while.end.loopexit, !prof !19\l|{<s0>T|<s1>F}}"];
+	Node0x6a023a0:s0 -> Node0x6a04150;
+	Node0x6a023a0:s1 -> Node0x6a04260;
+	Node0x6a04150 [shape=record,label="{if.then.i:                                        \l  %conv.i = sext i32 %call.i.i4 to i64\l  %6 = load %struct._IO_FILE*, %struct._IO_FILE** %input_file.i.i, align 8,\l... !tbaa !3\l  %call1.i = call i64 @fread(i8* %0, i64 1, i64 %conv.i, %struct._IO_FILE* %6)\l... #4\l  %cmp3.i = icmp eq i64 %call1.i, %conv.i\l  br i1 %cmp3.i, label %while.cond.backedge, label %if.then5.i\l|{<s0>T|<s1>F}}"];
+	Node0x6a04150:s0 -> Node0x6a03f20;
+	Node0x6a04150:s1 -> Node0x6a047a0;
+	Node0x6a03f20 [shape=record,label="{while.cond.backedge:                              \l  %7 = load %struct._IO_FILE*, %struct._IO_FILE** %input_file.i.i, align 8,\l... !tbaa !3\l  %call.i.i = tail call i32 @_IO_getc(%struct._IO_FILE* %7) #4\l  %cmp.i.i = icmp eq i32 %call.i.i, -1\l  br i1 %cmp.i.i, label %ReadByte.exit.thread.i.loopexit, label\l... %ReadByte.exit.i\l|{<s0>T|<s1>F}}"];
+	Node0x6a03f20:s0 -> Node0x6a02450;
+	Node0x6a03f20:s1 -> Node0x6a023a0;
+	Node0x6a047a0 [shape=record,label="{if.then5.i:                                       \l  %8 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct**\l... %.pre, align 8, !tbaa !10\l  %err.i = getelementptr inbounds %struct.jpeg_compress_struct,\l... %struct.jpeg_compress_struct* %8, i64 0, i32 0\l  %9 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err.i, align 8,\l... !tbaa !11\l  %msg_code.i = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %9, i64 0, i32 5\l  store i32 42, i32* %msg_code.i, align 8, !tbaa !15\l  %error_exit.i = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %9, i64 0, i32 0\l  %10 = load void (%struct.jpeg_common_struct*)*, void\l... (%struct.jpeg_common_struct*)** %error_exit.i, align 8, !tbaa !18\l  %11 = bitcast %struct.jpeg_compress_struct* %8 to %struct.jpeg_common_struct*\l  tail call void %10(%struct.jpeg_common_struct* %11) #4\l  br label %while.cond.backedge\l}"];
+	Node0x6a047a0 -> Node0x6a03f20;
+	Node0x6a04260 [shape=record,label="{while.end.loopexit:                               \l  br label %while.end\l}"];
+	Node0x6a04260 -> Node0x6a03da0;
+	Node0x6a03da0 [shape=record,label="{while.end:                                        \l  call void @llvm.lifetime.end(i64 256, i8* %0) #4\l  ret void\l}"];
+}

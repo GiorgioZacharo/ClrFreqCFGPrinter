@@ -1,0 +1,1172 @@
+; ModuleID = 'cjpeg.c'
+target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+%struct._IO_FILE = type { i32, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i8*, %struct._IO_marker*, %struct._IO_FILE*, i32, i32, i64, i16, i8, [1 x i8], i8*, i64, i8*, i8*, i8*, i8*, i64, i32, [20 x i8] }
+%struct._IO_marker = type { %struct._IO_marker*, %struct._IO_FILE*, i32 }
+%struct.jpeg_compress_struct = type { %struct.jpeg_error_mgr*, %struct.jpeg_memory_mgr*, %struct.jpeg_progress_mgr*, i32, i32, %struct.jpeg_destination_mgr*, i32, i32, i32, i32, double, i32, i32, i32, %struct.jpeg_component_info*, [4 x %struct.JQUANT_TBL*], [4 x %struct.JHUFF_TBL*], [4 x %struct.JHUFF_TBL*], [16 x i8], [16 x i8], [16 x i8], i32, %struct.jpeg_scan_info*, i32, i32, i32, i32, i32, i32, i32, i32, i32, i8, i16, i16, i32, i32, i32, i32, i32, i32, i32, [4 x %struct.jpeg_component_info*], i32, i32, i32, [10 x i32], i32, i32, i32, i32, %struct.jpeg_comp_master*, %struct.jpeg_c_main_controller*, %struct.jpeg_c_prep_controller*, %struct.jpeg_c_coef_controller*, %struct.jpeg_marker_writer*, %struct.jpeg_color_converter*, %struct.jpeg_downsampler*, %struct.jpeg_forward_dct*, %struct.jpeg_entropy_encoder* }
+%struct.jpeg_error_mgr = type { void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*, i32)*, void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*, i8*)*, void (%struct.jpeg_common_struct*)*, i32, %union.anon, i32, i64, i8**, i32, i8**, i32, i32 }
+%struct.jpeg_common_struct = type { %struct.jpeg_error_mgr*, %struct.jpeg_memory_mgr*, %struct.jpeg_progress_mgr*, i32, i32 }
+%union.anon = type { [8 x i32], [48 x i8] }
+%struct.jpeg_memory_mgr = type { i8* (%struct.jpeg_common_struct*, i32, i64)*, i8* (%struct.jpeg_common_struct*, i32, i64)*, i8** (%struct.jpeg_common_struct*, i32, i32, i32)*, [64 x i16]** (%struct.jpeg_common_struct*, i32, i32, i32)*, %struct.jvirt_sarray_control* (%struct.jpeg_common_struct*, i32, i32, i32, i32, i32)*, %struct.jvirt_barray_control* (%struct.jpeg_common_struct*, i32, i32, i32, i32, i32)*, {}*, i8** (%struct.jpeg_common_struct*, %struct.jvirt_sarray_control*, i32, i32, i32)*, [64 x i16]** (%struct.jpeg_common_struct*, %struct.jvirt_barray_control*, i32, i32, i32)*, void (%struct.jpeg_common_struct*, i32)*, {}*, i64 }
+%struct.jvirt_sarray_control = type opaque
+%struct.jvirt_barray_control = type opaque
+%struct.jpeg_progress_mgr = type { {}*, i64, i64, i32, i32 }
+%struct.jpeg_destination_mgr = type { i8*, i64, void (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)*, void (%struct.jpeg_compress_struct*)* }
+%struct.jpeg_component_info = type { i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, %struct.JQUANT_TBL*, i8* }
+%struct.JQUANT_TBL = type { [64 x i16], i32 }
+%struct.JHUFF_TBL = type { [17 x i8], [256 x i8], i32 }
+%struct.jpeg_scan_info = type { i32, [4 x i32], i32, i32, i32, i32 }
+%struct.jpeg_comp_master = type opaque
+%struct.jpeg_c_main_controller = type opaque
+%struct.jpeg_c_prep_controller = type opaque
+%struct.jpeg_c_coef_controller = type opaque
+%struct.jpeg_marker_writer = type opaque
+%struct.jpeg_color_converter = type opaque
+%struct.jpeg_downsampler = type opaque
+%struct.jpeg_forward_dct = type opaque
+%struct.jpeg_entropy_encoder = type opaque
+%struct.cjpeg_source_struct = type { void (%struct.jpeg_compress_struct*, %struct.cjpeg_source_struct*)*, i32 (%struct.jpeg_compress_struct*, %struct.cjpeg_source_struct*)*, void (%struct.jpeg_compress_struct*, %struct.cjpeg_source_struct*)*, %struct._IO_FILE*, i8**, i32 }
+
+@progname = internal unnamed_addr global i8* null, align 8
+@.str = private unnamed_addr constant [6 x i8] c"cjpeg\00", align 1
+@cdjpeg_message_table = internal constant [44 x i8*] [i8* null, i8* getelementptr inbounds ([32 x i8], [32 x i8]* @.str.5, i32 0, i32 0), i8* getelementptr inbounds ([43 x i8], [43 x i8]* @.str.6, i32 0, i32 0), i8* getelementptr inbounds ([36 x i8], [36 x i8]* @.str.7, i32 0, i32 0), i8* getelementptr inbounds ([42 x i8], [42 x i8]* @.str.8, i32 0, i32 0), i8* getelementptr inbounds ([36 x i8], [36 x i8]* @.str.9, i32 0, i32 0), i8* getelementptr inbounds ([41 x i8], [41 x i8]* @.str.10, i32 0, i32 0), i8* getelementptr inbounds ([40 x i8], [40 x i8]* @.str.11, i32 0, i32 0), i8* getelementptr inbounds ([23 x i8], [23 x i8]* @.str.12, i32 0, i32 0), i8* getelementptr inbounds ([34 x i8], [34 x i8]* @.str.13, i32 0, i32 0), i8* getelementptr inbounds ([27 x i8], [27 x i8]* @.str.14, i32 0, i32 0), i8* getelementptr inbounds ([38 x i8], [38 x i8]* @.str.15, i32 0, i32 0), i8* getelementptr inbounds ([24 x i8], [24 x i8]* @.str.16, i32 0, i32 0), i8* getelementptr inbounds ([22 x i8], [22 x i8]* @.str.17, i32 0, i32 0), i8* getelementptr inbounds ([36 x i8], [36 x i8]* @.str.18, i32 0, i32 0), i8* getelementptr inbounds ([27 x i8], [27 x i8]* @.str.19, i32 0, i32 0), i8* getelementptr inbounds ([15 x i8], [15 x i8]* @.str.20, i32 0, i32 0), i8* getelementptr inbounds ([19 x i8], [19 x i8]* @.str.21, i32 0, i32 0), i8* getelementptr inbounds ([48 x i8], [48 x i8]* @.str.22, i32 0, i32 0), i8* getelementptr inbounds ([44 x i8], [44 x i8]* @.str.23, i32 0, i32 0), i8* getelementptr inbounds ([35 x i8], [35 x i8]* @.str.24, i32 0, i32 0), i8* getelementptr inbounds ([25 x i8], [25 x i8]* @.str.25, i32 0, i32 0), i8* getelementptr inbounds ([40 x i8], [40 x i8]* @.str.26, i32 0, i32 0), i8* getelementptr inbounds ([27 x i8], [27 x i8]* @.str.27, i32 0, i32 0), i8* getelementptr inbounds ([20 x i8], [20 x i8]* @.str.28, i32 0, i32 0), i8* getelementptr inbounds ([36 x i8], [36 x i8]* @.str.29, i32 0, i32 0), i8* getelementptr inbounds ([28 x i8], [28 x i8]* @.str.30, i32 0, i32 0), i8* getelementptr inbounds ([15 x i8], [15 x i8]* @.str.31, i32 0, i32 0), i8* getelementptr inbounds ([16 x i8], [16 x i8]* @.str.32, i32 0, i32 0), i8* getelementptr inbounds ([21 x i8], [21 x i8]* @.str.33, i32 0, i32 0), i8* getelementptr inbounds ([16 x i8], [16 x i8]* @.str.34, i32 0, i32 0), i8* getelementptr inbounds ([21 x i8], [21 x i8]* @.str.35, i32 0, i32 0), i8* getelementptr inbounds ([34 x i8], [34 x i8]* @.str.36, i32 0, i32 0), i8* getelementptr inbounds ([34 x i8], [34 x i8]* @.str.37, i32 0, i32 0), i8* getelementptr inbounds ([38 x i8], [38 x i8]* @.str.38, i32 0, i32 0), i8* getelementptr inbounds ([22 x i8], [22 x i8]* @.str.39, i32 0, i32 0), i8* getelementptr inbounds ([28 x i8], [28 x i8]* @.str.40, i32 0, i32 0), i8* getelementptr inbounds ([30 x i8], [30 x i8]* @.str.41, i32 0, i32 0), i8* getelementptr inbounds ([51 x i8], [51 x i8]* @.str.42, i32 0, i32 0), i8* getelementptr inbounds ([53 x i8], [53 x i8]* @.str.43, i32 0, i32 0), i8* getelementptr inbounds ([14 x i8], [14 x i8]* @.str.44, i32 0, i32 0), i8* getelementptr inbounds ([59 x i8], [59 x i8]* @.str.45, i32 0, i32 0), i8* getelementptr inbounds ([31 x i8], [31 x i8]* @.str.46, i32 0, i32 0), i8* null], align 16
+@stderr = external global %struct._IO_FILE*, align 8
+@.str.1 = private unnamed_addr constant [25 x i8] c"%s: only one input file\0A\00", align 1
+@.str.2 = private unnamed_addr constant [3 x i8] c"rb\00", align 1
+@.str.3 = private unnamed_addr constant [19 x i8] c"%s: can't open %s\0A\00", align 1
+@outfilename = internal unnamed_addr global i8* null, align 8
+@.str.4 = private unnamed_addr constant [3 x i8] c"wb\00", align 1
+@stdin = external global %struct._IO_FILE*, align 8
+@stdout = external global %struct._IO_FILE*, align 8
+@.str.5 = private unnamed_addr constant [32 x i8] c"Unsupported BMP colormap format\00", align 1
+@.str.6 = private unnamed_addr constant [43 x i8] c"Only 8- and 24-bit BMP files are supported\00", align 1
+@.str.7 = private unnamed_addr constant [36 x i8] c"Invalid BMP file: bad header length\00", align 1
+@.str.8 = private unnamed_addr constant [42 x i8] c"Invalid BMP file: biPlanes not equal to 1\00", align 1
+@.str.9 = private unnamed_addr constant [36 x i8] c"BMP output must be grayscale or RGB\00", align 1
+@.str.10 = private unnamed_addr constant [41 x i8] c"Sorry, compressed BMPs not yet supported\00", align 1
+@.str.11 = private unnamed_addr constant [40 x i8] c"Not a BMP file - does not start with BM\00", align 1
+@.str.12 = private unnamed_addr constant [23 x i8] c"%ux%u 24-bit BMP image\00", align 1
+@.str.13 = private unnamed_addr constant [34 x i8] c"%ux%u 8-bit colormapped BMP image\00", align 1
+@.str.14 = private unnamed_addr constant [27 x i8] c"%ux%u 24-bit OS2 BMP image\00", align 1
+@.str.15 = private unnamed_addr constant [38 x i8] c"%ux%u 8-bit colormapped OS2 BMP image\00", align 1
+@.str.16 = private unnamed_addr constant [24 x i8] c"GIF output got confused\00", align 1
+@.str.17 = private unnamed_addr constant [22 x i8] c"Bogus GIF codesize %d\00", align 1
+@.str.18 = private unnamed_addr constant [36 x i8] c"GIF output must be grayscale or RGB\00", align 1
+@.str.19 = private unnamed_addr constant [27 x i8] c"Too few images in GIF file\00", align 1
+@.str.20 = private unnamed_addr constant [15 x i8] c"Not a GIF file\00", align 1
+@.str.21 = private unnamed_addr constant [19 x i8] c"%ux%ux%d GIF image\00", align 1
+@.str.22 = private unnamed_addr constant [48 x i8] c"Warning: unexpected GIF version number '%c%c%c'\00", align 1
+@.str.23 = private unnamed_addr constant [44 x i8] c"Ignoring GIF extension block of type 0x%02x\00", align 1
+@.str.24 = private unnamed_addr constant [35 x i8] c"Caution: nonsquare pixels in input\00", align 1
+@.str.25 = private unnamed_addr constant [25 x i8] c"Corrupt data in GIF file\00", align 1
+@.str.26 = private unnamed_addr constant [40 x i8] c"Bogus char 0x%02x in GIF file, ignoring\00", align 1
+@.str.27 = private unnamed_addr constant [27 x i8] c"Premature end of GIF image\00", align 1
+@.str.28 = private unnamed_addr constant [20 x i8] c"Ran out of GIF bits\00", align 1
+@.str.29 = private unnamed_addr constant [36 x i8] c"PPM output must be grayscale or RGB\00", align 1
+@.str.30 = private unnamed_addr constant [28 x i8] c"Nonnumeric data in PPM file\00", align 1
+@.str.31 = private unnamed_addr constant [15 x i8] c"Not a PPM file\00", align 1
+@.str.32 = private unnamed_addr constant [16 x i8] c"%ux%u PGM image\00", align 1
+@.str.33 = private unnamed_addr constant [21 x i8] c"%ux%u text PGM image\00", align 1
+@.str.34 = private unnamed_addr constant [16 x i8] c"%ux%u PPM image\00", align 1
+@.str.35 = private unnamed_addr constant [21 x i8] c"%ux%u text PPM image\00", align 1
+@.str.36 = private unnamed_addr constant [34 x i8] c"Unsupported Targa colormap format\00", align 1
+@.str.37 = private unnamed_addr constant [34 x i8] c"Invalid or unsupported Targa file\00", align 1
+@.str.38 = private unnamed_addr constant [38 x i8] c"Targa output must be grayscale or RGB\00", align 1
+@.str.39 = private unnamed_addr constant [22 x i8] c"%ux%u RGB Targa image\00", align 1
+@.str.40 = private unnamed_addr constant [28 x i8] c"%ux%u grayscale Targa image\00", align 1
+@.str.41 = private unnamed_addr constant [30 x i8] c"%ux%u colormapped Targa image\00", align 1
+@.str.42 = private unnamed_addr constant [51 x i8] c"Color map file is invalid or of unsupported format\00", align 1
+@.str.43 = private unnamed_addr constant [53 x i8] c"Output file format cannot handle %d colormap entries\00", align 1
+@.str.44 = private unnamed_addr constant [14 x i8] c"ungetc failed\00", align 1
+@.str.45 = private unnamed_addr constant [59 x i8] c"Unrecognized input file format --- perhaps you need -targa\00", align 1
+@.str.46 = private unnamed_addr constant [31 x i8] c"Unsupported output file format\00", align 1
+@is_targa = internal unnamed_addr global i1 false
+@.str.47 = private unnamed_addr constant [11 x i8] c"arithmetic\00", align 1
+@.str.48 = private unnamed_addr constant [44 x i8] c"%s: sorry, arithmetic coding not supported\0A\00", align 1
+@.str.49 = private unnamed_addr constant [9 x i8] c"baseline\00", align 1
+@.str.50 = private unnamed_addr constant [4 x i8] c"dct\00", align 1
+@.str.51 = private unnamed_addr constant [4 x i8] c"int\00", align 1
+@.str.52 = private unnamed_addr constant [5 x i8] c"fast\00", align 1
+@.str.53 = private unnamed_addr constant [6 x i8] c"float\00", align 1
+@.str.54 = private unnamed_addr constant [6 x i8] c"debug\00", align 1
+@.str.55 = private unnamed_addr constant [8 x i8] c"verbose\00", align 1
+@parse_switches.printed_version = internal unnamed_addr global i1 false
+@.str.56 = private unnamed_addr constant [47 x i8] c"Independent JPEG Group's CJPEG, version %s\0A%s\0A\00", align 1
+@.str.57 = private unnamed_addr constant [13 x i8] c"6a  7-Feb-96\00", align 1
+@.str.58 = private unnamed_addr constant [35 x i8] c"Copyright (C) 1996, Thomas G. Lane\00", align 1
+@.str.59 = private unnamed_addr constant [10 x i8] c"grayscale\00", align 1
+@.str.60 = private unnamed_addr constant [10 x i8] c"greyscale\00", align 1
+@.str.61 = private unnamed_addr constant [10 x i8] c"maxmemory\00", align 1
+@.str.62 = private unnamed_addr constant [6 x i8] c"%ld%c\00", align 1
+@.str.63 = private unnamed_addr constant [9 x i8] c"optimize\00", align 1
+@.str.64 = private unnamed_addr constant [9 x i8] c"optimise\00", align 1
+@.str.65 = private unnamed_addr constant [8 x i8] c"outfile\00", align 1
+@.str.66 = private unnamed_addr constant [12 x i8] c"progressive\00", align 1
+@.str.67 = private unnamed_addr constant [8 x i8] c"quality\00", align 1
+@.str.68 = private unnamed_addr constant [3 x i8] c"%d\00", align 1
+@.str.69 = private unnamed_addr constant [7 x i8] c"qslots\00", align 1
+@.str.70 = private unnamed_addr constant [8 x i8] c"qtables\00", align 1
+@.str.71 = private unnamed_addr constant [8 x i8] c"restart\00", align 1
+@.str.72 = private unnamed_addr constant [7 x i8] c"sample\00", align 1
+@.str.73 = private unnamed_addr constant [6 x i8] c"scans\00", align 1
+@.str.74 = private unnamed_addr constant [7 x i8] c"smooth\00", align 1
+@.str.75 = private unnamed_addr constant [6 x i8] c"targa\00", align 1
+@.str.76 = private unnamed_addr constant [22 x i8] c"usage: %s [switches] \00", align 1
+@.str.77 = private unnamed_addr constant [13 x i8] c"[inputfile]\0A\00", align 1
+@.str.78 = private unnamed_addr constant [38 x i8] c"Switches (names may be abbreviated):\0A\00", align 1
+@.str.79 = private unnamed_addr constant [69 x i8] c"  -quality N     Compression quality (0..100; 5-95 is useful range)\0A\00", align 1
+@.str.80 = private unnamed_addr constant [46 x i8] c"  -grayscale     Create monochrome JPEG file\0A\00", align 1
+@.str.81 = private unnamed_addr constant [78 x i8] c"  -optimize      Optimize Huffman table (smaller file, but slow compression)\0A\00", align 1
+@.str.82 = private unnamed_addr constant [47 x i8] c"  -progressive   Create progressive JPEG file\0A\00", align 1
+@.str.83 = private unnamed_addr constant [66 x i8] c"  -targa         Input file is Targa format (usually not needed)\0A\00", align 1
+@.str.84 = private unnamed_addr constant [30 x i8] c"Switches for advanced users:\0A\00", align 1
+@.str.85 = private unnamed_addr constant [43 x i8] c"  -dct int       Use integer DCT method%s\0A\00", align 1
+@.str.86 = private unnamed_addr constant [11 x i8] c" (default)\00", align 1
+@.str.87 = private unnamed_addr constant [57 x i8] c"  -dct fast      Use fast integer DCT (less accurate)%s\0A\00", align 1
+@.str.88 = private unnamed_addr constant [1 x i8] zeroinitializer, align 1
+@.str.89 = private unnamed_addr constant [50 x i8] c"  -dct float     Use floating-point DCT method%s\0A\00", align 1
+@.str.90 = private unnamed_addr constant [68 x i8] c"  -restart N     Set restart interval in rows, or in blocks with B\0A\00", align 1
+@.str.91 = private unnamed_addr constant [63 x i8] c"  -smooth N      Smooth dithered input (N=1..100 is strength)\0A\00", align 1
+@.str.92 = private unnamed_addr constant [52 x i8] c"  -maxmemory N   Maximum memory to use (in kbytes)\0A\00", align 1
+@.str.93 = private unnamed_addr constant [47 x i8] c"  -outfile name  Specify name for output file\0A\00", align 1
+@.str.94 = private unnamed_addr constant [44 x i8] c"  -verbose  or  -debug   Emit debug output\0A\00", align 1
+@.str.95 = private unnamed_addr constant [23 x i8] c"Switches for wizards:\0A\00", align 1
+@.str.96 = private unnamed_addr constant [40 x i8] c"  -baseline      Force baseline output\0A\00", align 1
+@.str.97 = private unnamed_addr constant [56 x i8] c"  -qtables file  Use quantization tables given in file\0A\00", align 1
+@.str.98 = private unnamed_addr constant [56 x i8] c"  -qslots N[,...]    Set component quantization tables\0A\00", align 1
+@.str.99 = private unnamed_addr constant [53 x i8] c"  -sample HxV[,...]  Set component sampling factors\0A\00", align 1
+@.str.100 = private unnamed_addr constant [57 x i8] c"  -scans file    Create multi-scan JPEG per script file\0A\00", align 1
+
+; Function Attrs: noreturn nounwind uwtable
+define i32 @main(i32 %argc, i8** nocapture readonly %argv) #0 !prof !2 {
+entry:
+  %cinfo = alloca %struct.jpeg_compress_struct, align 8
+  %jerr = alloca %struct.jpeg_error_mgr, align 8
+  %0 = bitcast %struct.jpeg_compress_struct* %cinfo to i8*
+  call void @llvm.lifetime.start(i64 496, i8* %0) #6
+  %1 = bitcast %struct.jpeg_error_mgr* %jerr to i8*
+  call void @llvm.lifetime.start(i64 168, i8* %1) #6
+  %2 = load i8*, i8** %argv, align 8, !tbaa !3
+  store i8* %2, i8** @progname, align 8, !tbaa !3
+  %cmp = icmp eq i8* %2, null
+  br i1 %cmp, label %if.then, label %lor.lhs.false, !prof !7
+
+lor.lhs.false:                                    ; preds = %entry
+  %3 = load i8, i8* %2, align 1, !tbaa !8
+  %cmp2 = icmp eq i8 %3, 0
+  br i1 %cmp2, label %if.then, label %if.end, !prof !7
+
+if.then:                                          ; preds = %lor.lhs.false, %entry
+  store i8* getelementptr inbounds ([6 x i8], [6 x i8]* @.str, i64 0, i64 0), i8** @progname, align 8, !tbaa !3
+  br label %if.end
+
+if.end:                                           ; preds = %if.then, %lor.lhs.false
+  %call = call %struct.jpeg_error_mgr* @jpeg_std_error(%struct.jpeg_error_mgr* nonnull %jerr) #6
+  %err = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 0
+  store %struct.jpeg_error_mgr* %call, %struct.jpeg_error_mgr** %err, align 8, !tbaa !9
+  call void @jpeg_CreateCompress(%struct.jpeg_compress_struct* nonnull %cinfo, i32 61, i64 496) #6
+  %addon_message_table = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %jerr, i64 0, i32 11
+  store i8** getelementptr inbounds ([44 x i8*], [44 x i8*]* @cdjpeg_message_table, i64 0, i64 0), i8*** %addon_message_table, align 8, !tbaa !14
+  %first_addon_message = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %jerr, i64 0, i32 12
+  store i32 1000, i32* %first_addon_message, align 8, !tbaa !17
+  %last_addon_message = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %jerr, i64 0, i32 13
+  store i32 1043, i32* %last_addon_message, align 4, !tbaa !18
+  %in_color_space = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 9
+  store i32 2, i32* %in_color_space, align 4, !tbaa !19
+  call void @jpeg_set_defaults(%struct.jpeg_compress_struct* nonnull %cinfo) #6
+  %call4 = call fastcc i32 @parse_switches(%struct.jpeg_compress_struct* nonnull %cinfo, i32 %argc, i8** nonnull %argv, i32 0)
+  %sub = add nsw i32 %argc, -1
+  %cmp5 = icmp slt i32 %call4, %sub
+  br i1 %cmp5, label %if.then7, label %if.end9, !prof !7
+
+if.then7:                                         ; preds = %if.end
+  %4 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %5 = load i8*, i8** @progname, align 8, !tbaa !3
+  %call8 = call i32 (%struct._IO_FILE*, i8*, ...) @fprintf(%struct._IO_FILE* %4, i8* nonnull getelementptr inbounds ([25 x i8], [25 x i8]* @.str.1, i64 0, i64 0), i8* %5) #7
+  call fastcc void @usage()
+  unreachable
+
+if.end9:                                          ; preds = %if.end
+  %cmp10 = icmp slt i32 %call4, %argc
+  br i1 %cmp10, label %if.then12, label %if.else, !prof !20
+
+if.then12:                                        ; preds = %if.end9
+  %idxprom = sext i32 %call4 to i64
+  %arrayidx13 = getelementptr inbounds i8*, i8** %argv, i64 %idxprom
+  %6 = load i8*, i8** %arrayidx13, align 8, !tbaa !3
+  %call14 = call %struct._IO_FILE* @fopen(i8* %6, i8* nonnull getelementptr inbounds ([3 x i8], [3 x i8]* @.str.2, i64 0, i64 0))
+  %cmp15 = icmp eq %struct._IO_FILE* %call14, null
+  br i1 %cmp15, label %if.then17, label %if.end23, !prof !7
+
+if.then17:                                        ; preds = %if.then12
+  %7 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %8 = load i8*, i8** @progname, align 8, !tbaa !3
+  %9 = load i8*, i8** %arrayidx13, align 8, !tbaa !3
+  %call20 = call i32 (%struct._IO_FILE*, i8*, ...) @fprintf(%struct._IO_FILE* %7, i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.3, i64 0, i64 0), i8* %8, i8* %9) #7
+  call void @exit(i32 1) #8
+  unreachable
+
+if.else:                                          ; preds = %if.end9
+  %call22 = call %struct._IO_FILE* @read_stdin() #6
+  br label %if.end23
+
+if.end23:                                         ; preds = %if.then12, %if.else
+  %input_file.0 = phi %struct._IO_FILE* [ %call14, %if.then12 ], [ %call22, %if.else ]
+  %10 = load i8*, i8** @outfilename, align 8, !tbaa !3
+  %cmp24 = icmp eq i8* %10, null
+  br i1 %cmp24, label %if.else33, label %if.then26, !prof !7
+
+if.then26:                                        ; preds = %if.end23
+  %call27 = call %struct._IO_FILE* @fopen(i8* nonnull %10, i8* nonnull getelementptr inbounds ([3 x i8], [3 x i8]* @.str.4, i64 0, i64 0))
+  %cmp28 = icmp eq %struct._IO_FILE* %call27, null
+  br i1 %cmp28, label %if.then30, label %if.end35, !prof !7
+
+if.then30:                                        ; preds = %if.then26
+  %11 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %12 = load i8*, i8** @progname, align 8, !tbaa !3
+  %13 = load i8*, i8** @outfilename, align 8, !tbaa !3
+  %call31 = call i32 (%struct._IO_FILE*, i8*, ...) @fprintf(%struct._IO_FILE* %11, i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.3, i64 0, i64 0), i8* %12, i8* %13) #7
+  call void @exit(i32 1) #8
+  unreachable
+
+if.else33:                                        ; preds = %if.end23
+  %call34 = call %struct._IO_FILE* @write_stdout() #6
+  br label %if.end35
+
+if.end35:                                         ; preds = %if.then26, %if.else33
+  %output_file.0 = phi %struct._IO_FILE* [ %call27, %if.then26 ], [ %call34, %if.else33 ]
+  %.b.i = load i1, i1* @is_targa, align 1
+  br i1 %.b.i, label %if.then.i, label %if.end.i, !prof !7
+
+if.then.i:                                        ; preds = %if.end35
+  %call.i = call %struct.cjpeg_source_struct* @jinit_read_targa(%struct.jpeg_compress_struct* nonnull %cinfo) #6
+  br label %select_file_type.exit
+
+if.end.i:                                         ; preds = %if.end35
+  %call1.i = call i32 @_IO_getc(%struct._IO_FILE* %input_file.0) #6
+  %cmp.i = icmp eq i32 %call1.i, -1
+  br i1 %cmp.i, label %if.then2.i, label %if.end4.i, !prof !7
+
+if.then2.i:                                       ; preds = %if.end.i
+  %14 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8, !tbaa !9
+  %msg_code.i = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %14, i64 0, i32 5
+  store i32 41, i32* %msg_code.i, align 8, !tbaa !21
+  %error_exit.i = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %14, i64 0, i32 0
+  %15 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit.i, align 8, !tbaa !22
+  %16 = bitcast %struct.jpeg_compress_struct* %cinfo to %struct.jpeg_common_struct*
+  call void %15(%struct.jpeg_common_struct* %16) #6
+  br label %if.end4.i
+
+if.end4.i:                                        ; preds = %if.then2.i, %if.end.i
+  %call5.i = call i32 @ungetc(i32 %call1.i, %struct._IO_FILE* %input_file.0) #6
+  %cmp6.i = icmp eq i32 %call5.i, -1
+  br i1 %cmp6.i, label %if.then7.i, label %if.end12.i, !prof !7
+
+if.then7.i:                                       ; preds = %if.end4.i
+  %17 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8, !tbaa !9
+  %msg_code9.i = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %17, i64 0, i32 5
+  store i32 1040, i32* %msg_code9.i, align 8, !tbaa !21
+  %error_exit11.i = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %17, i64 0, i32 0
+  %18 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit11.i, align 8, !tbaa !22
+  %19 = bitcast %struct.jpeg_compress_struct* %cinfo to %struct.jpeg_common_struct*
+  call void %18(%struct.jpeg_common_struct* %19) #6
+  br label %if.end12.i
+
+if.end12.i:                                       ; preds = %if.then7.i, %if.end4.i
+  switch i32 %call1.i, label %sw.default.i [
+    i32 66, label %sw.bb.i
+    i32 71, label %sw.bb14.i
+    i32 80, label %sw.bb16.i
+    i32 0, label %sw.bb18.i
+  ], !prof !23
+
+sw.bb.i:                                          ; preds = %if.end12.i
+  %call13.i = call %struct.cjpeg_source_struct* @jinit_read_bmp(%struct.jpeg_compress_struct* nonnull %cinfo) #6
+  br label %select_file_type.exit
+
+sw.bb14.i:                                        ; preds = %if.end12.i
+  %call15.i = call %struct.cjpeg_source_struct* @jinit_read_gif(%struct.jpeg_compress_struct* nonnull %cinfo) #6
+  br label %select_file_type.exit
+
+sw.bb16.i:                                        ; preds = %if.end12.i
+  %call17.i = call %struct.cjpeg_source_struct* @jinit_read_ppm(%struct.jpeg_compress_struct* nonnull %cinfo) #6
+  br label %select_file_type.exit
+
+sw.bb18.i:                                        ; preds = %if.end12.i
+  %call19.i = call %struct.cjpeg_source_struct* @jinit_read_targa(%struct.jpeg_compress_struct* nonnull %cinfo) #6
+  br label %select_file_type.exit
+
+sw.default.i:                                     ; preds = %if.end12.i
+  %20 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8, !tbaa !9
+  %msg_code21.i = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %20, i64 0, i32 5
+  store i32 1041, i32* %msg_code21.i, align 8, !tbaa !21
+  %error_exit23.i = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %20, i64 0, i32 0
+  %21 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit23.i, align 8, !tbaa !22
+  %22 = bitcast %struct.jpeg_compress_struct* %cinfo to %struct.jpeg_common_struct*
+  call void %21(%struct.jpeg_common_struct* %22) #6
+  br label %select_file_type.exit
+
+select_file_type.exit:                            ; preds = %if.then.i, %sw.bb.i, %sw.bb14.i, %sw.bb16.i, %sw.bb18.i, %sw.default.i
+  %retval.0.i = phi %struct.cjpeg_source_struct* [ %call.i, %if.then.i ], [ null, %sw.default.i ], [ %call19.i, %sw.bb18.i ], [ %call17.i, %sw.bb16.i ], [ %call15.i, %sw.bb14.i ], [ %call13.i, %sw.bb.i ]
+  %input_file37 = getelementptr inbounds %struct.cjpeg_source_struct, %struct.cjpeg_source_struct* %retval.0.i, i64 0, i32 3
+  store %struct._IO_FILE* %input_file.0, %struct._IO_FILE** %input_file37, align 8, !tbaa !24
+  %start_input = getelementptr inbounds %struct.cjpeg_source_struct, %struct.cjpeg_source_struct* %retval.0.i, i64 0, i32 0
+  %23 = load void (%struct.jpeg_compress_struct*, %struct.cjpeg_source_struct*)*, void (%struct.jpeg_compress_struct*, %struct.cjpeg_source_struct*)** %start_input, align 8, !tbaa !26
+  call void %23(%struct.jpeg_compress_struct* nonnull %cinfo, %struct.cjpeg_source_struct* %retval.0.i) #6
+  call void @jpeg_default_colorspace(%struct.jpeg_compress_struct* nonnull %cinfo) #6
+  %24 = call fastcc i32 @parse_switches(%struct.jpeg_compress_struct* nonnull %cinfo, i32 %argc, i8** nonnull %argv, i32 1)
+  call void @jpeg_stdio_dest(%struct.jpeg_compress_struct* nonnull %cinfo, %struct._IO_FILE* %output_file.0) #6
+  call void @jpeg_start_compress(%struct.jpeg_compress_struct* nonnull %cinfo, i32 1) #6
+  %next_scanline = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 36
+  %25 = load i32, i32* %next_scanline, align 8, !tbaa !27
+  %image_height = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 7
+  %26 = load i32, i32* %image_height, align 4, !tbaa !28
+  %cmp3974 = icmp ult i32 %25, %26
+  br i1 %cmp3974, label %while.body.lr.ph, label %while.end, !prof !29
+
+while.body.lr.ph:                                 ; preds = %select_file_type.exit
+  %get_pixel_rows = getelementptr inbounds %struct.cjpeg_source_struct, %struct.cjpeg_source_struct* %retval.0.i, i64 0, i32 1
+  %buffer = getelementptr inbounds %struct.cjpeg_source_struct, %struct.cjpeg_source_struct* %retval.0.i, i64 0, i32 4
+  br label %while.body
+
+while.body:                                       ; preds = %while.body.lr.ph, %while.body
+  %27 = load i32 (%struct.jpeg_compress_struct*, %struct.cjpeg_source_struct*)*, i32 (%struct.jpeg_compress_struct*, %struct.cjpeg_source_struct*)** %get_pixel_rows, align 8, !tbaa !30
+  %call41 = call i32 %27(%struct.jpeg_compress_struct* nonnull %cinfo, %struct.cjpeg_source_struct* %retval.0.i) #6
+  %28 = load i8**, i8*** %buffer, align 8, !tbaa !31
+  %call42 = call i32 @jpeg_write_scanlines(%struct.jpeg_compress_struct* nonnull %cinfo, i8** %28, i32 %call41) #6
+  %29 = load i32, i32* %next_scanline, align 8, !tbaa !27
+  %30 = load i32, i32* %image_height, align 4, !tbaa !28
+  %cmp39 = icmp ult i32 %29, %30
+  br i1 %cmp39, label %while.body, label %while.end.loopexit, !prof !29
+
+while.end.loopexit:                               ; preds = %while.body
+  br label %while.end
+
+while.end:                                        ; preds = %while.end.loopexit, %select_file_type.exit
+  %finish_input = getelementptr inbounds %struct.cjpeg_source_struct, %struct.cjpeg_source_struct* %retval.0.i, i64 0, i32 2
+  %31 = load void (%struct.jpeg_compress_struct*, %struct.cjpeg_source_struct*)*, void (%struct.jpeg_compress_struct*, %struct.cjpeg_source_struct*)** %finish_input, align 8, !tbaa !32
+  call void %31(%struct.jpeg_compress_struct* nonnull %cinfo, %struct.cjpeg_source_struct* %retval.0.i) #6
+  call void @jpeg_finish_compress(%struct.jpeg_compress_struct* nonnull %cinfo) #6
+  call void @jpeg_destroy_compress(%struct.jpeg_compress_struct* nonnull %cinfo) #6
+  %32 = load %struct._IO_FILE*, %struct._IO_FILE** @stdin, align 8, !tbaa !3
+  %cmp43 = icmp eq %struct._IO_FILE* %input_file.0, %32
+  br i1 %cmp43, label %if.end47, label %if.then45, !prof !7
+
+if.then45:                                        ; preds = %while.end
+  %call46 = call i32 @fclose(%struct._IO_FILE* %input_file.0)
+  br label %if.end47
+
+if.end47:                                         ; preds = %while.end, %if.then45
+  %33 = load %struct._IO_FILE*, %struct._IO_FILE** @stdout, align 8, !tbaa !3
+  %cmp48 = icmp eq %struct._IO_FILE* %output_file.0, %33
+  br i1 %cmp48, label %if.end52, label %if.then50, !prof !7
+
+if.then50:                                        ; preds = %if.end47
+  %call51 = call i32 @fclose(%struct._IO_FILE* %output_file.0)
+  br label %if.end52
+
+if.end52:                                         ; preds = %if.end47, %if.then50
+  %num_warnings = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %jerr, i64 0, i32 8
+  %34 = load i64, i64* %num_warnings, align 8, !tbaa !33
+  %tobool = icmp ne i64 %34, 0
+  %cond = select i1 %tobool, i32 2, i32 0
+  call void @exit(i32 %cond) #8
+  unreachable
+}
+
+; Function Attrs: argmemonly nounwind
+declare void @llvm.lifetime.start(i64, i8* nocapture) #1
+
+declare %struct.jpeg_error_mgr* @jpeg_std_error(%struct.jpeg_error_mgr*) #2
+
+declare void @jpeg_CreateCompress(%struct.jpeg_compress_struct*, i32, i64) #2
+
+declare void @jpeg_set_defaults(%struct.jpeg_compress_struct*) #2
+
+; Function Attrs: nounwind uwtable
+define internal fastcc i32 @parse_switches(%struct.jpeg_compress_struct* %cinfo, i32 %argc, i8** nocapture readonly %argv, i32 %for_real) unnamed_addr #3 {
+entry:
+  %quality = alloca i32, align 4
+  %lval = alloca i64, align 8
+  %ch = alloca i8, align 1
+  %lval154 = alloca i64, align 8
+  %ch155 = alloca i8, align 1
+  %val = alloca i32, align 4
+  %0 = bitcast i32* %quality to i8*
+  call void @llvm.lifetime.start(i64 4, i8* %0) #6
+  store i32 75, i32* %quality, align 4, !tbaa !34
+  store i1 false, i1* @is_targa, align 1
+  store i8* null, i8** @outfilename, align 8, !tbaa !3
+  %err = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 0
+  %1 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8, !tbaa !9
+  %trace_level = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %1, i64 0, i32 7
+  store i32 0, i32* %trace_level, align 4, !tbaa !35
+  %cmp153 = icmp sgt i32 %argc, 1
+  br i1 %cmp153, label %for.body.lr.ph, label %for.end, !prof !36
+
+for.body.lr.ph:                                   ; preds = %entry
+  %2 = bitcast i32* %val to i8*
+  %smoothing_factor = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 27
+  %3 = bitcast i64* %lval154 to i8*
+  %restart_in_rows186 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 30
+  %restart_interval = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 29
+  %optimize_coding = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 25
+  %4 = bitcast i64* %lval to i8*
+  %mem = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 1
+  %dct_method38 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 28
+  br label %for.body
+
+for.body:                                         ; preds = %for.body.lr.ph, %for.inc
+  %scansarg.0161 = phi i8* [ null, %for.body.lr.ph ], [ %scansarg.1, %for.inc ]
+  %samplearg.0160 = phi i8* [ null, %for.body.lr.ph ], [ %samplearg.1, %for.inc ]
+  %qslotsarg.0159 = phi i8* [ null, %for.body.lr.ph ], [ %qslotsarg.1, %for.inc ]
+  %qtablefile.0158 = phi i8* [ null, %for.body.lr.ph ], [ %qtablefile.1, %for.inc ]
+  %simple_progressive.0157 = phi i32 [ 0, %for.body.lr.ph ], [ %simple_progressive.1, %for.inc ]
+  %force_baseline.0156 = phi i32 [ 0, %for.body.lr.ph ], [ %force_baseline.1, %for.inc ]
+  %q_scale_factor.0155 = phi i32 [ 100, %for.body.lr.ph ], [ %q_scale_factor.1, %for.inc ]
+  %argn.0154 = phi i32 [ 1, %for.body.lr.ph ], [ %inc255, %for.inc ]
+  %idxprom = sext i32 %argn.0154 to i64
+  %arrayidx = getelementptr inbounds i8*, i8** %argv, i64 %idxprom
+  %5 = load i8*, i8** %arrayidx, align 8, !tbaa !3
+  %6 = load i8, i8* %5, align 1, !tbaa !8
+  %cmp1 = icmp eq i8 %6, 45
+  br i1 %cmp1, label %if.end6, label %if.then, !prof !37
+
+if.then:                                          ; preds = %for.body
+  %cmp3 = icmp slt i32 %argn.0154, 1
+  br i1 %cmp3, label %if.then5, label %for.end.loopexit, !prof !38
+
+if.then5:                                         ; preds = %if.then
+  store i8* null, i8** @outfilename, align 8, !tbaa !3
+  br label %for.inc
+
+if.end6:                                          ; preds = %for.body
+  %incdec.ptr = getelementptr inbounds i8, i8* %5, i64 1
+  %call = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([11 x i8], [11 x i8]* @.str.47, i64 0, i64 0), i32 1) #6
+  %tobool = icmp eq i32 %call, 0
+  br i1 %tobool, label %if.else, label %if.then7, !prof !39
+
+if.then7:                                         ; preds = %if.end6
+  %7 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %8 = load i8*, i8** @progname, align 8, !tbaa !3
+  %call8 = call i32 (%struct._IO_FILE*, i8*, ...) @fprintf(%struct._IO_FILE* %7, i8* nonnull getelementptr inbounds ([44 x i8], [44 x i8]* @.str.48, i64 0, i64 0), i8* %8) #7
+  call void @exit(i32 1) #8
+  unreachable
+
+if.else:                                          ; preds = %if.end6
+  %call9 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([9 x i8], [9 x i8]* @.str.49, i64 0, i64 0), i32 1) #6
+  %tobool10 = icmp eq i32 %call9, 0
+  br i1 %tobool10, label %if.else12, label %for.inc, !prof !39
+
+if.else12:                                        ; preds = %if.else
+  %call13 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([4 x i8], [4 x i8]* @.str.50, i64 0, i64 0), i32 2) #6
+  %tobool14 = icmp eq i32 %call13, 0
+  br i1 %tobool14, label %if.else43, label %if.then15, !prof !40
+
+if.then15:                                        ; preds = %if.else12
+  %inc = add nsw i32 %argn.0154, 1
+  %cmp16 = icmp slt i32 %inc, %argc
+  br i1 %cmp16, label %if.end19, label %if.then18, !prof !41
+
+if.then18:                                        ; preds = %if.then15
+  call fastcc void @usage()
+  unreachable
+
+if.end19:                                         ; preds = %if.then15
+  %idxprom20 = sext i32 %inc to i64
+  %arrayidx21 = getelementptr inbounds i8*, i8** %argv, i64 %idxprom20
+  %9 = load i8*, i8** %arrayidx21, align 8, !tbaa !3
+  %call22 = call i32 @keymatch(i8* %9, i8* nonnull getelementptr inbounds ([4 x i8], [4 x i8]* @.str.51, i64 0, i64 0), i32 1) #6
+  %tobool23 = icmp eq i32 %call22, 0
+  br i1 %tobool23, label %if.else25, label %if.then24, !prof !38
+
+if.then24:                                        ; preds = %if.end19
+  store i32 0, i32* %dct_method38, align 4, !tbaa !42
+  br label %for.inc
+
+if.else25:                                        ; preds = %if.end19
+  %10 = load i8*, i8** %arrayidx21, align 8, !tbaa !3
+  %call28 = call i32 @keymatch(i8* %10, i8* nonnull getelementptr inbounds ([5 x i8], [5 x i8]* @.str.52, i64 0, i64 0), i32 2) #6
+  %tobool29 = icmp eq i32 %call28, 0
+  br i1 %tobool29, label %if.else32, label %if.then30
+
+if.then30:                                        ; preds = %if.else25
+  store i32 1, i32* %dct_method38, align 4, !tbaa !42
+  br label %for.inc
+
+if.else32:                                        ; preds = %if.else25
+  %11 = load i8*, i8** %arrayidx21, align 8, !tbaa !3
+  %call35 = call i32 @keymatch(i8* %11, i8* nonnull getelementptr inbounds ([6 x i8], [6 x i8]* @.str.53, i64 0, i64 0), i32 2) #6
+  %tobool36 = icmp eq i32 %call35, 0
+  br i1 %tobool36, label %if.else39, label %if.then37
+
+if.then37:                                        ; preds = %if.else32
+  store i32 2, i32* %dct_method38, align 4, !tbaa !42
+  br label %for.inc
+
+if.else39:                                        ; preds = %if.else32
+  call fastcc void @usage()
+  unreachable
+
+if.else43:                                        ; preds = %if.else12
+  %call44 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([6 x i8], [6 x i8]* @.str.54, i64 0, i64 0), i32 1) #6
+  %tobool45 = icmp eq i32 %call44, 0
+  br i1 %tobool45, label %lor.lhs.false, label %if.then48, !prof !43
+
+lor.lhs.false:                                    ; preds = %if.else43
+  %call46 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([8 x i8], [8 x i8]* @.str.55, i64 0, i64 0), i32 1) #6
+  %tobool47 = icmp eq i32 %call46, 0
+  br i1 %tobool47, label %if.else56, label %if.then48, !prof !43
+
+if.then48:                                        ; preds = %lor.lhs.false, %if.else43
+  %.b = load i1, i1* @parse_switches.printed_version, align 1
+  br i1 %.b, label %if.end52, label %if.then50
+
+if.then50:                                        ; preds = %if.then48
+  %12 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %call51 = call i32 (%struct._IO_FILE*, i8*, ...) @fprintf(%struct._IO_FILE* %12, i8* nonnull getelementptr inbounds ([47 x i8], [47 x i8]* @.str.56, i64 0, i64 0), i8* nonnull getelementptr inbounds ([13 x i8], [13 x i8]* @.str.57, i64 0, i64 0), i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @.str.58, i64 0, i64 0)) #7
+  store i1 true, i1* @parse_switches.printed_version, align 1
+  br label %if.end52
+
+if.end52:                                         ; preds = %if.then50, %if.then48
+  %13 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8, !tbaa !9
+  %trace_level54 = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %13, i64 0, i32 7
+  %14 = load i32, i32* %trace_level54, align 4, !tbaa !35
+  %inc55 = add nsw i32 %14, 1
+  store i32 %inc55, i32* %trace_level54, align 4, !tbaa !35
+  br label %for.inc
+
+if.else56:                                        ; preds = %lor.lhs.false
+  %call57 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([10 x i8], [10 x i8]* @.str.59, i64 0, i64 0), i32 2) #6
+  %tobool58 = icmp eq i32 %call57, 0
+  br i1 %tobool58, label %lor.lhs.false59, label %if.then62, !prof !43
+
+lor.lhs.false59:                                  ; preds = %if.else56
+  %call60 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([10 x i8], [10 x i8]* @.str.60, i64 0, i64 0), i32 2) #6
+  %tobool61 = icmp eq i32 %call60, 0
+  br i1 %tobool61, label %if.else63, label %if.then62, !prof !43
+
+if.then62:                                        ; preds = %lor.lhs.false59, %if.else56
+  call void @jpeg_set_colorspace(%struct.jpeg_compress_struct* %cinfo, i32 1) #6
+  br label %for.inc
+
+if.else63:                                        ; preds = %lor.lhs.false59
+  %call64 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([10 x i8], [10 x i8]* @.str.61, i64 0, i64 0), i32 3) #6
+  %tobool65 = icmp eq i32 %call64, 0
+  br i1 %tobool65, label %if.else89, label %if.then66, !prof !43
+
+if.then66:                                        ; preds = %if.else63
+  call void @llvm.lifetime.start(i64 8, i8* %4) #6
+  call void @llvm.lifetime.start(i64 1, i8* nonnull %ch) #6
+  store i8 120, i8* %ch, align 1, !tbaa !8
+  %inc67 = add nsw i32 %argn.0154, 1
+  %cmp68 = icmp slt i32 %inc67, %argc
+  br i1 %cmp68, label %if.end71, label %if.then70
+
+if.then70:                                        ; preds = %if.then66
+  call fastcc void @usage()
+  unreachable
+
+if.end71:                                         ; preds = %if.then66
+  %idxprom72 = sext i32 %inc67 to i64
+  %arrayidx73 = getelementptr inbounds i8*, i8** %argv, i64 %idxprom72
+  %15 = load i8*, i8** %arrayidx73, align 8, !tbaa !3
+  %call74 = call i32 (i8*, i8*, ...) @__isoc99_sscanf(i8* %15, i8* nonnull getelementptr inbounds ([6 x i8], [6 x i8]* @.str.62, i64 0, i64 0), i64* nonnull %lval, i8* nonnull %ch) #6
+  %cmp75 = icmp slt i32 %call74, 1
+  br i1 %cmp75, label %if.then77, label %if.end78
+
+if.then77:                                        ; preds = %if.end71
+  call fastcc void @usage()
+  unreachable
+
+if.end78:                                         ; preds = %if.end71
+  %16 = load i8, i8* %ch, align 1, !tbaa !8
+  switch i8 %16, label %if.end78.if.end87_crit_edge [
+    i8 109, label %if.then86
+    i8 77, label %if.then86
+  ]
+
+if.end78.if.end87_crit_edge:                      ; preds = %if.end78
+  %.pre = load i64, i64* %lval, align 8, !tbaa !44
+  br label %if.end87
+
+if.then86:                                        ; preds = %if.end78, %if.end78
+  %17 = load i64, i64* %lval, align 8, !tbaa !44
+  %mul = mul nsw i64 %17, 1000
+  store i64 %mul, i64* %lval, align 8, !tbaa !44
+  br label %if.end87
+
+if.end87:                                         ; preds = %if.end78.if.end87_crit_edge, %if.then86
+  %18 = phi i64 [ %.pre, %if.end78.if.end87_crit_edge ], [ %mul, %if.then86 ]
+  %mul88 = mul nsw i64 %18, 1000
+  %19 = load %struct.jpeg_memory_mgr*, %struct.jpeg_memory_mgr** %mem, align 8, !tbaa !45
+  %max_memory_to_use = getelementptr inbounds %struct.jpeg_memory_mgr, %struct.jpeg_memory_mgr* %19, i64 0, i32 11
+  store i64 %mul88, i64* %max_memory_to_use, align 8, !tbaa !46
+  call void @llvm.lifetime.end(i64 1, i8* nonnull %ch) #6
+  call void @llvm.lifetime.end(i64 8, i8* nonnull %4) #6
+  br label %for.inc
+
+if.else89:                                        ; preds = %if.else63
+  %call90 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([9 x i8], [9 x i8]* @.str.63, i64 0, i64 0), i32 1) #6
+  %tobool91 = icmp eq i32 %call90, 0
+  br i1 %tobool91, label %lor.lhs.false92, label %if.then95, !prof !48
+
+lor.lhs.false92:                                  ; preds = %if.else89
+  %call93 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([9 x i8], [9 x i8]* @.str.64, i64 0, i64 0), i32 1) #6
+  %tobool94 = icmp eq i32 %call93, 0
+  br i1 %tobool94, label %if.else96, label %if.then95, !prof !49
+
+if.then95:                                        ; preds = %lor.lhs.false92, %if.else89
+  store i32 1, i32* %optimize_coding, align 8, !tbaa !50
+  br label %for.inc
+
+if.else96:                                        ; preds = %lor.lhs.false92
+  %call97 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([8 x i8], [8 x i8]* @.str.65, i64 0, i64 0), i32 4) #6
+  %tobool98 = icmp eq i32 %call97, 0
+  br i1 %tobool98, label %if.else107, label %if.then99, !prof !51
+
+if.then99:                                        ; preds = %if.else96
+  %inc100 = add nsw i32 %argn.0154, 1
+  %cmp101 = icmp slt i32 %inc100, %argc
+  br i1 %cmp101, label %if.end104, label %if.then103, !prof !41
+
+if.then103:                                       ; preds = %if.then99
+  call fastcc void @usage()
+  unreachable
+
+if.end104:                                        ; preds = %if.then99
+  %idxprom105 = sext i32 %inc100 to i64
+  %arrayidx106 = getelementptr inbounds i8*, i8** %argv, i64 %idxprom105
+  %20 = bitcast i8** %arrayidx106 to i64*
+  %21 = load i64, i64* %20, align 8, !tbaa !3
+  store i64 %21, i64* bitcast (i8** @outfilename to i64*), align 8, !tbaa !3
+  br label %for.inc
+
+if.else107:                                       ; preds = %if.else96
+  %call108 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([12 x i8], [12 x i8]* @.str.66, i64 0, i64 0), i32 1) #6
+  %tobool109 = icmp eq i32 %call108, 0
+  br i1 %tobool109, label %if.else111, label %for.inc, !prof !38
+
+if.else111:                                       ; preds = %if.else107
+  %call112 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([8 x i8], [8 x i8]* @.str.67, i64 0, i64 0), i32 1) #6
+  %tobool113 = icmp eq i32 %call112, 0
+  br i1 %tobool113, label %if.else128, label %if.then114
+
+if.then114:                                       ; preds = %if.else111
+  %inc115 = add nsw i32 %argn.0154, 1
+  %cmp116 = icmp slt i32 %inc115, %argc
+  br i1 %cmp116, label %if.end119, label %if.then118
+
+if.then118:                                       ; preds = %if.then114
+  call fastcc void @usage()
+  unreachable
+
+if.end119:                                        ; preds = %if.then114
+  %idxprom120 = sext i32 %inc115 to i64
+  %arrayidx121 = getelementptr inbounds i8*, i8** %argv, i64 %idxprom120
+  %22 = load i8*, i8** %arrayidx121, align 8, !tbaa !3
+  %call122 = call i32 (i8*, i8*, ...) @__isoc99_sscanf(i8* %22, i8* nonnull getelementptr inbounds ([3 x i8], [3 x i8]* @.str.68, i64 0, i64 0), i32* nonnull %quality) #6
+  %cmp123 = icmp eq i32 %call122, 1
+  br i1 %cmp123, label %if.end126, label %if.then125
+
+if.then125:                                       ; preds = %if.end119
+  call fastcc void @usage()
+  unreachable
+
+if.end126:                                        ; preds = %if.end119
+  %23 = load i32, i32* %quality, align 4, !tbaa !34
+  %call127 = call i32 @jpeg_quality_scaling(i32 %23) #6
+  br label %for.inc
+
+if.else128:                                       ; preds = %if.else111
+  %call129 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([7 x i8], [7 x i8]* @.str.69, i64 0, i64 0), i32 2) #6
+  %tobool130 = icmp eq i32 %call129, 0
+  br i1 %tobool130, label %if.else139, label %if.then131
+
+if.then131:                                       ; preds = %if.else128
+  %inc132 = add nsw i32 %argn.0154, 1
+  %cmp133 = icmp slt i32 %inc132, %argc
+  br i1 %cmp133, label %if.end136, label %if.then135
+
+if.then135:                                       ; preds = %if.then131
+  call fastcc void @usage()
+  unreachable
+
+if.end136:                                        ; preds = %if.then131
+  %idxprom137 = sext i32 %inc132 to i64
+  %arrayidx138 = getelementptr inbounds i8*, i8** %argv, i64 %idxprom137
+  %24 = load i8*, i8** %arrayidx138, align 8, !tbaa !3
+  br label %for.inc
+
+if.else139:                                       ; preds = %if.else128
+  %call140 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([8 x i8], [8 x i8]* @.str.70, i64 0, i64 0), i32 2) #6
+  %tobool141 = icmp eq i32 %call140, 0
+  br i1 %tobool141, label %if.else150, label %if.then142
+
+if.then142:                                       ; preds = %if.else139
+  %inc143 = add nsw i32 %argn.0154, 1
+  %cmp144 = icmp slt i32 %inc143, %argc
+  br i1 %cmp144, label %if.end147, label %if.then146
+
+if.then146:                                       ; preds = %if.then142
+  call fastcc void @usage()
+  unreachable
+
+if.end147:                                        ; preds = %if.then142
+  %idxprom148 = sext i32 %inc143 to i64
+  %arrayidx149 = getelementptr inbounds i8*, i8** %argv, i64 %idxprom148
+  %25 = load i8*, i8** %arrayidx149, align 8, !tbaa !3
+  br label %for.inc
+
+if.else150:                                       ; preds = %if.else139
+  %call151 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([8 x i8], [8 x i8]* @.str.71, i64 0, i64 0), i32 1) #6
+  %tobool152 = icmp eq i32 %call151, 0
+  br i1 %tobool152, label %if.else188, label %if.then153
+
+if.then153:                                       ; preds = %if.else150
+  call void @llvm.lifetime.start(i64 8, i8* %3) #6
+  call void @llvm.lifetime.start(i64 1, i8* nonnull %ch155) #6
+  store i8 120, i8* %ch155, align 1, !tbaa !8
+  %inc156 = add nsw i32 %argn.0154, 1
+  %cmp157 = icmp slt i32 %inc156, %argc
+  br i1 %cmp157, label %if.end160, label %if.then159
+
+if.then159:                                       ; preds = %if.then153
+  call fastcc void @usage()
+  unreachable
+
+if.end160:                                        ; preds = %if.then153
+  %idxprom161 = sext i32 %inc156 to i64
+  %arrayidx162 = getelementptr inbounds i8*, i8** %argv, i64 %idxprom161
+  %26 = load i8*, i8** %arrayidx162, align 8, !tbaa !3
+  %call163 = call i32 (i8*, i8*, ...) @__isoc99_sscanf(i8* %26, i8* nonnull getelementptr inbounds ([6 x i8], [6 x i8]* @.str.62, i64 0, i64 0), i64* nonnull %lval154, i8* nonnull %ch155) #6
+  %cmp164 = icmp slt i32 %call163, 1
+  br i1 %cmp164, label %if.then166, label %if.end167
+
+if.then166:                                       ; preds = %if.end160
+  call fastcc void @usage()
+  unreachable
+
+if.end167:                                        ; preds = %if.end160
+  %27 = load i64, i64* %lval154, align 8, !tbaa !44
+  %28 = icmp ugt i64 %27, 65535
+  br i1 %28, label %if.then173, label %if.end174
+
+if.then173:                                       ; preds = %if.end167
+  call fastcc void @usage()
+  unreachable
+
+if.end174:                                        ; preds = %if.end167
+  %29 = load i8, i8* %ch155, align 1, !tbaa !8
+  switch i8 %29, label %if.else184 [
+    i8 98, label %if.then182
+    i8 66, label %if.then182
+  ]
+
+if.then182:                                       ; preds = %if.end174, %if.end174
+  %conv183 = trunc i64 %27 to i32
+  store i32 %conv183, i32* %restart_interval, align 8, !tbaa !52
+  br label %if.end187
+
+if.else184:                                       ; preds = %if.end174
+  %conv185 = trunc i64 %27 to i32
+  br label %if.end187
+
+if.end187:                                        ; preds = %if.else184, %if.then182
+  %storemerge = phi i32 [ 0, %if.then182 ], [ %conv185, %if.else184 ]
+  store i32 %storemerge, i32* %restart_in_rows186, align 4, !tbaa !53
+  call void @llvm.lifetime.end(i64 1, i8* nonnull %ch155) #6
+  call void @llvm.lifetime.end(i64 8, i8* nonnull %3) #6
+  br label %for.inc
+
+if.else188:                                       ; preds = %if.else150
+  %call189 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([7 x i8], [7 x i8]* @.str.72, i64 0, i64 0), i32 2) #6
+  %tobool190 = icmp eq i32 %call189, 0
+  br i1 %tobool190, label %if.else199, label %if.then191
+
+if.then191:                                       ; preds = %if.else188
+  %inc192 = add nsw i32 %argn.0154, 1
+  %cmp193 = icmp slt i32 %inc192, %argc
+  br i1 %cmp193, label %if.end196, label %if.then195
+
+if.then195:                                       ; preds = %if.then191
+  call fastcc void @usage()
+  unreachable
+
+if.end196:                                        ; preds = %if.then191
+  %idxprom197 = sext i32 %inc192 to i64
+  %arrayidx198 = getelementptr inbounds i8*, i8** %argv, i64 %idxprom197
+  %30 = load i8*, i8** %arrayidx198, align 8, !tbaa !3
+  br label %for.inc
+
+if.else199:                                       ; preds = %if.else188
+  %call200 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([6 x i8], [6 x i8]* @.str.73, i64 0, i64 0), i32 2) #6
+  %tobool201 = icmp eq i32 %call200, 0
+  br i1 %tobool201, label %if.else210, label %if.then202
+
+if.then202:                                       ; preds = %if.else199
+  %inc203 = add nsw i32 %argn.0154, 1
+  %cmp204 = icmp slt i32 %inc203, %argc
+  br i1 %cmp204, label %if.end207, label %if.then206
+
+if.then206:                                       ; preds = %if.then202
+  call fastcc void @usage()
+  unreachable
+
+if.end207:                                        ; preds = %if.then202
+  %idxprom208 = sext i32 %inc203 to i64
+  %arrayidx209 = getelementptr inbounds i8*, i8** %argv, i64 %idxprom208
+  %31 = load i8*, i8** %arrayidx209, align 8, !tbaa !3
+  br label %for.inc
+
+if.else210:                                       ; preds = %if.else199
+  %call211 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([7 x i8], [7 x i8]* @.str.74, i64 0, i64 0), i32 2) #6
+  %tobool212 = icmp eq i32 %call211, 0
+  br i1 %tobool212, label %if.else233, label %if.then213
+
+if.then213:                                       ; preds = %if.else210
+  call void @llvm.lifetime.start(i64 4, i8* %2) #6
+  %inc214 = add nsw i32 %argn.0154, 1
+  %cmp215 = icmp slt i32 %inc214, %argc
+  br i1 %cmp215, label %if.end218, label %if.then217
+
+if.then217:                                       ; preds = %if.then213
+  call fastcc void @usage()
+  unreachable
+
+if.end218:                                        ; preds = %if.then213
+  %idxprom219 = sext i32 %inc214 to i64
+  %arrayidx220 = getelementptr inbounds i8*, i8** %argv, i64 %idxprom219
+  %32 = load i8*, i8** %arrayidx220, align 8, !tbaa !3
+  %call221 = call i32 (i8*, i8*, ...) @__isoc99_sscanf(i8* %32, i8* nonnull getelementptr inbounds ([3 x i8], [3 x i8]* @.str.68, i64 0, i64 0), i32* nonnull %val) #6
+  %cmp222 = icmp eq i32 %call221, 1
+  br i1 %cmp222, label %if.end225, label %if.then224
+
+if.then224:                                       ; preds = %if.end218
+  call fastcc void @usage()
+  unreachable
+
+if.end225:                                        ; preds = %if.end218
+  %33 = load i32, i32* %val, align 4, !tbaa !34
+  %34 = icmp ugt i32 %33, 100
+  br i1 %34, label %if.then231, label %if.end232
+
+if.then231:                                       ; preds = %if.end225
+  call fastcc void @usage()
+  unreachable
+
+if.end232:                                        ; preds = %if.end225
+  store i32 %33, i32* %smoothing_factor, align 8, !tbaa !54
+  call void @llvm.lifetime.end(i64 4, i8* nonnull %2) #6
+  br label %for.inc
+
+if.else233:                                       ; preds = %if.else210
+  %call234 = call i32 @keymatch(i8* %incdec.ptr, i8* nonnull getelementptr inbounds ([6 x i8], [6 x i8]* @.str.75, i64 0, i64 0), i32 1) #6
+  %tobool235 = icmp eq i32 %call234, 0
+  br i1 %tobool235, label %if.else237, label %if.then236
+
+if.then236:                                       ; preds = %if.else233
+  store i1 true, i1* @is_targa, align 1
+  br label %for.inc
+
+if.else237:                                       ; preds = %if.else233
+  call fastcc void @usage()
+  unreachable
+
+for.inc:                                          ; preds = %if.else107, %if.else, %if.then30, %if.then37, %if.then24, %if.then62, %if.then95, %if.end136, %if.end187, %if.end207, %if.then236, %if.end232, %if.end196, %if.end147, %if.end126, %if.end104, %if.end87, %if.end52, %if.then5
+  %argn.1 = phi i32 [ %argn.0154, %if.then5 ], [ %inc, %if.then24 ], [ %inc, %if.then30 ], [ %inc, %if.then37 ], [ %argn.0154, %if.end52 ], [ %argn.0154, %if.then62 ], [ %inc67, %if.end87 ], [ %argn.0154, %if.then95 ], [ %inc100, %if.end104 ], [ %inc115, %if.end126 ], [ %inc132, %if.end136 ], [ %inc143, %if.end147 ], [ %inc156, %if.end187 ], [ %inc192, %if.end196 ], [ %inc203, %if.end207 ], [ %inc214, %if.end232 ], [ %argn.0154, %if.then236 ], [ %argn.0154, %if.else ], [ %argn.0154, %if.else107 ]
+  %q_scale_factor.1 = phi i32 [ %q_scale_factor.0155, %if.then5 ], [ %q_scale_factor.0155, %if.then24 ], [ %q_scale_factor.0155, %if.then30 ], [ %q_scale_factor.0155, %if.then37 ], [ %q_scale_factor.0155, %if.end52 ], [ %q_scale_factor.0155, %if.then62 ], [ %q_scale_factor.0155, %if.end87 ], [ %q_scale_factor.0155, %if.then95 ], [ %q_scale_factor.0155, %if.end104 ], [ %call127, %if.end126 ], [ %q_scale_factor.0155, %if.end136 ], [ %q_scale_factor.0155, %if.end147 ], [ %q_scale_factor.0155, %if.end187 ], [ %q_scale_factor.0155, %if.end196 ], [ %q_scale_factor.0155, %if.end207 ], [ %q_scale_factor.0155, %if.end232 ], [ %q_scale_factor.0155, %if.then236 ], [ %q_scale_factor.0155, %if.else ], [ %q_scale_factor.0155, %if.else107 ]
+  %force_baseline.1 = phi i32 [ %force_baseline.0156, %if.then5 ], [ %force_baseline.0156, %if.then24 ], [ %force_baseline.0156, %if.then30 ], [ %force_baseline.0156, %if.then37 ], [ %force_baseline.0156, %if.end52 ], [ %force_baseline.0156, %if.then62 ], [ %force_baseline.0156, %if.end87 ], [ %force_baseline.0156, %if.then95 ], [ %force_baseline.0156, %if.end104 ], [ %force_baseline.0156, %if.end126 ], [ %force_baseline.0156, %if.end136 ], [ %force_baseline.0156, %if.end147 ], [ %force_baseline.0156, %if.end187 ], [ %force_baseline.0156, %if.end196 ], [ %force_baseline.0156, %if.end207 ], [ %force_baseline.0156, %if.end232 ], [ %force_baseline.0156, %if.then236 ], [ 1, %if.else ], [ %force_baseline.0156, %if.else107 ]
+  %simple_progressive.1 = phi i32 [ %simple_progressive.0157, %if.then5 ], [ %simple_progressive.0157, %if.then24 ], [ %simple_progressive.0157, %if.then30 ], [ %simple_progressive.0157, %if.then37 ], [ %simple_progressive.0157, %if.end52 ], [ %simple_progressive.0157, %if.then62 ], [ %simple_progressive.0157, %if.end87 ], [ %simple_progressive.0157, %if.then95 ], [ %simple_progressive.0157, %if.end104 ], [ %simple_progressive.0157, %if.end126 ], [ %simple_progressive.0157, %if.end136 ], [ %simple_progressive.0157, %if.end147 ], [ %simple_progressive.0157, %if.end187 ], [ %simple_progressive.0157, %if.end196 ], [ %simple_progressive.0157, %if.end207 ], [ %simple_progressive.0157, %if.end232 ], [ %simple_progressive.0157, %if.then236 ], [ %simple_progressive.0157, %if.else ], [ 1, %if.else107 ]
+  %qtablefile.1 = phi i8* [ %qtablefile.0158, %if.then5 ], [ %qtablefile.0158, %if.then24 ], [ %qtablefile.0158, %if.then30 ], [ %qtablefile.0158, %if.then37 ], [ %qtablefile.0158, %if.end52 ], [ %qtablefile.0158, %if.then62 ], [ %qtablefile.0158, %if.end87 ], [ %qtablefile.0158, %if.then95 ], [ %qtablefile.0158, %if.end104 ], [ %qtablefile.0158, %if.end126 ], [ %qtablefile.0158, %if.end136 ], [ %25, %if.end147 ], [ %qtablefile.0158, %if.end187 ], [ %qtablefile.0158, %if.end196 ], [ %qtablefile.0158, %if.end207 ], [ %qtablefile.0158, %if.end232 ], [ %qtablefile.0158, %if.then236 ], [ %qtablefile.0158, %if.else ], [ %qtablefile.0158, %if.else107 ]
+  %qslotsarg.1 = phi i8* [ %qslotsarg.0159, %if.then5 ], [ %qslotsarg.0159, %if.then24 ], [ %qslotsarg.0159, %if.then30 ], [ %qslotsarg.0159, %if.then37 ], [ %qslotsarg.0159, %if.end52 ], [ %qslotsarg.0159, %if.then62 ], [ %qslotsarg.0159, %if.end87 ], [ %qslotsarg.0159, %if.then95 ], [ %qslotsarg.0159, %if.end104 ], [ %qslotsarg.0159, %if.end126 ], [ %24, %if.end136 ], [ %qslotsarg.0159, %if.end147 ], [ %qslotsarg.0159, %if.end187 ], [ %qslotsarg.0159, %if.end196 ], [ %qslotsarg.0159, %if.end207 ], [ %qslotsarg.0159, %if.end232 ], [ %qslotsarg.0159, %if.then236 ], [ %qslotsarg.0159, %if.else ], [ %qslotsarg.0159, %if.else107 ]
+  %samplearg.1 = phi i8* [ %samplearg.0160, %if.then5 ], [ %samplearg.0160, %if.then24 ], [ %samplearg.0160, %if.then30 ], [ %samplearg.0160, %if.then37 ], [ %samplearg.0160, %if.end52 ], [ %samplearg.0160, %if.then62 ], [ %samplearg.0160, %if.end87 ], [ %samplearg.0160, %if.then95 ], [ %samplearg.0160, %if.end104 ], [ %samplearg.0160, %if.end126 ], [ %samplearg.0160, %if.end136 ], [ %samplearg.0160, %if.end147 ], [ %samplearg.0160, %if.end187 ], [ %30, %if.end196 ], [ %samplearg.0160, %if.end207 ], [ %samplearg.0160, %if.end232 ], [ %samplearg.0160, %if.then236 ], [ %samplearg.0160, %if.else ], [ %samplearg.0160, %if.else107 ]
+  %scansarg.1 = phi i8* [ %scansarg.0161, %if.then5 ], [ %scansarg.0161, %if.then24 ], [ %scansarg.0161, %if.then30 ], [ %scansarg.0161, %if.then37 ], [ %scansarg.0161, %if.end52 ], [ %scansarg.0161, %if.then62 ], [ %scansarg.0161, %if.end87 ], [ %scansarg.0161, %if.then95 ], [ %scansarg.0161, %if.end104 ], [ %scansarg.0161, %if.end126 ], [ %scansarg.0161, %if.end136 ], [ %scansarg.0161, %if.end147 ], [ %scansarg.0161, %if.end187 ], [ %scansarg.0161, %if.end196 ], [ %31, %if.end207 ], [ %scansarg.0161, %if.end232 ], [ %scansarg.0161, %if.then236 ], [ %scansarg.0161, %if.else ], [ %scansarg.0161, %if.else107 ]
+  %inc255 = add nsw i32 %argn.1, 1
+  %cmp = icmp slt i32 %inc255, %argc
+  br i1 %cmp, label %for.body, label %for.end.loopexit, !prof !36
+
+for.end.loopexit:                                 ; preds = %if.then, %for.inc
+  %scansarg.0.lcssa.ph = phi i8* [ %scansarg.0161, %if.then ], [ %scansarg.1, %for.inc ]
+  %samplearg.0.lcssa.ph = phi i8* [ %samplearg.0160, %if.then ], [ %samplearg.1, %for.inc ]
+  %qslotsarg.0.lcssa.ph = phi i8* [ %qslotsarg.0159, %if.then ], [ %qslotsarg.1, %for.inc ]
+  %qtablefile.0.lcssa.ph = phi i8* [ %qtablefile.0158, %if.then ], [ %qtablefile.1, %for.inc ]
+  %simple_progressive.0.lcssa.ph = phi i32 [ %simple_progressive.0157, %if.then ], [ %simple_progressive.1, %for.inc ]
+  %force_baseline.0.lcssa.ph = phi i32 [ %force_baseline.0156, %if.then ], [ %force_baseline.1, %for.inc ]
+  %q_scale_factor.0.lcssa.ph = phi i32 [ %q_scale_factor.0155, %if.then ], [ %q_scale_factor.1, %for.inc ]
+  %argn.0.lcssa.ph = phi i32 [ %argn.0154, %if.then ], [ %inc255, %for.inc ]
+  br label %for.end
+
+for.end:                                          ; preds = %for.end.loopexit, %entry
+  %scansarg.0.lcssa = phi i8* [ null, %entry ], [ %scansarg.0.lcssa.ph, %for.end.loopexit ]
+  %samplearg.0.lcssa = phi i8* [ null, %entry ], [ %samplearg.0.lcssa.ph, %for.end.loopexit ]
+  %qslotsarg.0.lcssa = phi i8* [ null, %entry ], [ %qslotsarg.0.lcssa.ph, %for.end.loopexit ]
+  %qtablefile.0.lcssa = phi i8* [ null, %entry ], [ %qtablefile.0.lcssa.ph, %for.end.loopexit ]
+  %simple_progressive.0.lcssa = phi i32 [ 0, %entry ], [ %simple_progressive.0.lcssa.ph, %for.end.loopexit ]
+  %force_baseline.0.lcssa = phi i32 [ 0, %entry ], [ %force_baseline.0.lcssa.ph, %for.end.loopexit ]
+  %q_scale_factor.0.lcssa = phi i32 [ 100, %entry ], [ %q_scale_factor.0.lcssa.ph, %for.end.loopexit ]
+  %argn.0.lcssa = phi i32 [ 1, %entry ], [ %argn.0.lcssa.ph, %for.end.loopexit ]
+  %tobool256 = icmp eq i32 %for_real, 0
+  br i1 %tobool256, label %if.end293, label %if.then257, !prof !55
+
+if.then257:                                       ; preds = %for.end
+  %35 = load i32, i32* %quality, align 4, !tbaa !34
+  call void @jpeg_set_quality(%struct.jpeg_compress_struct* %cinfo, i32 %35, i32 %force_baseline.0.lcssa) #6
+  %cmp258 = icmp eq i8* %qtablefile.0.lcssa, null
+  br i1 %cmp258, label %if.end265, label %if.then260, !prof !20
+
+if.then260:                                       ; preds = %if.then257
+  %call261 = call i32 @read_quant_tables(%struct.jpeg_compress_struct* %cinfo, i8* nonnull %qtablefile.0.lcssa, i32 %q_scale_factor.0.lcssa, i32 %force_baseline.0.lcssa) #6
+  %tobool262 = icmp eq i32 %call261, 0
+  br i1 %tobool262, label %if.then263, label %if.end265
+
+if.then263:                                       ; preds = %if.then260
+  call fastcc void @usage()
+  unreachable
+
+if.end265:                                        ; preds = %if.then260, %if.then257
+  %cmp266 = icmp eq i8* %qslotsarg.0.lcssa, null
+  br i1 %cmp266, label %if.end273, label %if.then268, !prof !20
+
+if.then268:                                       ; preds = %if.end265
+  %call269 = call i32 @set_quant_slots(%struct.jpeg_compress_struct* %cinfo, i8* nonnull %qslotsarg.0.lcssa) #6
+  %tobool270 = icmp eq i32 %call269, 0
+  br i1 %tobool270, label %if.then271, label %if.end273
+
+if.then271:                                       ; preds = %if.then268
+  call fastcc void @usage()
+  unreachable
+
+if.end273:                                        ; preds = %if.then268, %if.end265
+  %cmp274 = icmp eq i8* %samplearg.0.lcssa, null
+  br i1 %cmp274, label %if.end281, label %if.then276, !prof !20
+
+if.then276:                                       ; preds = %if.end273
+  %call277 = call i32 @set_sample_factors(%struct.jpeg_compress_struct* %cinfo, i8* nonnull %samplearg.0.lcssa) #6
+  %tobool278 = icmp eq i32 %call277, 0
+  br i1 %tobool278, label %if.then279, label %if.end281
+
+if.then279:                                       ; preds = %if.then276
+  call fastcc void @usage()
+  unreachable
+
+if.end281:                                        ; preds = %if.then276, %if.end273
+  %tobool282 = icmp eq i32 %simple_progressive.0.lcssa, 0
+  br i1 %tobool282, label %if.end284, label %if.then283, !prof !7
+
+if.then283:                                       ; preds = %if.end281
+  call void @jpeg_simple_progression(%struct.jpeg_compress_struct* %cinfo) #6
+  br label %if.end284
+
+if.end284:                                        ; preds = %if.end281, %if.then283
+  %cmp285 = icmp eq i8* %scansarg.0.lcssa, null
+  br i1 %cmp285, label %if.end293, label %if.then287, !prof !20
+
+if.then287:                                       ; preds = %if.end284
+  %call288 = call i32 @read_scan_script(%struct.jpeg_compress_struct* %cinfo, i8* nonnull %scansarg.0.lcssa) #6
+  %tobool289 = icmp eq i32 %call288, 0
+  br i1 %tobool289, label %if.then290, label %if.end293
+
+if.then290:                                       ; preds = %if.then287
+  call fastcc void @usage()
+  unreachable
+
+if.end293:                                        ; preds = %if.then287, %if.end284, %for.end
+  call void @llvm.lifetime.end(i64 4, i8* %0) #6
+  ret i32 %argn.0.lcssa
+}
+
+; Function Attrs: nounwind
+declare i32 @fprintf(%struct._IO_FILE* nocapture, i8* nocapture readonly, ...) #4
+
+; Function Attrs: noreturn nounwind uwtable
+define internal fastcc void @usage() unnamed_addr #0 !prof !56 {
+entry:
+  %0 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %1 = load i8*, i8** @progname, align 8, !tbaa !3
+  %call = tail call i32 (%struct._IO_FILE*, i8*, ...) @fprintf(%struct._IO_FILE* %0, i8* getelementptr inbounds ([22 x i8], [22 x i8]* @.str.76, i64 0, i64 0), i8* %1) #7
+  %2 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %3 = tail call i64 @fwrite(i8* getelementptr inbounds ([13 x i8], [13 x i8]* @.str.77, i64 0, i64 0), i64 12, i64 1, %struct._IO_FILE* %2) #7
+  %4 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %5 = tail call i64 @fwrite(i8* getelementptr inbounds ([38 x i8], [38 x i8]* @.str.78, i64 0, i64 0), i64 37, i64 1, %struct._IO_FILE* %4) #7
+  %6 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %7 = tail call i64 @fwrite(i8* getelementptr inbounds ([69 x i8], [69 x i8]* @.str.79, i64 0, i64 0), i64 68, i64 1, %struct._IO_FILE* %6) #7
+  %8 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %9 = tail call i64 @fwrite(i8* getelementptr inbounds ([46 x i8], [46 x i8]* @.str.80, i64 0, i64 0), i64 45, i64 1, %struct._IO_FILE* %8) #7
+  %10 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %11 = tail call i64 @fwrite(i8* getelementptr inbounds ([78 x i8], [78 x i8]* @.str.81, i64 0, i64 0), i64 77, i64 1, %struct._IO_FILE* %10) #7
+  %12 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %13 = tail call i64 @fwrite(i8* getelementptr inbounds ([47 x i8], [47 x i8]* @.str.82, i64 0, i64 0), i64 46, i64 1, %struct._IO_FILE* %12) #7
+  %14 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %15 = tail call i64 @fwrite(i8* getelementptr inbounds ([66 x i8], [66 x i8]* @.str.83, i64 0, i64 0), i64 65, i64 1, %struct._IO_FILE* %14) #7
+  %16 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %17 = tail call i64 @fwrite(i8* getelementptr inbounds ([30 x i8], [30 x i8]* @.str.84, i64 0, i64 0), i64 29, i64 1, %struct._IO_FILE* %16) #7
+  %18 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %call9 = tail call i32 (%struct._IO_FILE*, i8*, ...) @fprintf(%struct._IO_FILE* %18, i8* getelementptr inbounds ([43 x i8], [43 x i8]* @.str.85, i64 0, i64 0), i8* getelementptr inbounds ([11 x i8], [11 x i8]* @.str.86, i64 0, i64 0)) #7
+  %19 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %call10 = tail call i32 (%struct._IO_FILE*, i8*, ...) @fprintf(%struct._IO_FILE* %19, i8* getelementptr inbounds ([57 x i8], [57 x i8]* @.str.87, i64 0, i64 0), i8* getelementptr inbounds ([1 x i8], [1 x i8]* @.str.88, i64 0, i64 0)) #7
+  %20 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %call11 = tail call i32 (%struct._IO_FILE*, i8*, ...) @fprintf(%struct._IO_FILE* %20, i8* getelementptr inbounds ([50 x i8], [50 x i8]* @.str.89, i64 0, i64 0), i8* getelementptr inbounds ([1 x i8], [1 x i8]* @.str.88, i64 0, i64 0)) #7
+  %21 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %22 = tail call i64 @fwrite(i8* getelementptr inbounds ([68 x i8], [68 x i8]* @.str.90, i64 0, i64 0), i64 67, i64 1, %struct._IO_FILE* %21) #7
+  %23 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %24 = tail call i64 @fwrite(i8* getelementptr inbounds ([63 x i8], [63 x i8]* @.str.91, i64 0, i64 0), i64 62, i64 1, %struct._IO_FILE* %23) #7
+  %25 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %26 = tail call i64 @fwrite(i8* getelementptr inbounds ([52 x i8], [52 x i8]* @.str.92, i64 0, i64 0), i64 51, i64 1, %struct._IO_FILE* %25) #7
+  %27 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %28 = tail call i64 @fwrite(i8* getelementptr inbounds ([47 x i8], [47 x i8]* @.str.93, i64 0, i64 0), i64 46, i64 1, %struct._IO_FILE* %27) #7
+  %29 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %30 = tail call i64 @fwrite(i8* getelementptr inbounds ([44 x i8], [44 x i8]* @.str.94, i64 0, i64 0), i64 43, i64 1, %struct._IO_FILE* %29) #7
+  %31 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %32 = tail call i64 @fwrite(i8* getelementptr inbounds ([23 x i8], [23 x i8]* @.str.95, i64 0, i64 0), i64 22, i64 1, %struct._IO_FILE* %31) #7
+  %33 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %34 = tail call i64 @fwrite(i8* getelementptr inbounds ([40 x i8], [40 x i8]* @.str.96, i64 0, i64 0), i64 39, i64 1, %struct._IO_FILE* %33) #7
+  %35 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %36 = tail call i64 @fwrite(i8* getelementptr inbounds ([56 x i8], [56 x i8]* @.str.97, i64 0, i64 0), i64 55, i64 1, %struct._IO_FILE* %35) #7
+  %37 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %38 = tail call i64 @fwrite(i8* getelementptr inbounds ([56 x i8], [56 x i8]* @.str.98, i64 0, i64 0), i64 55, i64 1, %struct._IO_FILE* %37) #7
+  %39 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %40 = tail call i64 @fwrite(i8* getelementptr inbounds ([53 x i8], [53 x i8]* @.str.99, i64 0, i64 0), i64 52, i64 1, %struct._IO_FILE* %39) #7
+  %41 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3
+  %42 = tail call i64 @fwrite(i8* getelementptr inbounds ([57 x i8], [57 x i8]* @.str.100, i64 0, i64 0), i64 56, i64 1, %struct._IO_FILE* %41) #7
+  tail call void @exit(i32 1) #8
+  unreachable
+}
+
+; Function Attrs: nounwind
+declare noalias %struct._IO_FILE* @fopen(i8* nocapture readonly, i8* nocapture readonly) #4
+
+; Function Attrs: noreturn nounwind
+declare void @exit(i32) #5
+
+declare %struct._IO_FILE* @read_stdin() #2
+
+declare %struct._IO_FILE* @write_stdout() #2
+
+declare void @jpeg_default_colorspace(%struct.jpeg_compress_struct*) #2
+
+declare void @jpeg_stdio_dest(%struct.jpeg_compress_struct*, %struct._IO_FILE*) #2
+
+declare void @jpeg_start_compress(%struct.jpeg_compress_struct*, i32) #2
+
+declare i32 @jpeg_write_scanlines(%struct.jpeg_compress_struct*, i8**, i32) #2
+
+declare void @jpeg_finish_compress(%struct.jpeg_compress_struct*) #2
+
+declare void @jpeg_destroy_compress(%struct.jpeg_compress_struct*) #2
+
+; Function Attrs: nounwind
+declare i32 @fclose(%struct._IO_FILE* nocapture) #4
+
+declare i32 @keymatch(i8*, i8*, i32) #2
+
+declare void @jpeg_set_colorspace(%struct.jpeg_compress_struct*, i32) #2
+
+; Function Attrs: nounwind
+declare i32 @__isoc99_sscanf(i8* nocapture readonly, i8* nocapture readonly, ...) #4
+
+; Function Attrs: argmemonly nounwind
+declare void @llvm.lifetime.end(i64, i8* nocapture) #1
+
+declare i32 @jpeg_quality_scaling(i32) #2
+
+declare void @jpeg_set_quality(%struct.jpeg_compress_struct*, i32, i32) #2
+
+declare i32 @read_quant_tables(%struct.jpeg_compress_struct*, i8*, i32, i32) #2
+
+declare i32 @set_quant_slots(%struct.jpeg_compress_struct*, i8*) #2
+
+declare i32 @set_sample_factors(%struct.jpeg_compress_struct*, i8*) #2
+
+declare void @jpeg_simple_progression(%struct.jpeg_compress_struct*) #2
+
+declare i32 @read_scan_script(%struct.jpeg_compress_struct*, i8*) #2
+
+declare %struct.cjpeg_source_struct* @jinit_read_targa(%struct.jpeg_compress_struct*) #2
+
+; Function Attrs: nounwind
+declare i32 @_IO_getc(%struct._IO_FILE* nocapture) #4
+
+; Function Attrs: nounwind
+declare i32 @ungetc(i32, %struct._IO_FILE* nocapture) #4
+
+declare %struct.cjpeg_source_struct* @jinit_read_bmp(%struct.jpeg_compress_struct*) #2
+
+declare %struct.cjpeg_source_struct* @jinit_read_gif(%struct.jpeg_compress_struct*) #2
+
+declare %struct.cjpeg_source_struct* @jinit_read_ppm(%struct.jpeg_compress_struct*) #2
+
+; Function Attrs: nounwind
+declare i64 @fwrite(i8* nocapture, i64, i64, %struct._IO_FILE* nocapture) #6
+
+attributes #0 = { noreturn nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #1 = { argmemonly nounwind }
+attributes #2 = { "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #3 = { nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #4 = { nounwind "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #5 = { noreturn nounwind "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #6 = { nounwind }
+attributes #7 = { cold }
+attributes #8 = { noreturn nounwind }
+
+!llvm.module.flags = !{!0}
+!llvm.ident = !{!1}
+
+!0 = !{i32 1, !"MaxFunctionCount", i32 150581}
+!1 = !{!"clang version 3.8.0 (trunk 257473)"}
+!2 = !{!"function_entry_count", i64 1}
+!3 = !{!4, !4, i64 0}
+!4 = !{!"any pointer", !5, i64 0}
+!5 = !{!"omnipotent char", !6, i64 0}
+!6 = !{!"Simple C/C++ TBAA"}
+!7 = !{!"branch_weights", i32 1, i32 2}
+!8 = !{!5, !5, i64 0}
+!9 = !{!10, !4, i64 0}
+!10 = !{!"jpeg_compress_struct", !4, i64 0, !4, i64 8, !4, i64 16, !11, i64 24, !11, i64 28, !4, i64 32, !11, i64 40, !11, i64 44, !11, i64 48, !5, i64 52, !12, i64 56, !11, i64 64, !11, i64 68, !5, i64 72, !4, i64 80, !5, i64 88, !5, i64 120, !5, i64 152, !5, i64 184, !5, i64 200, !5, i64 216, !11, i64 232, !4, i64 240, !11, i64 248, !11, i64 252, !11, i64 256, !11, i64 260, !11, i64 264, !5, i64 268, !11, i64 272, !11, i64 276, !11, i64 280, !5, i64 284, !13, i64 286, !13, i64 288, !11, i64 292, !11, i64 296, !11, i64 300, !11, i64 304, !11, i64 308, !11, i64 312, !11, i64 316, !5, i64 320, !11, i64 352, !11, i64 356, !11, i64 360, !5, i64 364, !11, i64 404, !11, i64 408, !11, i64 412, !11, i64 416, !4, i64 424, !4, i64 432, !4, i64 440, !4, i64 448, !4, i64 456, !4, i64 464, !4, i64 472, !4, i64 480, !4, i64 488}
+!11 = !{!"int", !5, i64 0}
+!12 = !{!"double", !5, i64 0}
+!13 = !{!"short", !5, i64 0}
+!14 = !{!15, !4, i64 152}
+!15 = !{!"jpeg_error_mgr", !4, i64 0, !4, i64 8, !4, i64 16, !4, i64 24, !4, i64 32, !11, i64 40, !5, i64 44, !11, i64 124, !16, i64 128, !4, i64 136, !11, i64 144, !4, i64 152, !11, i64 160, !11, i64 164}
+!16 = !{!"long", !5, i64 0}
+!17 = !{!15, !11, i64 160}
+!18 = !{!15, !11, i64 164}
+!19 = !{!10, !5, i64 52}
+!20 = !{!"branch_weights", i32 2, i32 1}
+!21 = !{!15, !11, i64 40}
+!22 = !{!15, !4, i64 0}
+!23 = !{!"branch_weights", i32 1, i32 1, i32 1, i32 2, i32 1}
+!24 = !{!25, !4, i64 24}
+!25 = !{!"cjpeg_source_struct", !4, i64 0, !4, i64 8, !4, i64 16, !4, i64 24, !4, i64 32, !11, i64 40}
+!26 = !{!25, !4, i64 0}
+!27 = !{!10, !11, i64 296}
+!28 = !{!10, !11, i64 44}
+!29 = !{!"branch_weights", i32 513, i32 2}
+!30 = !{!25, !4, i64 8}
+!31 = !{!25, !4, i64 32}
+!32 = !{!25, !4, i64 16}
+!33 = !{!15, !16, i64 128}
+!34 = !{!11, !11, i64 0}
+!35 = !{!15, !11, i64 124}
+!36 = !{!"branch_weights", i32 11, i32 1}
+!37 = !{!"branch_weights", i32 9, i32 3}
+!38 = !{!"branch_weights", i32 1, i32 3}
+!39 = !{!"branch_weights", i32 9, i32 1}
+!40 = !{!"branch_weights", i32 7, i32 3}
+!41 = !{!"branch_weights", i32 3, i32 1}
+!42 = !{!10, !5, i64 268}
+!43 = !{!"branch_weights", i32 7, i32 1}
+!44 = !{!16, !16, i64 0}
+!45 = !{!10, !4, i64 8}
+!46 = !{!47, !16, i64 88}
+!47 = !{!"jpeg_memory_mgr", !4, i64 0, !4, i64 8, !4, i64 16, !4, i64 24, !4, i64 32, !4, i64 40, !4, i64 48, !4, i64 56, !4, i64 64, !4, i64 72, !4, i64 80, !16, i64 88}
+!48 = !{!"branch_weights", i32 5, i32 3}
+!49 = !{!"branch_weights", i32 5, i32 1}
+!50 = !{!10, !11, i64 256}
+!51 = !{!"branch_weights", i32 3, i32 3}
+!52 = !{!10, !11, i64 272}
+!53 = !{!10, !11, i64 276}
+!54 = !{!10, !11, i64 264}
+!55 = !{!"branch_weights", i32 2, i32 2}
+!56 = !{!"function_entry_count", i64 0}

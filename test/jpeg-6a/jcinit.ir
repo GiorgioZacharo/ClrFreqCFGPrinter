@@ -1,0 +1,163 @@
+; ModuleID = 'jcinit.c'
+target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+%struct.jpeg_compress_struct = type { %struct.jpeg_error_mgr*, %struct.jpeg_memory_mgr*, %struct.jpeg_progress_mgr*, i32, i32, %struct.jpeg_destination_mgr*, i32, i32, i32, i32, double, i32, i32, i32, %struct.jpeg_component_info*, [4 x %struct.JQUANT_TBL*], [4 x %struct.JHUFF_TBL*], [4 x %struct.JHUFF_TBL*], [16 x i8], [16 x i8], [16 x i8], i32, %struct.jpeg_scan_info*, i32, i32, i32, i32, i32, i32, i32, i32, i32, i8, i16, i16, i32, i32, i32, i32, i32, i32, i32, [4 x %struct.jpeg_component_info*], i32, i32, i32, [10 x i32], i32, i32, i32, i32, %struct.jpeg_comp_master*, %struct.jpeg_c_main_controller*, %struct.jpeg_c_prep_controller*, %struct.jpeg_c_coef_controller*, %struct.jpeg_marker_writer*, %struct.jpeg_color_converter*, %struct.jpeg_downsampler*, %struct.jpeg_forward_dct*, %struct.jpeg_entropy_encoder* }
+%struct.jpeg_error_mgr = type { void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*, i32)*, void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*, i8*)*, void (%struct.jpeg_common_struct*)*, i32, %union.anon, i32, i64, i8**, i32, i8**, i32, i32 }
+%struct.jpeg_common_struct = type { %struct.jpeg_error_mgr*, %struct.jpeg_memory_mgr*, %struct.jpeg_progress_mgr*, i32, i32 }
+%union.anon = type { [8 x i32], [48 x i8] }
+%struct.jpeg_memory_mgr = type { i8* (%struct.jpeg_common_struct*, i32, i64)*, i8* (%struct.jpeg_common_struct*, i32, i64)*, i8** (%struct.jpeg_common_struct*, i32, i32, i32)*, [64 x i16]** (%struct.jpeg_common_struct*, i32, i32, i32)*, %struct.jvirt_sarray_control* (%struct.jpeg_common_struct*, i32, i32, i32, i32, i32)*, %struct.jvirt_barray_control* (%struct.jpeg_common_struct*, i32, i32, i32, i32, i32)*, {}*, i8** (%struct.jpeg_common_struct*, %struct.jvirt_sarray_control*, i32, i32, i32)*, [64 x i16]** (%struct.jpeg_common_struct*, %struct.jvirt_barray_control*, i32, i32, i32)*, void (%struct.jpeg_common_struct*, i32)*, {}*, i64 }
+%struct.jvirt_sarray_control = type opaque
+%struct.jvirt_barray_control = type opaque
+%struct.jpeg_progress_mgr = type { {}*, i64, i64, i32, i32 }
+%struct.jpeg_destination_mgr = type { i8*, i64, {}*, i32 (%struct.jpeg_compress_struct*)*, {}* }
+%struct.jpeg_component_info = type { i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, %struct.JQUANT_TBL*, i8* }
+%struct.JQUANT_TBL = type { [64 x i16], i32 }
+%struct.JHUFF_TBL = type { [17 x i8], [256 x i8], i32 }
+%struct.jpeg_scan_info = type { i32, [4 x i32], i32, i32, i32, i32 }
+%struct.jpeg_comp_master = type { {}*, {}*, {}*, i32, i32 }
+%struct.jpeg_c_main_controller = type { void (%struct.jpeg_compress_struct*, i32)*, void (%struct.jpeg_compress_struct*, i8**, i32*, i32)* }
+%struct.jpeg_c_prep_controller = type { void (%struct.jpeg_compress_struct*, i32)*, void (%struct.jpeg_compress_struct*, i8**, i32*, i32, i8***, i32*, i32)* }
+%struct.jpeg_c_coef_controller = type { void (%struct.jpeg_compress_struct*, i32)*, i32 (%struct.jpeg_compress_struct*, i8***)* }
+%struct.jpeg_marker_writer = type { void (%struct.jpeg_compress_struct*, i32, i8*, i32)*, {}*, {}*, {}*, {}*, {}* }
+%struct.jpeg_color_converter = type { {}*, void (%struct.jpeg_compress_struct*, i8**, i8***, i32, i32)* }
+%struct.jpeg_downsampler = type { {}*, void (%struct.jpeg_compress_struct*, i8***, i32, i8***, i32)*, i32 }
+%struct.jpeg_forward_dct = type { {}*, void (%struct.jpeg_compress_struct*, %struct.jpeg_component_info*, i8**, [64 x i16]*, i32, i32, i32)* }
+%struct.jpeg_entropy_encoder = type { void (%struct.jpeg_compress_struct*, i32)*, i32 (%struct.jpeg_compress_struct*, [64 x i16]**)*, {}* }
+
+; Function Attrs: nounwind uwtable
+define void @jinit_compress_master(%struct.jpeg_compress_struct* %cinfo) #0 !prof !2 {
+entry:
+  tail call void @jinit_c_master_control(%struct.jpeg_compress_struct* %cinfo, i32 0) #2
+  %raw_data_in = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 23
+  %0 = load i32, i32* %raw_data_in, align 8, !tbaa !3
+  %tobool = icmp eq i32 %0, 0
+  br i1 %tobool, label %if.then, label %if.end, !prof !11
+
+if.then:                                          ; preds = %entry
+  tail call void @jinit_color_converter(%struct.jpeg_compress_struct* nonnull %cinfo) #2
+  tail call void @jinit_downsampler(%struct.jpeg_compress_struct* nonnull %cinfo) #2
+  tail call void @jinit_c_prep_controller(%struct.jpeg_compress_struct* nonnull %cinfo, i32 0) #2
+  br label %if.end
+
+if.end:                                           ; preds = %entry, %if.then
+  tail call void @jinit_forward_dct(%struct.jpeg_compress_struct* nonnull %cinfo) #2
+  %arith_code = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 24
+  %1 = load i32, i32* %arith_code, align 4, !tbaa !12
+  %tobool1 = icmp eq i32 %1, 0
+  br i1 %tobool1, label %if.else, label %if.then2, !prof !11
+
+if.then2:                                         ; preds = %if.end
+  %err = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 0
+  %2 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8, !tbaa !13
+  %msg_code = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %2, i64 0, i32 5
+  store i32 1, i32* %msg_code, align 8, !tbaa !14
+  %error_exit = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %2, i64 0, i32 0
+  %3 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit, align 8, !tbaa !17
+  %4 = bitcast %struct.jpeg_compress_struct* %cinfo to %struct.jpeg_common_struct*
+  tail call void %3(%struct.jpeg_common_struct* %4) #2
+  br label %if.end8
+
+if.else:                                          ; preds = %if.end
+  %progressive_mode = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 37
+  %5 = load i32, i32* %progressive_mode, align 4, !tbaa !18
+  %tobool4 = icmp eq i32 %5, 0
+  br i1 %tobool4, label %if.else6, label %if.then5, !prof !19
+
+if.then5:                                         ; preds = %if.else
+  tail call void @jinit_phuff_encoder(%struct.jpeg_compress_struct* nonnull %cinfo) #2
+  br label %if.end8
+
+if.else6:                                         ; preds = %if.else
+  tail call void @jinit_huff_encoder(%struct.jpeg_compress_struct* nonnull %cinfo) #2
+  br label %if.end8
+
+if.end8:                                          ; preds = %if.then5, %if.else6, %if.then2
+  %num_scans = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 21
+  %6 = load i32, i32* %num_scans, align 8, !tbaa !20
+  %cmp = icmp sgt i32 %6, 1
+  br i1 %cmp, label %lor.end, label %lor.rhs, !prof !11
+
+lor.rhs:                                          ; preds = %if.end8
+  %optimize_coding = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 25
+  %7 = load i32, i32* %optimize_coding, align 8, !tbaa !21
+  %tobool9 = icmp ne i32 %7, 0
+  br label %lor.end
+
+lor.end:                                          ; preds = %lor.rhs, %if.end8
+  %8 = phi i1 [ true, %if.end8 ], [ %tobool9, %lor.rhs ]
+  %lor.ext = zext i1 %8 to i32
+  tail call void @jinit_c_coef_controller(%struct.jpeg_compress_struct* nonnull %cinfo, i32 %lor.ext) #2
+  tail call void @jinit_c_main_controller(%struct.jpeg_compress_struct* nonnull %cinfo, i32 0) #2
+  tail call void @jinit_marker_writer(%struct.jpeg_compress_struct* nonnull %cinfo) #2
+  %mem = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 1
+  %9 = load %struct.jpeg_memory_mgr*, %struct.jpeg_memory_mgr** %mem, align 8, !tbaa !22
+  %realize_virt_arrays = getelementptr inbounds %struct.jpeg_memory_mgr, %struct.jpeg_memory_mgr* %9, i64 0, i32 6
+  %realize_virt_arrays10 = bitcast {}** %realize_virt_arrays to void (%struct.jpeg_common_struct*)**
+  %10 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %realize_virt_arrays10, align 8, !tbaa !23
+  %11 = bitcast %struct.jpeg_compress_struct* %cinfo to %struct.jpeg_common_struct*
+  tail call void %10(%struct.jpeg_common_struct* %11) #2
+  %marker = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 55
+  %12 = load %struct.jpeg_marker_writer*, %struct.jpeg_marker_writer** %marker, align 8, !tbaa !25
+  %write_file_header = getelementptr inbounds %struct.jpeg_marker_writer, %struct.jpeg_marker_writer* %12, i64 0, i32 1
+  %write_file_header11 = bitcast {}** %write_file_header to void (%struct.jpeg_compress_struct*)**
+  %13 = load void (%struct.jpeg_compress_struct*)*, void (%struct.jpeg_compress_struct*)** %write_file_header11, align 8, !tbaa !26
+  tail call void %13(%struct.jpeg_compress_struct* nonnull %cinfo) #2
+  ret void
+}
+
+declare void @jinit_c_master_control(%struct.jpeg_compress_struct*, i32) #1
+
+declare void @jinit_color_converter(%struct.jpeg_compress_struct*) #1
+
+declare void @jinit_downsampler(%struct.jpeg_compress_struct*) #1
+
+declare void @jinit_c_prep_controller(%struct.jpeg_compress_struct*, i32) #1
+
+declare void @jinit_forward_dct(%struct.jpeg_compress_struct*) #1
+
+declare void @jinit_phuff_encoder(%struct.jpeg_compress_struct*) #1
+
+declare void @jinit_huff_encoder(%struct.jpeg_compress_struct*) #1
+
+declare void @jinit_c_coef_controller(%struct.jpeg_compress_struct*, i32) #1
+
+declare void @jinit_c_main_controller(%struct.jpeg_compress_struct*, i32) #1
+
+declare void @jinit_marker_writer(%struct.jpeg_compress_struct*) #1
+
+attributes #0 = { nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #1 = { "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #2 = { nounwind }
+
+!llvm.module.flags = !{!0}
+!llvm.ident = !{!1}
+
+!0 = !{i32 1, !"MaxFunctionCount", i32 150581}
+!1 = !{!"clang version 3.8.0 (trunk 257473)"}
+!2 = !{!"function_entry_count", i64 1}
+!3 = !{!4, !8, i64 248}
+!4 = !{!"jpeg_compress_struct", !5, i64 0, !5, i64 8, !5, i64 16, !8, i64 24, !8, i64 28, !5, i64 32, !8, i64 40, !8, i64 44, !8, i64 48, !6, i64 52, !9, i64 56, !8, i64 64, !8, i64 68, !6, i64 72, !5, i64 80, !6, i64 88, !6, i64 120, !6, i64 152, !6, i64 184, !6, i64 200, !6, i64 216, !8, i64 232, !5, i64 240, !8, i64 248, !8, i64 252, !8, i64 256, !8, i64 260, !8, i64 264, !6, i64 268, !8, i64 272, !8, i64 276, !8, i64 280, !6, i64 284, !10, i64 286, !10, i64 288, !8, i64 292, !8, i64 296, !8, i64 300, !8, i64 304, !8, i64 308, !8, i64 312, !8, i64 316, !6, i64 320, !8, i64 352, !8, i64 356, !8, i64 360, !6, i64 364, !8, i64 404, !8, i64 408, !8, i64 412, !8, i64 416, !5, i64 424, !5, i64 432, !5, i64 440, !5, i64 448, !5, i64 456, !5, i64 464, !5, i64 472, !5, i64 480, !5, i64 488}
+!5 = !{!"any pointer", !6, i64 0}
+!6 = !{!"omnipotent char", !7, i64 0}
+!7 = !{!"Simple C/C++ TBAA"}
+!8 = !{!"int", !6, i64 0}
+!9 = !{!"double", !6, i64 0}
+!10 = !{!"short", !6, i64 0}
+!11 = !{!"branch_weights", i32 2, i32 1}
+!12 = !{!4, !8, i64 252}
+!13 = !{!4, !5, i64 0}
+!14 = !{!15, !8, i64 40}
+!15 = !{!"jpeg_error_mgr", !5, i64 0, !5, i64 8, !5, i64 16, !5, i64 24, !5, i64 32, !8, i64 40, !6, i64 44, !8, i64 124, !16, i64 128, !5, i64 136, !8, i64 144, !5, i64 152, !8, i64 160, !8, i64 164}
+!16 = !{!"long", !6, i64 0}
+!17 = !{!15, !5, i64 0}
+!18 = !{!4, !8, i64 300}
+!19 = !{!"branch_weights", i32 1, i32 2}
+!20 = !{!4, !8, i64 232}
+!21 = !{!4, !8, i64 256}
+!22 = !{!4, !5, i64 8}
+!23 = !{!24, !5, i64 48}
+!24 = !{!"jpeg_memory_mgr", !5, i64 0, !5, i64 8, !5, i64 16, !5, i64 24, !5, i64 32, !5, i64 40, !5, i64 48, !5, i64 56, !5, i64 64, !5, i64 72, !5, i64 80, !16, i64 88}
+!25 = !{!4, !5, i64 456}
+!26 = !{!27, !5, i64 8}
+!27 = !{!"jpeg_marker_writer", !5, i64 0, !5, i64 8, !5, i64 16, !5, i64 24, !5, i64 32, !5, i64 40}

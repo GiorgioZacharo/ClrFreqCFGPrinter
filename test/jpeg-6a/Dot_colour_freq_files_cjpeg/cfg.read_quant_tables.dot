@@ -1,0 +1,42 @@
+digraph "CFG for 'read_quant_tables' function" {
+	label="CFG for 'read_quant_tables' function";
+
+	Node0x5e34b20 [shape=record,label="{entry:\l  %termchar = alloca i32, align 4\l  %val = alloca i64, align 8\l  %table = alloca [64 x i32], align 16\l  %0 = bitcast i32* %termchar to i8*\l  call void @llvm.lifetime.start(i64 4, i8* %0) #5\l  %1 = bitcast i64* %val to i8*\l  call void @llvm.lifetime.start(i64 8, i8* %1) #5\l  %2 = bitcast [64 x i32]* %table to i8*\l  call void @llvm.lifetime.start(i64 256, i8* %2) #5\l  %call = tail call %struct._IO_FILE* @fopen(i8* %filename, i8* getelementptr\l... inbounds ([2 x i8], [2 x i8]* @.str, i64 0, i64 0))\l  %cmp = icmp eq %struct._IO_FILE* %call, null\l  br i1 %cmp, label %if.then, label %while.cond.preheader\l|{<s0>T|<s1>F}}"];
+	Node0x5e34b20:s0 -> Node0x5e367b0;
+	Node0x5e34b20:s1 -> Node0x5e368b0;
+	Node0x5e368b0 [shape=record,label="{while.cond.preheader:                             \l  %call248 = call fastcc i32 @read_text_integer(%struct._IO_FILE* nonnull\l... %call, i64* nonnull %val, i32* nonnull %termchar)\l  %tobool49 = icmp eq i32 %call248, 0\l  br i1 %tobool49, label %while.end, label %while.body.lr.ph\l|{<s0>T|<s1>F}}"];
+	Node0x5e368b0:s0 -> Node0x5e36f80;
+	Node0x5e368b0:s1 -> Node0x5e37090;
+	Node0x5e37090 [shape=record,label="{while.body.lr.ph:                                 \l  %arrayidx = getelementptr inbounds [64 x i32], [64 x i32]* %table, i64 0,\l... i64 0\l  br label %while.body\l}"];
+	Node0x5e37090 -> Node0x5e372a0;
+	Node0x5e367b0 [shape=record,label="{if.then:                                          \l  %3 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3\l  %call1 = tail call i32 (%struct._IO_FILE*, i8*, ...)\l... @fprintf(%struct._IO_FILE* %3, i8* nonnull getelementptr inbounds ([26 x i8],\l... [26 x i8]* @.str.1, i64 0, i64 0), i8* %filename) #6\l  br label %cleanup\l}"];
+	Node0x5e367b0 -> Node0x5e387b0;
+	Node0x5e372a0 [shape=record,label="{while.body:                                       \l  %tblno.050 = phi i32 [ 0, %while.body.lr.ph ], [ %inc18, %for.end ]\l  %cmp3 = icmp sgt i32 %tblno.050, 3\l  br i1 %cmp3, label %if.then4, label %if.end7\l|{<s0>T|<s1>F}}"];
+	Node0x5e372a0:s0 -> Node0x5e38bd0;
+	Node0x5e372a0:s1 -> Node0x5e38cb0;
+	Node0x5e38bd0 [shape=record,label="{if.then4:                                         \l  %4 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3\l  %call5 = call i32 (%struct._IO_FILE*, i8*, ...) @fprintf(%struct._IO_FILE*\l... %4, i8* nonnull getelementptr inbounds ([28 x i8], [28 x i8]* @.str.2, i64 0,\l... i64 0), i8* %filename) #6\l  %call6 = call i32 @fclose(%struct._IO_FILE* nonnull %call)\l  br label %cleanup\l}"];
+	Node0x5e38bd0 -> Node0x5e387b0;
+	Node0x5e38cb0 [shape=record,label="{if.end7:                                          \l  %5 = load i64, i64* %val, align 8, !tbaa !7\l  %conv = trunc i64 %5 to i32\l  store i32 %conv, i32* %arrayidx, align 16, !tbaa !9\l  br label %for.body\l}"];
+	Node0x5e38cb0 -> Node0x5e31fb0;
+	Node0x5e31fb0 [shape=record,label="{for.body:                                         \l  %indvars.iv = phi i64 [ 1, %if.end7 ], [ %indvars.iv.next, %if.end15 ]\l  %call10 = call fastcc i32 @read_text_integer(%struct._IO_FILE* nonnull\l... %call, i64* nonnull %val, i32* nonnull %termchar)\l  %tobool11 = icmp eq i32 %call10, 0\l  br i1 %tobool11, label %if.then12, label %if.end15\l|{<s0>T|<s1>F}}"];
+	Node0x5e31fb0:s0 -> Node0x5e3a7a0;
+	Node0x5e31fb0:s1 -> Node0x5e3a3b0;
+	Node0x5e3a7a0 [shape=record,label="{if.then12:                                        \l  %6 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3\l  %call13 = call i32 (%struct._IO_FILE*, i8*, ...) @fprintf(%struct._IO_FILE*\l... %6, i8* nonnull getelementptr inbounds ([31 x i8], [31 x i8]* @.str.3, i64 0,\l... i64 0), i8* %filename) #6\l  %call14 = call i32 @fclose(%struct._IO_FILE* nonnull %call)\l  br label %cleanup\l}"];
+	Node0x5e3a7a0 -> Node0x5e387b0;
+	Node0x5e3a3b0 [shape=record,label="{if.end15:                                         \l  %7 = load i64, i64* %val, align 8, !tbaa !7\l  %conv16 = trunc i64 %7 to i32\l  %arrayidx17 = getelementptr inbounds [64 x i32], [64 x i32]* %table, i64 0,\l... i64 %indvars.iv\l  store i32 %conv16, i32* %arrayidx17, align 4, !tbaa !9\l  %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1\l  %cmp8 = icmp slt i64 %indvars.iv.next, 64\l  br i1 %cmp8, label %for.body, label %for.end\l|{<s0>T|<s1>F}}"];
+	Node0x5e3a3b0:s0 -> Node0x5e31fb0;
+	Node0x5e3a3b0:s1 -> Node0x5e38970;
+	Node0x5e38970 [shape=record,label="{for.end:                                          \l  call void @jpeg_add_quant_table(%struct.jpeg_compress_struct* %cinfo, i32\l... %tblno.050, i32* nonnull %arrayidx, i32 %scale_factor, i32 %force_baseline) #5\l  %inc18 = add nuw nsw i32 %tblno.050, 1\l  %call2 = call fastcc i32 @read_text_integer(%struct._IO_FILE* nonnull %call,\l... i64* nonnull %val, i32* nonnull %termchar)\l  %tobool = icmp eq i32 %call2, 0\l  br i1 %tobool, label %while.end.loopexit, label %while.body\l|{<s0>T|<s1>F}}"];
+	Node0x5e38970:s0 -> Node0x5e3c0e0;
+	Node0x5e38970:s1 -> Node0x5e372a0;
+	Node0x5e3c0e0 [shape=record,label="{while.end.loopexit:                               \l  br label %while.end\l}"];
+	Node0x5e3c0e0 -> Node0x5e36f80;
+	Node0x5e36f80 [shape=record,label="{while.end:                                        \l  %8 = load i32, i32* %termchar, align 4, !tbaa !9\l  %cmp19 = icmp eq i32 %8, -1\l  br i1 %cmp19, label %if.end24, label %if.then21\l|{<s0>T|<s1>F}}"];
+	Node0x5e36f80:s0 -> Node0x5e36ed0;
+	Node0x5e36f80:s1 -> Node0x5e3c2f0;
+	Node0x5e3c2f0 [shape=record,label="{if.then21:                                        \l  %9 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !3\l  %call22 = call i32 (%struct._IO_FILE*, i8*, ...) @fprintf(%struct._IO_FILE*\l... %9, i8* nonnull getelementptr inbounds ([29 x i8], [29 x i8]* @.str.4, i64 0,\l... i64 0), i8* %filename) #6\l  %call23 = call i32 @fclose(%struct._IO_FILE* nonnull %call)\l  br label %cleanup\l}"];
+	Node0x5e3c2f0 -> Node0x5e387b0;
+	Node0x5e36ed0 [shape=record,label="{if.end24:                                         \l  %call25 = call i32 @fclose(%struct._IO_FILE* nonnull %call)\l  br label %cleanup\l}"];
+	Node0x5e36ed0 -> Node0x5e387b0;
+	Node0x5e387b0 [shape=record,label="{cleanup:                                          \l  %retval.0 = phi i32 [ 0, %if.then ], [ 0, %if.then4 ], [ 0, %if.then12 ], [\l... 0, %if.then21 ], [ 1, %if.end24 ]\l  call void @llvm.lifetime.end(i64 256, i8* %2) #5\l  call void @llvm.lifetime.end(i64 8, i8* %1) #5\l  call void @llvm.lifetime.end(i64 4, i8* %0) #5\l  ret i32 %retval.0\l}"];
+}

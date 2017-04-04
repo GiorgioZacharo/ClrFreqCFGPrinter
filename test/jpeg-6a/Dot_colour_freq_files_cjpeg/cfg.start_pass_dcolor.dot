@@ -1,0 +1,5 @@
+digraph "CFG for 'start_pass_dcolor' function" {
+	label="CFG for 'start_pass_dcolor' function";
+
+	Node0x670c2a0 [shape=record,label="{entry:\l  ret void\l}"];
+}

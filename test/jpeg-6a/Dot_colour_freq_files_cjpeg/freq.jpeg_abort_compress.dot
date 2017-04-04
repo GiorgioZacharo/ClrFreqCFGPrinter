@@ -1,0 +1,5 @@
+digraph "CFG for 'jpeg_abort_compress' function" {
+	label="CFG for 'jpeg_abort_compress' function";
+
+	Node0x67309d0 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  %0 = bitcast %struct.jpeg_compress_struct* %cinfo to\l... %struct.jpeg_common_struct*\l  tail call void @jpeg_abort(%struct.jpeg_common_struct* %0) #4\l  ret void\l}"];
+}

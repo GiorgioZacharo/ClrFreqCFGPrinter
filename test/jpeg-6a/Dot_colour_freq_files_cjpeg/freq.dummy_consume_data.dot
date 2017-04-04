@@ -1,0 +1,5 @@
+digraph "CFG for 'dummy_consume_data' function" {
+	label="CFG for 'dummy_consume_data' function";
+
+	Node0x585d0b0 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  ret i32 0\l}"];
+}

@@ -1,0 +1,10 @@
+digraph "CFG for 'finish_output_pass' function" {
+	label="CFG for 'finish_output_pass' function";
+
+	Node0x6150b70 [shape=record,label="{entry:\l  %master1 = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 73\l  %0 = bitcast %struct.jpeg_decomp_master** %master1 to\l... %struct.my_decomp_master**\l  %1 = load %struct.my_decomp_master*, %struct.my_decomp_master** %0, align 8,\l... !tbaa !2\l  %quantize_colors = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 19\l  %2 = load i32, i32* %quantize_colors, align 4, !tbaa !10\l  %tobool = icmp eq i32 %2, 0\l  br i1 %tobool, label %if.end, label %if.then\l|{<s0>T|<s1>F}}"];
+	Node0x6150b70:s0 -> Node0x6150e10;
+	Node0x6150b70:s1 -> Node0x6150ec0;
+	Node0x6150ec0 [shape=record,label="{if.then:                                          \l  %cquantize = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 83\l  %3 = load %struct.jpeg_color_quantizer*, %struct.jpeg_color_quantizer**\l... %cquantize, align 8, !tbaa !11\l  %finish_pass = getelementptr inbounds %struct.jpeg_color_quantizer,\l... %struct.jpeg_color_quantizer* %3, i64 0, i32 2\l  %finish_pass2 = bitcast \{\}** %finish_pass to void\l... (%struct.jpeg_decompress_struct*)**\l  %4 = load void (%struct.jpeg_decompress_struct*)*, void\l... (%struct.jpeg_decompress_struct*)** %finish_pass2, align 8, !tbaa !12\l  tail call void %4(%struct.jpeg_decompress_struct* nonnull %cinfo) #3\l  br label %if.end\l}"];
+	Node0x6150ec0 -> Node0x6150e10;
+	Node0x6150e10 [shape=record,label="{if.end:                                           \l  %pass_number = getelementptr inbounds %struct.my_decomp_master,\l... %struct.my_decomp_master* %1, i64 0, i32 1\l  %5 = load i32, i32* %pass_number, align 8, !tbaa !14\l  %inc = add nsw i32 %5, 1\l  store i32 %inc, i32* %pass_number, align 8, !tbaa !14\l  ret void\l}"];
+}

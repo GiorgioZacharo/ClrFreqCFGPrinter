@@ -1,0 +1,5 @@
+digraph "CFG for 'finish_input_pass' function" {
+	label="CFG for 'finish_input_pass' function";
+
+	Node0x51a99e0 [shape=record,label="{entry:\l  %inputctl = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 77\l  %0 = load %struct.jpeg_input_controller*, %struct.jpeg_input_controller**\l... %inputctl, align 8, !tbaa !2\l  %consume_input = getelementptr inbounds %struct.jpeg_input_controller,\l... %struct.jpeg_input_controller* %0, i64 0, i32 0\l  store i32 (%struct.jpeg_decompress_struct*)* @consume_markers, i32\l... (%struct.jpeg_decompress_struct*)** %consume_input, align 8, !tbaa !10\l  ret void\l}"];
+}

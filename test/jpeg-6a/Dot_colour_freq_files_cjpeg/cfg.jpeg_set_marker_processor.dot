@@ -1,0 +1,17 @@
+digraph "CFG for 'jpeg_set_marker_processor' function" {
+	label="CFG for 'jpeg_set_marker_processor' function";
+
+	Node0x514ae10 [shape=record,label="{entry:\l  %cmp = icmp eq i32 %marker_code, 254\l  br i1 %cmp, label %if.then, label %if.else\l|{<s0>T|<s1>F}}"];
+	Node0x514ae10:s0 -> Node0x5142220;
+	Node0x514ae10:s1 -> Node0x5142290;
+	Node0x5142220 [shape=record,label="{if.then:                                          \l  %marker = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 78\l  %0 = load %struct.jpeg_marker_reader*, %struct.jpeg_marker_reader** %marker,\l... align 8, !tbaa !2\l  %process_COM = getelementptr inbounds %struct.jpeg_marker_reader,\l... %struct.jpeg_marker_reader* %0, i64 0, i32 3\l  store i32 (%struct.jpeg_decompress_struct*)* %routine, i32\l... (%struct.jpeg_decompress_struct*)** %process_COM, align 8, !tbaa !10\l  br label %if.end9\l}"];
+	Node0x5142220 -> Node0x514b930;
+	Node0x5142290 [shape=record,label="{if.else:                                          \l  %1 = and i32 %marker_code, -16\l  %2 = icmp eq i32 %1, 224\l  br i1 %2, label %if.then3, label %if.else5\l|{<s0>T|<s1>F}}"];
+	Node0x5142290:s0 -> Node0x514bc30;
+	Node0x5142290:s1 -> Node0x514bcb0;
+	Node0x514bc30 [shape=record,label="{if.then3:                                         \l  %sub = add nsw i32 %marker_code, -224\l  %idxprom = sext i32 %sub to i64\l  %marker4 = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 78\l  %3 = load %struct.jpeg_marker_reader*, %struct.jpeg_marker_reader**\l... %marker4, align 8, !tbaa !2\l  %arrayidx = getelementptr inbounds %struct.jpeg_marker_reader,\l... %struct.jpeg_marker_reader* %3, i64 0, i32 4, i64 %idxprom\l  store i32 (%struct.jpeg_decompress_struct*)* %routine, i32\l... (%struct.jpeg_decompress_struct*)** %arrayidx, align 8, !tbaa !12\l  br label %if.end9\l}"];
+	Node0x514bc30 -> Node0x514b930;
+	Node0x514bcb0 [shape=record,label="{if.else5:                                         \l  %err = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 0\l  %4 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8,\l... !tbaa !13\l  %msg_code = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %4, i64 0, i32 5\l  store i32 67, i32* %msg_code, align 8, !tbaa !14\l  %arrayidx7 = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %4, i64 0, i32 6, i32 0, i64 0\l  store i32 %marker_code, i32* %arrayidx7, align 4, !tbaa !17\l  %error_exit = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %4, i64 0, i32 0\l  %5 = load void (%struct.jpeg_common_struct*)*, void\l... (%struct.jpeg_common_struct*)** %error_exit, align 8, !tbaa !18\l  %6 = bitcast %struct.jpeg_decompress_struct* %cinfo to\l... %struct.jpeg_common_struct*\l  tail call void %5(%struct.jpeg_common_struct* %6) #3\l  br label %if.end9\l}"];
+	Node0x514bcb0 -> Node0x514b930;
+	Node0x514b930 [shape=record,label="{if.end9:                                          \l  ret void\l}"];
+}

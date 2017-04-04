@@ -1,0 +1,2570 @@
+; ModuleID = 'jchuff.c'
+target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+%struct.jpeg_compress_struct = type { %struct.jpeg_error_mgr*, %struct.jpeg_memory_mgr*, %struct.jpeg_progress_mgr*, i32, i32, %struct.jpeg_destination_mgr*, i32, i32, i32, i32, double, i32, i32, i32, %struct.jpeg_component_info*, [4 x %struct.JQUANT_TBL*], [4 x %struct.JHUFF_TBL*], [4 x %struct.JHUFF_TBL*], [16 x i8], [16 x i8], [16 x i8], i32, %struct.jpeg_scan_info*, i32, i32, i32, i32, i32, i32, i32, i32, i32, i8, i16, i16, i32, i32, i32, i32, i32, i32, i32, [4 x %struct.jpeg_component_info*], i32, i32, i32, [10 x i32], i32, i32, i32, i32, %struct.jpeg_comp_master*, %struct.jpeg_c_main_controller*, %struct.jpeg_c_prep_controller*, %struct.jpeg_c_coef_controller*, %struct.jpeg_marker_writer*, %struct.jpeg_color_converter*, %struct.jpeg_downsampler*, %struct.jpeg_forward_dct*, %struct.jpeg_entropy_encoder* }
+%struct.jpeg_error_mgr = type { void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*, i32)*, void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*, i8*)*, void (%struct.jpeg_common_struct*)*, i32, %union.anon, i32, i64, i8**, i32, i8**, i32, i32 }
+%struct.jpeg_common_struct = type { %struct.jpeg_error_mgr*, %struct.jpeg_memory_mgr*, %struct.jpeg_progress_mgr*, i32, i32 }
+%union.anon = type { [8 x i32], [48 x i8] }
+%struct.jpeg_memory_mgr = type { i8* (%struct.jpeg_common_struct*, i32, i64)*, i8* (%struct.jpeg_common_struct*, i32, i64)*, i8** (%struct.jpeg_common_struct*, i32, i32, i32)*, [64 x i16]** (%struct.jpeg_common_struct*, i32, i32, i32)*, %struct.jvirt_sarray_control* (%struct.jpeg_common_struct*, i32, i32, i32, i32, i32)*, %struct.jvirt_barray_control* (%struct.jpeg_common_struct*, i32, i32, i32, i32, i32)*, {}*, i8** (%struct.jpeg_common_struct*, %struct.jvirt_sarray_control*, i32, i32, i32)*, [64 x i16]** (%struct.jpeg_common_struct*, %struct.jvirt_barray_control*, i32, i32, i32)*, void (%struct.jpeg_common_struct*, i32)*, {}*, i64 }
+%struct.jvirt_sarray_control = type opaque
+%struct.jvirt_barray_control = type opaque
+%struct.jpeg_progress_mgr = type { {}*, i64, i64, i32, i32 }
+%struct.jpeg_destination_mgr = type { i8*, i64, void (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)*, void (%struct.jpeg_compress_struct*)* }
+%struct.jpeg_component_info = type { i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, %struct.JQUANT_TBL*, i8* }
+%struct.JQUANT_TBL = type { [64 x i16], i32 }
+%struct.jpeg_scan_info = type { i32, [4 x i32], i32, i32, i32, i32 }
+%struct.jpeg_comp_master = type { void (%struct.jpeg_compress_struct*)*, void (%struct.jpeg_compress_struct*)*, void (%struct.jpeg_compress_struct*)*, i32, i32 }
+%struct.jpeg_c_main_controller = type { void (%struct.jpeg_compress_struct*, i32)*, void (%struct.jpeg_compress_struct*, i8**, i32*, i32)* }
+%struct.jpeg_c_prep_controller = type { void (%struct.jpeg_compress_struct*, i32)*, void (%struct.jpeg_compress_struct*, i8**, i32*, i32, i8***, i32*, i32)* }
+%struct.jpeg_c_coef_controller = type { void (%struct.jpeg_compress_struct*, i32)*, i32 (%struct.jpeg_compress_struct*, i8***)* }
+%struct.jpeg_marker_writer = type { void (%struct.jpeg_compress_struct*, i32, i8*, i32)*, void (%struct.jpeg_compress_struct*)*, void (%struct.jpeg_compress_struct*)*, void (%struct.jpeg_compress_struct*)*, void (%struct.jpeg_compress_struct*)*, void (%struct.jpeg_compress_struct*)* }
+%struct.jpeg_color_converter = type { void (%struct.jpeg_compress_struct*)*, void (%struct.jpeg_compress_struct*, i8**, i8***, i32, i32)* }
+%struct.jpeg_downsampler = type { void (%struct.jpeg_compress_struct*)*, void (%struct.jpeg_compress_struct*, i8***, i32, i8***, i32)*, i32 }
+%struct.jpeg_forward_dct = type { void (%struct.jpeg_compress_struct*)*, void (%struct.jpeg_compress_struct*, %struct.jpeg_component_info*, i8**, [64 x i16]*, i32, i32, i32)* }
+%struct.jpeg_entropy_encoder = type { void (%struct.jpeg_compress_struct*, i32)*, i32 (%struct.jpeg_compress_struct*, [64 x i16]**)*, void (%struct.jpeg_compress_struct*)* }
+%struct.JHUFF_TBL = type { [17 x i8], [256 x i8], i32 }
+%struct.c_derived_tbl = type { [256 x i32], [256 x i8] }
+%struct.huff_entropy_encoder = type { %struct.jpeg_entropy_encoder, %struct.savable_state, i32, i32, [4 x %struct.c_derived_tbl*], [4 x %struct.c_derived_tbl*], [4 x i64*], [4 x i64*] }
+%struct.savable_state = type { i64, i32, [4 x i32] }
+%struct.working_state = type { i8*, i64, %struct.savable_state, %struct.jpeg_compress_struct* }
+
+@jpeg_natural_order = external constant [0 x i32], align 4
+
+; Function Attrs: nounwind uwtable
+define void @jpeg_make_c_derived_tbl(%struct.jpeg_compress_struct* %cinfo, %struct.JHUFF_TBL* nocapture readonly %htbl, %struct.c_derived_tbl** nocapture %pdtbl) #0 !prof !2 {
+entry:
+  %huffsize = alloca [257 x i8], align 16
+  %huffcode = alloca [257 x i32], align 16
+  %0 = getelementptr inbounds [257 x i8], [257 x i8]* %huffsize, i64 0, i64 0
+  call void @llvm.lifetime.start(i64 257, i8* %0) #4
+  %1 = bitcast [257 x i32]* %huffcode to i8*
+  call void @llvm.lifetime.start(i64 1028, i8* %1) #4
+  %2 = load %struct.c_derived_tbl*, %struct.c_derived_tbl** %pdtbl, align 8, !tbaa !3
+  %cmp = icmp eq %struct.c_derived_tbl* %2, null
+  br i1 %cmp, label %if.then, label %if.end, !prof !7
+
+if.then:                                          ; preds = %entry
+  %mem = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 1
+  %3 = load %struct.jpeg_memory_mgr*, %struct.jpeg_memory_mgr** %mem, align 8, !tbaa !8
+  %alloc_small = getelementptr inbounds %struct.jpeg_memory_mgr, %struct.jpeg_memory_mgr* %3, i64 0, i32 0
+  %4 = load i8* (%struct.jpeg_common_struct*, i32, i64)*, i8* (%struct.jpeg_common_struct*, i32, i64)** %alloc_small, align 8, !tbaa !13
+  %5 = bitcast %struct.jpeg_compress_struct* %cinfo to %struct.jpeg_common_struct*
+  %call = tail call i8* %4(%struct.jpeg_common_struct* %5, i32 1, i64 1280) #4
+  %6 = bitcast %struct.c_derived_tbl** %pdtbl to i8**
+  store i8* %call, i8** %6, align 8, !tbaa !3
+  %7 = bitcast i8* %call to %struct.c_derived_tbl*
+  br label %if.end
+
+if.end:                                           ; preds = %if.then, %entry
+  %8 = phi %struct.c_derived_tbl* [ %7, %if.then ], [ %2, %entry ]
+  br label %for.cond2.preheader
+
+for.cond2.preheader:                              ; preds = %for.inc10, %if.end
+  %indvars.iv109 = phi i64 [ 1, %if.end ], [ %indvars.iv.next110, %for.inc10 ]
+  %p.0104 = phi i32 [ 0, %if.end ], [ %p.1.lcssa, %for.inc10 ]
+  %l.0103 = phi i32 [ 1, %if.end ], [ %inc11, %for.inc10 ]
+  %arrayidx = getelementptr inbounds %struct.JHUFF_TBL, %struct.JHUFF_TBL* %htbl, i64 0, i32 0, i64 %indvars.iv109
+  %9 = load i8, i8* %arrayidx, align 1, !tbaa !16
+  %cmp399 = icmp eq i8 %9, 0
+  br i1 %cmp399, label %for.inc10, label %for.body5.lr.ph, !prof !17
+
+for.body5.lr.ph:                                  ; preds = %for.cond2.preheader
+  %conv6 = trunc i32 %l.0103 to i8
+  %conv = zext i8 %9 to i32
+  %10 = sext i32 %p.0104 to i64
+  %scevgep = getelementptr [257 x i8], [257 x i8]* %huffsize, i64 0, i64 %10
+  %11 = icmp ugt i32 %conv, 1
+  %smax = select i1 %11, i32 %conv, i32 1
+  %12 = add nsw i32 %smax, -1
+  %13 = zext i32 %12 to i64
+  %14 = add nuw nsw i64 %13, 1
+  call void @llvm.memset.p0i8.i64(i8* %scevgep, i8 %conv6, i64 %14, i32 1, i1 false)
+  %15 = zext i8 %9 to i32
+  %16 = add nsw i32 %15, -1
+  %xtraiter121 = and i32 %15, 7
+  %lcmp.mod122 = icmp eq i32 %xtraiter121, 0
+  br i1 %lcmp.mod122, label %for.body5.lr.ph.split, label %for.body5.prol.preheader
+
+for.body5.prol.preheader:                         ; preds = %for.body5.lr.ph
+  br label %for.body5.prol
+
+for.body5.prol:                                   ; preds = %for.body5.prol, %for.body5.prol.preheader
+  %p.1101.prol = phi i32 [ %inc.prol, %for.body5.prol ], [ %p.0104, %for.body5.prol.preheader ]
+  %i.0100.prol = phi i32 [ %inc9.prol, %for.body5.prol ], [ 1, %for.body5.prol.preheader ]
+  %prol.iter123 = phi i32 [ %prol.iter123.sub, %for.body5.prol ], [ %xtraiter121, %for.body5.prol.preheader ]
+  %inc.prol = add nsw i32 %p.1101.prol, 1
+  %inc9.prol = add nuw nsw i32 %i.0100.prol, 1
+  %prol.iter123.sub = add i32 %prol.iter123, -1
+  %prol.iter123.cmp = icmp eq i32 %prol.iter123.sub, 0
+  br i1 %prol.iter123.cmp, label %for.body5.lr.ph.split.loopexit, label %for.body5.prol, !llvm.loop !18
+
+for.body5.lr.ph.split.loopexit:                   ; preds = %for.body5.prol
+  %inc9.prol.lcssa = phi i32 [ %inc9.prol, %for.body5.prol ]
+  %inc.prol.lcssa = phi i32 [ %inc.prol, %for.body5.prol ]
+  br label %for.body5.lr.ph.split
+
+for.body5.lr.ph.split:                            ; preds = %for.body5.lr.ph, %for.body5.lr.ph.split.loopexit
+  %p.1101.unr = phi i32 [ %p.0104, %for.body5.lr.ph ], [ %inc.prol.lcssa, %for.body5.lr.ph.split.loopexit ]
+  %i.0100.unr = phi i32 [ 1, %for.body5.lr.ph ], [ %inc9.prol.lcssa, %for.body5.lr.ph.split.loopexit ]
+  %inc.lcssa.unr = phi i32 [ undef, %for.body5.lr.ph ], [ %inc.prol.lcssa, %for.body5.lr.ph.split.loopexit ]
+  %17 = icmp ult i32 %16, 7
+  br i1 %17, label %for.inc10.loopexit, label %for.body5.lr.ph.split.split
+
+for.body5.lr.ph.split.split:                      ; preds = %for.body5.lr.ph.split
+  br label %for.body5
+
+for.body5:                                        ; preds = %for.body5, %for.body5.lr.ph.split.split
+  %p.1101 = phi i32 [ %p.1101.unr, %for.body5.lr.ph.split.split ], [ %inc.7, %for.body5 ]
+  %i.0100 = phi i32 [ %i.0100.unr, %for.body5.lr.ph.split.split ], [ %inc9.7, %for.body5 ]
+  %inc9.6 = add nsw i32 %i.0100, 7
+  %inc.7 = add nsw i32 %p.1101, 8
+  %inc9.7 = add nsw i32 %i.0100, 8
+  %cmp3.7 = icmp slt i32 %inc9.6, %conv
+  br i1 %cmp3.7, label %for.body5, label %for.inc10.loopexit.unr-lcssa, !prof !20
+
+for.inc10.loopexit.unr-lcssa:                     ; preds = %for.body5
+  %inc.7.lcssa = phi i32 [ %inc.7, %for.body5 ]
+  br label %for.inc10.loopexit
+
+for.inc10.loopexit:                               ; preds = %for.body5.lr.ph.split, %for.inc10.loopexit.unr-lcssa
+  %inc.lcssa = phi i32 [ %inc.lcssa.unr, %for.body5.lr.ph.split ], [ %inc.7.lcssa, %for.inc10.loopexit.unr-lcssa ]
+  br label %for.inc10
+
+for.inc10:                                        ; preds = %for.inc10.loopexit, %for.cond2.preheader
+  %p.1.lcssa = phi i32 [ %p.0104, %for.cond2.preheader ], [ %inc.lcssa, %for.inc10.loopexit ]
+  %indvars.iv.next110 = add nuw nsw i64 %indvars.iv109, 1
+  %inc11 = add nuw nsw i32 %l.0103, 1
+  %exitcond111 = icmp eq i64 %indvars.iv.next110, 17
+  br i1 %exitcond111, label %for.end12, label %for.cond2.preheader, !prof !21
+
+for.end12:                                        ; preds = %for.inc10
+  %p.1.lcssa.lcssa = phi i32 [ %p.1.lcssa, %for.inc10 ]
+  %idxprom13 = sext i32 %p.1.lcssa.lcssa to i64
+  %arrayidx14 = getelementptr inbounds [257 x i8], [257 x i8]* %huffsize, i64 0, i64 %idxprom13
+  store i8 0, i8* %arrayidx14, align 1, !tbaa !16
+  %18 = load i8, i8* %0, align 16, !tbaa !16
+  %tobool94 = icmp eq i8 %18, 0
+  br i1 %tobool94, label %while.end31, label %while.cond19.preheader.preheader, !prof !22
+
+while.cond19.preheader.preheader:                 ; preds = %for.end12
+  %conv16 = sext i8 %18 to i32
+  br label %while.cond19.preheader.outer
+
+while.cond19.preheader.outer:                     ; preds = %while.cond19.preheader.preheader, %while.end
+  %.ph = phi i8 [ %18, %while.cond19.preheader.preheader ], [ %.lcssa, %while.end ]
+  %code.097.ph = phi i32 [ 0, %while.cond19.preheader.preheader ], [ %shl, %while.end ]
+  %si.096.ph = phi i32 [ %conv16, %while.cond19.preheader.preheader ], [ %inc30, %while.end ]
+  %p.295.ph = phi i32 [ 0, %while.cond19.preheader.preheader ], [ %inc26.lcssa, %while.end ]
+  %conv2287 = sext i8 %.ph to i32
+  %cmp2388115 = icmp eq i32 %conv2287, %si.096.ph
+  br i1 %cmp2388115, label %while.body25.preheader, label %while.end.thread.preheader, !prof !23
+
+while.end.thread.preheader:                       ; preds = %while.cond19.preheader.outer
+  %19 = sext i8 %.ph to i32
+  %20 = sub i32 %19, %si.096.ph
+  %21 = add nsw i32 %19, -1
+  %22 = sub i32 %21, %si.096.ph
+  %xtraiter119 = and i32 %20, 7
+  %lcmp.mod120 = icmp eq i32 %xtraiter119, 0
+  br i1 %lcmp.mod120, label %while.end.thread.preheader.split, label %while.end.thread.prol.preheader
+
+while.end.thread.prol.preheader:                  ; preds = %while.end.thread.preheader
+  br label %while.end.thread.prol
+
+while.end.thread.prol:                            ; preds = %while.end.thread.prol, %while.end.thread.prol.preheader
+  %si.096117.prol = phi i32 [ %inc30113.prol, %while.end.thread.prol ], [ %si.096.ph, %while.end.thread.prol.preheader ]
+  %code.097116.prol = phi i32 [ %shl112.prol, %while.end.thread.prol ], [ %code.097.ph, %while.end.thread.prol.preheader ]
+  %prol.iter = phi i32 [ %prol.iter.sub, %while.end.thread.prol ], [ %xtraiter119, %while.end.thread.prol.preheader ]
+  %shl112.prol = shl i32 %code.097116.prol, 1
+  %inc30113.prol = add nsw i32 %si.096117.prol, 1
+  %prol.iter.sub = add i32 %prol.iter, -1
+  %prol.iter.cmp = icmp eq i32 %prol.iter.sub, 0
+  br i1 %prol.iter.cmp, label %while.end.thread.preheader.split.loopexit, label %while.end.thread.prol, !llvm.loop !24
+
+while.end.thread.preheader.split.loopexit:        ; preds = %while.end.thread.prol
+  %inc30113.prol.lcssa = phi i32 [ %inc30113.prol, %while.end.thread.prol ]
+  %shl112.prol.lcssa = phi i32 [ %shl112.prol, %while.end.thread.prol ]
+  br label %while.end.thread.preheader.split
+
+while.end.thread.preheader.split:                 ; preds = %while.end.thread.preheader, %while.end.thread.preheader.split.loopexit
+  %inc30113.lcssa.unr = phi i32 [ undef, %while.end.thread.preheader ], [ %inc30113.prol.lcssa, %while.end.thread.preheader.split.loopexit ]
+  %shl112.lcssa.unr = phi i32 [ undef, %while.end.thread.preheader ], [ %shl112.prol.lcssa, %while.end.thread.preheader.split.loopexit ]
+  %si.096117.unr = phi i32 [ %si.096.ph, %while.end.thread.preheader ], [ %inc30113.prol.lcssa, %while.end.thread.preheader.split.loopexit ]
+  %code.097116.unr = phi i32 [ %code.097.ph, %while.end.thread.preheader ], [ %shl112.prol.lcssa, %while.end.thread.preheader.split.loopexit ]
+  %23 = icmp ult i32 %22, 7
+  br i1 %23, label %while.body25.preheader.loopexit, label %while.end.thread.preheader.split.split
+
+while.end.thread.preheader.split.split:           ; preds = %while.end.thread.preheader.split
+  br label %while.end.thread
+
+while.end.thread:                                 ; preds = %while.end.thread, %while.end.thread.preheader.split.split
+  %si.096117 = phi i32 [ %si.096117.unr, %while.end.thread.preheader.split.split ], [ %inc30113.7, %while.end.thread ]
+  %code.097116 = phi i32 [ %code.097116.unr, %while.end.thread.preheader.split.split ], [ %shl112, %while.end.thread ]
+  %shl112 = shl i32 %code.097116, 8
+  %inc30113.7 = add nsw i32 %si.096117, 8
+  %cmp2388.7 = icmp eq i32 %conv2287, %inc30113.7
+  br i1 %cmp2388.7, label %while.body25.preheader.loopexit.unr-lcssa, label %while.end.thread, !prof !23
+
+while.body25.preheader.loopexit.unr-lcssa:        ; preds = %while.end.thread
+  %inc30113.7.lcssa = phi i32 [ %inc30113.7, %while.end.thread ]
+  %shl112.lcssa124 = phi i32 [ %shl112, %while.end.thread ]
+  br label %while.body25.preheader.loopexit
+
+while.body25.preheader.loopexit:                  ; preds = %while.end.thread.preheader.split, %while.body25.preheader.loopexit.unr-lcssa
+  %inc30113.lcssa = phi i32 [ %inc30113.lcssa.unr, %while.end.thread.preheader.split ], [ %inc30113.7.lcssa, %while.body25.preheader.loopexit.unr-lcssa ]
+  %shl112.lcssa = phi i32 [ %shl112.lcssa.unr, %while.end.thread.preheader.split ], [ %shl112.lcssa124, %while.body25.preheader.loopexit.unr-lcssa ]
+  br label %while.body25.preheader
+
+while.body25.preheader:                           ; preds = %while.body25.preheader.loopexit, %while.cond19.preheader.outer
+  %si.096.lcssa = phi i32 [ %si.096.ph, %while.cond19.preheader.outer ], [ %inc30113.lcssa, %while.body25.preheader.loopexit ]
+  %code.097.lcssa = phi i32 [ %code.097.ph, %while.cond19.preheader.outer ], [ %shl112.lcssa, %while.body25.preheader.loopexit ]
+  %idxprom2085 = sext i32 %p.295.ph to i64
+  br label %while.body25
+
+while.body25:                                     ; preds = %while.body25.preheader, %while.body25
+  %idxprom2091 = phi i64 [ %idxprom20, %while.body25 ], [ %idxprom2085, %while.body25.preheader ]
+  %code.190 = phi i32 [ %inc29, %while.body25 ], [ %code.097.lcssa, %while.body25.preheader ]
+  %p.389 = phi i32 [ %inc26, %while.body25 ], [ %p.295.ph, %while.body25.preheader ]
+  %inc26 = add nsw i32 %p.389, 1
+  %arrayidx28 = getelementptr inbounds [257 x i32], [257 x i32]* %huffcode, i64 0, i64 %idxprom2091
+  store i32 %code.190, i32* %arrayidx28, align 4, !tbaa !25
+  %inc29 = add i32 %code.190, 1
+  %idxprom20 = sext i32 %inc26 to i64
+  %arrayidx21 = getelementptr inbounds [257 x i8], [257 x i8]* %huffsize, i64 0, i64 %idxprom20
+  %24 = load i8, i8* %arrayidx21, align 1, !tbaa !16
+  %conv22 = sext i8 %24 to i32
+  %cmp23 = icmp eq i32 %conv22, %si.096.lcssa
+  br i1 %cmp23, label %while.body25, label %while.end, !prof !23
+
+while.end:                                        ; preds = %while.body25
+  %.lcssa = phi i8 [ %24, %while.body25 ]
+  %inc29.lcssa = phi i32 [ %inc29, %while.body25 ]
+  %inc26.lcssa = phi i32 [ %inc26, %while.body25 ]
+  %shl = shl i32 %inc29.lcssa, 1
+  %inc30 = add nsw i32 %si.096.lcssa, 1
+  %tobool = icmp eq i8 %.lcssa, 0
+  br i1 %tobool, label %while.end31.loopexit, label %while.cond19.preheader.outer, !prof !26
+
+while.end31.loopexit:                             ; preds = %while.end
+  br label %while.end31
+
+while.end31:                                      ; preds = %while.end31.loopexit, %for.end12
+  %arraydecay = getelementptr inbounds %struct.c_derived_tbl, %struct.c_derived_tbl* %8, i64 0, i32 1, i64 0
+  tail call void @llvm.memset.p0i8.i64(i8* %arraydecay, i8 0, i64 256, i32 4, i1 false)
+  %cmp3383 = icmp sgt i32 %p.1.lcssa.lcssa, 0
+  br i1 %cmp3383, label %for.body35.preheader, label %for.end52, !prof !27
+
+for.body35.preheader:                             ; preds = %while.end31
+  %xtraiter = and i32 %p.1.lcssa.lcssa, 1
+  %lcmp.mod = icmp eq i32 %xtraiter, 0
+  br i1 %lcmp.mod, label %for.body35.preheader.split, label %for.body35.prol
+
+for.body35.prol:                                  ; preds = %for.body35.preheader
+  %arrayidx37.prol = getelementptr inbounds [257 x i32], [257 x i32]* %huffcode, i64 0, i64 0
+  %25 = load i32, i32* %arrayidx37.prol, align 16, !tbaa !25
+  %arrayidx39.prol = getelementptr inbounds %struct.JHUFF_TBL, %struct.JHUFF_TBL* %htbl, i64 0, i32 1, i64 0
+  %26 = load i8, i8* %arrayidx39.prol, align 1, !tbaa !16
+  %idxprom40.prol = zext i8 %26 to i64
+  %arrayidx41.prol = getelementptr inbounds %struct.c_derived_tbl, %struct.c_derived_tbl* %8, i64 0, i32 0, i64 %idxprom40.prol
+  store i32 %25, i32* %arrayidx41.prol, align 4, !tbaa !25
+  %arrayidx43.prol = getelementptr inbounds [257 x i8], [257 x i8]* %huffsize, i64 0, i64 0
+  %27 = load i8, i8* %arrayidx43.prol, align 16, !tbaa !16
+  %28 = load i8, i8* %arrayidx39.prol, align 1, !tbaa !16
+  %idxprom47.prol = zext i8 %28 to i64
+  %arrayidx49.prol = getelementptr inbounds %struct.c_derived_tbl, %struct.c_derived_tbl* %8, i64 0, i32 1, i64 %idxprom47.prol
+  store i8 %27, i8* %arrayidx49.prol, align 1, !tbaa !16
+  br label %for.body35.preheader.split
+
+for.body35.preheader.split:                       ; preds = %for.body35.preheader, %for.body35.prol
+  %indvars.iv.unr = phi i64 [ 0, %for.body35.preheader ], [ 1, %for.body35.prol ]
+  %29 = icmp eq i32 %p.1.lcssa.lcssa, 1
+  br i1 %29, label %for.end52.loopexit, label %for.body35.preheader.split.split
+
+for.body35.preheader.split.split:                 ; preds = %for.body35.preheader.split
+  br label %for.body35
+
+for.body35:                                       ; preds = %for.body35, %for.body35.preheader.split.split
+  %indvars.iv = phi i64 [ %indvars.iv.unr, %for.body35.preheader.split.split ], [ %indvars.iv.next.1, %for.body35 ]
+  %arrayidx37 = getelementptr inbounds [257 x i32], [257 x i32]* %huffcode, i64 0, i64 %indvars.iv
+  %30 = load i32, i32* %arrayidx37, align 4, !tbaa !25
+  %arrayidx39 = getelementptr inbounds %struct.JHUFF_TBL, %struct.JHUFF_TBL* %htbl, i64 0, i32 1, i64 %indvars.iv
+  %31 = load i8, i8* %arrayidx39, align 1, !tbaa !16
+  %idxprom40 = zext i8 %31 to i64
+  %arrayidx41 = getelementptr inbounds %struct.c_derived_tbl, %struct.c_derived_tbl* %8, i64 0, i32 0, i64 %idxprom40
+  store i32 %30, i32* %arrayidx41, align 4, !tbaa !25
+  %arrayidx43 = getelementptr inbounds [257 x i8], [257 x i8]* %huffsize, i64 0, i64 %indvars.iv
+  %32 = load i8, i8* %arrayidx43, align 1, !tbaa !16
+  %33 = load i8, i8* %arrayidx39, align 1, !tbaa !16
+  %idxprom47 = zext i8 %33 to i64
+  %arrayidx49 = getelementptr inbounds %struct.c_derived_tbl, %struct.c_derived_tbl* %8, i64 0, i32 1, i64 %idxprom47
+  store i8 %32, i8* %arrayidx49, align 1, !tbaa !16
+  %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+  %arrayidx37.1 = getelementptr inbounds [257 x i32], [257 x i32]* %huffcode, i64 0, i64 %indvars.iv.next
+  %34 = load i32, i32* %arrayidx37.1, align 4, !tbaa !25
+  %arrayidx39.1 = getelementptr inbounds %struct.JHUFF_TBL, %struct.JHUFF_TBL* %htbl, i64 0, i32 1, i64 %indvars.iv.next
+  %35 = load i8, i8* %arrayidx39.1, align 1, !tbaa !16
+  %idxprom40.1 = zext i8 %35 to i64
+  %arrayidx41.1 = getelementptr inbounds %struct.c_derived_tbl, %struct.c_derived_tbl* %8, i64 0, i32 0, i64 %idxprom40.1
+  store i32 %34, i32* %arrayidx41.1, align 4, !tbaa !25
+  %arrayidx43.1 = getelementptr inbounds [257 x i8], [257 x i8]* %huffsize, i64 0, i64 %indvars.iv.next
+  %36 = load i8, i8* %arrayidx43.1, align 1, !tbaa !16
+  %37 = load i8, i8* %arrayidx39.1, align 1, !tbaa !16
+  %idxprom47.1 = zext i8 %37 to i64
+  %arrayidx49.1 = getelementptr inbounds %struct.c_derived_tbl, %struct.c_derived_tbl* %8, i64 0, i32 1, i64 %idxprom47.1
+  store i8 %36, i8* %arrayidx49.1, align 1, !tbaa !16
+  %indvars.iv.next.1 = add nsw i64 %indvars.iv, 2
+  %lftr.wideiv.1 = trunc i64 %indvars.iv.next.1 to i32
+  %exitcond.1 = icmp eq i32 %lftr.wideiv.1, %p.1.lcssa.lcssa
+  br i1 %exitcond.1, label %for.end52.loopexit.unr-lcssa, label %for.body35, !prof !28
+
+for.end52.loopexit.unr-lcssa:                     ; preds = %for.body35
+  br label %for.end52.loopexit
+
+for.end52.loopexit:                               ; preds = %for.body35.preheader.split, %for.end52.loopexit.unr-lcssa
+  br label %for.end52
+
+for.end52:                                        ; preds = %for.end52.loopexit, %while.end31
+  call void @llvm.lifetime.end(i64 1028, i8* %1) #4
+  call void @llvm.lifetime.end(i64 257, i8* nonnull %0) #4
+  ret void
+}
+
+; Function Attrs: argmemonly nounwind
+declare void @llvm.lifetime.start(i64, i8* nocapture) #1
+
+; Function Attrs: argmemonly nounwind
+declare void @llvm.memset.p0i8.i64(i8* nocapture, i8, i64, i32, i1) #1
+
+; Function Attrs: argmemonly nounwind
+declare void @llvm.lifetime.end(i64, i8* nocapture) #1
+
+; Function Attrs: nounwind uwtable
+define void @jpeg_gen_optimal_table(%struct.jpeg_compress_struct* %cinfo, %struct.JHUFF_TBL* nocapture %htbl, i64* nocapture %freq) #0 !prof !29 {
+entry:
+  %bits = alloca [33 x i8], align 16
+  %codesize = alloca [257 x i32], align 16
+  %others = alloca [257 x i32], align 16
+  %0 = bitcast [257 x i32]* %others to i8*
+  %1 = getelementptr inbounds [33 x i8], [33 x i8]* %bits, i64 0, i64 0
+  call void @llvm.lifetime.start(i64 33, i8* %1) #4
+  %2 = bitcast [257 x i32]* %codesize to i8*
+  call void @llvm.lifetime.start(i64 1028, i8* %2) #4
+  call void @llvm.lifetime.start(i64 1028, i8* %0) #4
+  call void @llvm.memset.p0i8.i64(i8* %1, i8 0, i64 33, i32 16, i1 false)
+  call void @llvm.memset.p0i8.i64(i8* %2, i8 0, i64 1028, i32 16, i1 false)
+  call void @llvm.memset.p0i8.i64(i8* %0, i8 -1, i64 1028, i32 16, i1 false)
+  %arrayidx2 = getelementptr inbounds i64, i64* %freq, i64 256
+  store i64 1, i64* %arrayidx2, align 8, !tbaa !30
+  br label %for.cond4
+
+for.cond4.loopexit:                               ; preds = %while.body65
+  br label %for.cond4.backedge
+
+for.cond4:                                        ; preds = %for.cond4.backedge, %entry
+  %c1.0 = phi i32 [ -1, %entry ], [ %c1.0.be, %for.cond4.backedge ]
+  %i.1 = phi i32 [ 0, %entry ], [ %i.1.be, %for.cond4.backedge ]
+  %v.0 = phi i64 [ 1000000000, %entry ], [ %v.0.be, %for.cond4.backedge ]
+  %cmp5 = icmp slt i32 %i.1, 257
+  br i1 %cmp5, label %for.body6, label %for.body19.preheader, !prof !31
+
+for.body19.preheader:                             ; preds = %for.cond4
+  %3 = zext i32 %c1.0 to i64
+  br label %for.body19
+
+for.body6:                                        ; preds = %for.cond4
+  %idxprom7 = sext i32 %i.1 to i64
+  %arrayidx8 = getelementptr inbounds i64, i64* %freq, i64 %idxprom7
+  %4 = load i64, i64* %arrayidx8, align 8, !tbaa !30
+  %tobool = icmp eq i64 %4, 0
+  %cmp11 = icmp sgt i64 %4, %v.0
+  %or.cond = or i1 %tobool, %cmp11
+  %c1.1 = select i1 %or.cond, i32 %c1.0, i32 %i.1
+  %v.1 = select i1 %or.cond, i64 %v.0, i64 %4
+  %inc15 = add nsw i32 %i.1, 1
+  br label %for.cond4.backedge
+
+for.body19:                                       ; preds = %for.body19, %for.body19.preheader
+  %indvars.iv275 = phi i64 [ 0, %for.body19.preheader ], [ %indvars.iv.next276, %for.body19 ]
+  %v.2256 = phi i64 [ 1000000000, %for.body19.preheader ], [ %v.3, %for.body19 ]
+  %c2.0254 = phi i32 [ -1, %for.body19.preheader ], [ %c2.1, %for.body19 ]
+  %arrayidx21 = getelementptr inbounds i64, i64* %freq, i64 %indvars.iv275
+  %5 = load i64, i64* %arrayidx21, align 8, !tbaa !30
+  %tobool22 = icmp eq i64 %5, 0
+  %cmp26 = icmp sgt i64 %5, %v.2256
+  %or.cond244 = or i1 %tobool22, %cmp26
+  %cmp28 = icmp eq i64 %indvars.iv275, %3
+  %or.cond245 = or i1 %cmp28, %or.cond244
+  %6 = trunc i64 %indvars.iv275 to i32
+  %c2.1 = select i1 %or.cond245, i32 %c2.0254, i32 %6
+  %v.3 = select i1 %or.cond245, i64 %v.2256, i64 %5
+  %indvars.iv.next276 = add nuw nsw i64 %indvars.iv275, 1
+  %exitcond277 = icmp eq i64 %indvars.iv.next276, 257
+  br i1 %exitcond277, label %for.end35, label %for.body19, !prof !32
+
+for.end35:                                        ; preds = %for.body19
+  %c2.1.lcssa = phi i32 [ %c2.1, %for.body19 ]
+  %cmp36 = icmp slt i32 %c2.1.lcssa, 0
+  br i1 %cmp36, label %for.cond73.preheader, label %if.end38, !prof !33
+
+for.cond73.preheader:                             ; preds = %for.end35
+  %err = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 0
+  %7 = bitcast %struct.jpeg_compress_struct* %cinfo to %struct.jpeg_common_struct*
+  br label %for.body75
+
+if.end38:                                         ; preds = %for.end35
+  %idxprom39 = sext i32 %c2.1.lcssa to i64
+  %arrayidx40 = getelementptr inbounds i64, i64* %freq, i64 %idxprom39
+  %8 = load i64, i64* %arrayidx40, align 8, !tbaa !30
+  %idxprom41 = sext i32 %c1.0 to i64
+  %arrayidx42 = getelementptr inbounds i64, i64* %freq, i64 %idxprom41
+  %9 = load i64, i64* %arrayidx42, align 8, !tbaa !30
+  %add = add nsw i64 %9, %8
+  store i64 %add, i64* %arrayidx42, align 8, !tbaa !30
+  store i64 0, i64* %arrayidx40, align 8, !tbaa !30
+  %arrayidx46 = getelementptr inbounds [257 x i32], [257 x i32]* %codesize, i64 0, i64 %idxprom41
+  %10 = load i32, i32* %arrayidx46, align 4, !tbaa !25
+  %inc47 = add nsw i32 %10, 1
+  store i32 %inc47, i32* %arrayidx46, align 4, !tbaa !25
+  %arrayidx49258 = getelementptr inbounds [257 x i32], [257 x i32]* %others, i64 0, i64 %idxprom41
+  %11 = load i32, i32* %arrayidx49258, align 4, !tbaa !25
+  %cmp50259 = icmp sgt i32 %11, -1
+  br i1 %cmp50259, label %while.body.preheader, label %while.end, !prof !34
+
+while.body.preheader:                             ; preds = %if.end38
+  br label %while.body
+
+while.body:                                       ; preds = %while.body.preheader, %while.body
+  %12 = phi i32 [ %14, %while.body ], [ %11, %while.body.preheader ]
+  %idxprom53 = sext i32 %12 to i64
+  %arrayidx54 = getelementptr inbounds [257 x i32], [257 x i32]* %codesize, i64 0, i64 %idxprom53
+  %13 = load i32, i32* %arrayidx54, align 4, !tbaa !25
+  %inc55 = add nsw i32 %13, 1
+  store i32 %inc55, i32* %arrayidx54, align 4, !tbaa !25
+  %arrayidx49 = getelementptr inbounds [257 x i32], [257 x i32]* %others, i64 0, i64 %idxprom53
+  %14 = load i32, i32* %arrayidx49, align 4, !tbaa !25
+  %cmp50 = icmp sgt i32 %14, -1
+  br i1 %cmp50, label %while.body, label %while.end.loopexit, !prof !34
+
+while.end.loopexit:                               ; preds = %while.body
+  %arrayidx49.lcssa284 = phi i32* [ %arrayidx49, %while.body ]
+  br label %while.end
+
+while.end:                                        ; preds = %while.end.loopexit, %if.end38
+  %arrayidx49.lcssa = phi i32* [ %arrayidx49258, %if.end38 ], [ %arrayidx49.lcssa284, %while.end.loopexit ]
+  store i32 %c2.1.lcssa, i32* %arrayidx49.lcssa, align 4, !tbaa !25
+  %arrayidx59 = getelementptr inbounds [257 x i32], [257 x i32]* %codesize, i64 0, i64 %idxprom39
+  %15 = load i32, i32* %arrayidx59, align 4, !tbaa !25
+  %inc60 = add nsw i32 %15, 1
+  store i32 %inc60, i32* %arrayidx59, align 4, !tbaa !25
+  %arrayidx63261 = getelementptr inbounds [257 x i32], [257 x i32]* %others, i64 0, i64 %idxprom39
+  %16 = load i32, i32* %arrayidx63261, align 4, !tbaa !25
+  %cmp64262 = icmp sgt i32 %16, -1
+  br i1 %cmp64262, label %while.body65.preheader, label %for.cond4.backedge, !prof !35
+
+for.cond4.backedge:                               ; preds = %while.end, %for.body6, %for.cond4.loopexit
+  %c1.0.be = phi i32 [ %c1.1, %for.body6 ], [ -1, %while.end ], [ -1, %for.cond4.loopexit ]
+  %i.1.be = phi i32 [ %inc15, %for.body6 ], [ 0, %while.end ], [ 0, %for.cond4.loopexit ]
+  %v.0.be = phi i64 [ %v.1, %for.body6 ], [ 1000000000, %while.end ], [ 1000000000, %for.cond4.loopexit ]
+  br label %for.cond4
+
+while.body65.preheader:                           ; preds = %while.end
+  br label %while.body65
+
+while.body65:                                     ; preds = %while.body65.preheader, %while.body65
+  %17 = phi i32 [ %19, %while.body65 ], [ %16, %while.body65.preheader ]
+  %idxprom68 = sext i32 %17 to i64
+  %arrayidx69 = getelementptr inbounds [257 x i32], [257 x i32]* %codesize, i64 0, i64 %idxprom68
+  %18 = load i32, i32* %arrayidx69, align 4, !tbaa !25
+  %inc70 = add nsw i32 %18, 1
+  store i32 %inc70, i32* %arrayidx69, align 4, !tbaa !25
+  %arrayidx63 = getelementptr inbounds [257 x i32], [257 x i32]* %others, i64 0, i64 %idxprom68
+  %19 = load i32, i32* %arrayidx63, align 4, !tbaa !25
+  %cmp64 = icmp sgt i32 %19, -1
+  br i1 %cmp64, label %while.body65, label %for.cond4.loopexit, !prof !35
+
+for.body75:                                       ; preds = %for.inc92, %for.cond73.preheader
+  %indvars.iv272 = phi i64 [ 0, %for.cond73.preheader ], [ %indvars.iv.next273, %for.inc92 ]
+  %arrayidx77 = getelementptr inbounds [257 x i32], [257 x i32]* %codesize, i64 0, i64 %indvars.iv272
+  %20 = load i32, i32* %arrayidx77, align 4, !tbaa !25
+  %tobool78 = icmp eq i32 %20, 0
+  br i1 %tobool78, label %for.inc92, label %if.then79, !prof !36
+
+if.then79:                                        ; preds = %for.body75
+  %cmp82 = icmp sgt i32 %20, 32
+  br i1 %cmp82, label %if.then83, label %if.end85, !prof !37
+
+if.then83:                                        ; preds = %if.then79
+  %21 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8, !tbaa !38
+  %msg_code = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %21, i64 0, i32 5
+  store i32 38, i32* %msg_code, align 8, !tbaa !39
+  %error_exit = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %21, i64 0, i32 0
+  %22 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit, align 8, !tbaa !41
+  tail call void %22(%struct.jpeg_common_struct* %7) #4
+  br label %if.end85
+
+if.end85:                                         ; preds = %if.then83, %if.then79
+  %idxprom88 = sext i32 %20 to i64
+  %arrayidx89 = getelementptr inbounds [33 x i8], [33 x i8]* %bits, i64 0, i64 %idxprom88
+  %23 = load i8, i8* %arrayidx89, align 1, !tbaa !16
+  %inc90 = add i8 %23, 1
+  store i8 %inc90, i8* %arrayidx89, align 1, !tbaa !16
+  br label %for.inc92
+
+for.inc92:                                        ; preds = %for.body75, %if.end85
+  %indvars.iv.next273 = add nuw nsw i64 %indvars.iv272, 1
+  %exitcond274 = icmp eq i64 %indvars.iv.next273, 257
+  br i1 %exitcond274, label %while.cond98.preheader.preheader, label %for.body75, !prof !42
+
+while.cond98.preheader.preheader:                 ; preds = %for.inc92
+  br label %while.cond98.preheader
+
+while.cond98.preheader:                           ; preds = %while.cond98.preheader.preheader, %for.inc131
+  %indvars.iv268 = phi i64 [ %indvars.iv.next269.pre-phi, %for.inc131 ], [ 32, %while.cond98.preheader.preheader ]
+  %arrayidx100 = getelementptr inbounds [33 x i8], [33 x i8]* %bits, i64 0, i64 %indvars.iv268
+  %24 = load i8, i8* %arrayidx100, align 1, !tbaa !16
+  %cmp101250 = icmp eq i8 %24, 0
+  br i1 %cmp101250, label %while.cond98.preheader.for.inc131_crit_edge, label %while.body103.lr.ph, !prof !43
+
+while.cond98.preheader.for.inc131_crit_edge:      ; preds = %while.cond98.preheader
+  %.pre = add nsw i64 %indvars.iv268, -1
+  br label %for.inc131
+
+while.body103.lr.ph:                              ; preds = %while.cond98.preheader
+  %25 = add i64 %indvars.iv268, 4294967294
+  %26 = add nsw i64 %indvars.iv268, -1
+  %arrayidx119 = getelementptr inbounds [33 x i8], [33 x i8]* %bits, i64 0, i64 %26
+  %27 = trunc i64 %25 to i32
+  br label %while.cond104.outer
+
+while.cond104.outer:                              ; preds = %while.end111, %while.body103.lr.ph
+  %.ph = phi i8 [ %32, %while.end111 ], [ %24, %while.body103.lr.ph ]
+  br label %while.cond104
+
+while.cond104:                                    ; preds = %while.cond104.outer, %while.cond104
+  %j.0 = phi i32 [ %dec, %while.cond104 ], [ %27, %while.cond104.outer ]
+  %idxprom105 = sext i32 %j.0 to i64
+  %arrayidx106 = getelementptr inbounds [33 x i8], [33 x i8]* %bits, i64 0, i64 %idxprom105
+  %28 = load i8, i8* %arrayidx106, align 1, !tbaa !16
+  %cmp108 = icmp eq i8 %28, 0
+  %dec = add nsw i32 %j.0, -1
+  br i1 %cmp108, label %while.cond104, label %while.end111
+
+while.end111:                                     ; preds = %while.cond104
+  %arrayidx106.lcssa = phi i8* [ %arrayidx106, %while.cond104 ]
+  %j.0.lcssa = phi i32 [ %j.0, %while.cond104 ]
+  %sub115 = add i8 %.ph, -2
+  store i8 %sub115, i8* %arrayidx100, align 1, !tbaa !16
+  %29 = load i8, i8* %arrayidx119, align 1, !tbaa !16
+  %inc120 = add i8 %29, 1
+  store i8 %inc120, i8* %arrayidx119, align 1, !tbaa !16
+  %add121 = add nsw i32 %j.0.lcssa, 1
+  %idxprom122 = sext i32 %add121 to i64
+  %arrayidx123 = getelementptr inbounds [33 x i8], [33 x i8]* %bits, i64 0, i64 %idxprom122
+  %30 = load i8, i8* %arrayidx123, align 1, !tbaa !16
+  %add125 = add i8 %30, 2
+  store i8 %add125, i8* %arrayidx123, align 1, !tbaa !16
+  %31 = load i8, i8* %arrayidx106.lcssa, align 1, !tbaa !16
+  %dec129 = add i8 %31, -1
+  store i8 %dec129, i8* %arrayidx106.lcssa, align 1, !tbaa !16
+  %32 = load i8, i8* %arrayidx100, align 1, !tbaa !16
+  %cmp101 = icmp eq i8 %32, 0
+  br i1 %cmp101, label %for.inc131.loopexit, label %while.cond104.outer, !prof !43
+
+for.inc131.loopexit:                              ; preds = %while.end111
+  br label %for.inc131
+
+for.inc131:                                       ; preds = %for.inc131.loopexit, %while.cond98.preheader.for.inc131_crit_edge
+  %indvars.iv.next269.pre-phi = phi i64 [ %.pre, %while.cond98.preheader.for.inc131_crit_edge ], [ %26, %for.inc131.loopexit ]
+  %cmp96 = icmp sgt i64 %indvars.iv.next269.pre-phi, 16
+  br i1 %cmp96, label %while.cond98.preheader, label %while.cond134.preheader, !prof !44
+
+while.cond134.preheader:                          ; preds = %for.inc131
+  br label %while.cond134
+
+while.cond134:                                    ; preds = %while.cond134.preheader, %while.cond134
+  %indvars.iv266 = phi i64 [ %indvars.iv.next267, %while.cond134 ], [ 16, %while.cond134.preheader ]
+  %arrayidx136 = getelementptr inbounds [33 x i8], [33 x i8]* %bits, i64 0, i64 %indvars.iv266
+  %33 = load i8, i8* %arrayidx136, align 1, !tbaa !16
+  %cmp138 = icmp eq i8 %33, 0
+  %indvars.iv.next267 = add i64 %indvars.iv266, -1
+  br i1 %cmp138, label %while.cond134, label %while.end142, !prof !45
+
+while.end142:                                     ; preds = %while.cond134
+  %.lcssa = phi i8 [ %33, %while.cond134 ]
+  %arrayidx136.lcssa = phi i8* [ %arrayidx136, %while.cond134 ]
+  %dec145 = add i8 %.lcssa, -1
+  store i8 %dec145, i8* %arrayidx136.lcssa, align 1, !tbaa !16
+  %arraydecay147 = getelementptr inbounds %struct.JHUFF_TBL, %struct.JHUFF_TBL* %htbl, i64 0, i32 0, i64 0
+  call void @llvm.memcpy.p0i8.p0i8.i64(i8* %arraydecay147, i8* nonnull %1, i64 17, i32 4, i1 false)
+  br label %for.cond153.preheader
+
+for.cond153.preheader:                            ; preds = %for.inc170, %while.end142
+  %i.6249 = phi i32 [ 1, %while.end142 ], [ %inc171, %for.inc170 ]
+  %p.0248 = phi i32 [ 0, %while.end142 ], [ %p.2.1.lcssa, %for.inc170 ]
+  br label %for.body156
+
+for.body156:                                      ; preds = %for.inc167.1, %for.cond153.preheader
+  %indvars.iv = phi i64 [ 0, %for.cond153.preheader ], [ %indvars.iv.next.1, %for.inc167.1 ]
+  %p.1246 = phi i32 [ %p.0248, %for.cond153.preheader ], [ %p.2.1, %for.inc167.1 ]
+  %arrayidx158 = getelementptr inbounds [257 x i32], [257 x i32]* %codesize, i64 0, i64 %indvars.iv
+  %34 = load i32, i32* %arrayidx158, align 8, !tbaa !25
+  %cmp159 = icmp eq i32 %34, %i.6249
+  br i1 %cmp159, label %if.then161, label %for.inc167, !prof !46
+
+if.then161:                                       ; preds = %for.body156
+  %conv162 = trunc i64 %indvars.iv to i8
+  %idxprom163 = sext i32 %p.1246 to i64
+  %arrayidx164 = getelementptr inbounds %struct.JHUFF_TBL, %struct.JHUFF_TBL* %htbl, i64 0, i32 1, i64 %idxprom163
+  store i8 %conv162, i8* %arrayidx164, align 1, !tbaa !16
+  %inc165 = add nsw i32 %p.1246, 1
+  br label %for.inc167
+
+for.inc167:                                       ; preds = %for.body156, %if.then161
+  %p.2 = phi i32 [ %inc165, %if.then161 ], [ %p.1246, %for.body156 ]
+  %indvars.iv.next = or i64 %indvars.iv, 1
+  %arrayidx158.1 = getelementptr inbounds [257 x i32], [257 x i32]* %codesize, i64 0, i64 %indvars.iv.next
+  %35 = load i32, i32* %arrayidx158.1, align 4, !tbaa !25
+  %cmp159.1 = icmp eq i32 %35, %i.6249
+  br i1 %cmp159.1, label %if.then161.1, label %for.inc167.1, !prof !46
+
+for.inc170:                                       ; preds = %for.inc167.1
+  %p.2.1.lcssa = phi i32 [ %p.2.1, %for.inc167.1 ]
+  %inc171 = add nuw nsw i32 %i.6249, 1
+  %exitcond265 = icmp eq i32 %inc171, 33
+  br i1 %exitcond265, label %for.end172, label %for.cond153.preheader, !prof !47
+
+for.end172:                                       ; preds = %for.inc170
+  %sent_table = getelementptr inbounds %struct.JHUFF_TBL, %struct.JHUFF_TBL* %htbl, i64 0, i32 2
+  store i32 0, i32* %sent_table, align 4, !tbaa !48
+  call void @llvm.lifetime.end(i64 1028, i8* %0) #4
+  call void @llvm.lifetime.end(i64 1028, i8* %2) #4
+  call void @llvm.lifetime.end(i64 33, i8* %1) #4
+  ret void
+
+if.then161.1:                                     ; preds = %for.inc167
+  %conv162.1 = trunc i64 %indvars.iv.next to i8
+  %idxprom163.1 = sext i32 %p.2 to i64
+  %arrayidx164.1 = getelementptr inbounds %struct.JHUFF_TBL, %struct.JHUFF_TBL* %htbl, i64 0, i32 1, i64 %idxprom163.1
+  store i8 %conv162.1, i8* %arrayidx164.1, align 1, !tbaa !16
+  %inc165.1 = add nsw i32 %p.2, 1
+  br label %for.inc167.1
+
+for.inc167.1:                                     ; preds = %if.then161.1, %for.inc167
+  %p.2.1 = phi i32 [ %inc165.1, %if.then161.1 ], [ %p.2, %for.inc167 ]
+  %indvars.iv.next.1 = add nsw i64 %indvars.iv, 2
+  %exitcond.1 = icmp eq i64 %indvars.iv.next.1, 256
+  br i1 %exitcond.1, label %for.inc170, label %for.body156, !prof !50
+}
+
+; Function Attrs: argmemonly nounwind
+declare void @llvm.memcpy.p0i8.p0i8.i64(i8* nocapture, i8* nocapture readonly, i64, i32, i1) #1
+
+; Function Attrs: nounwind uwtable
+define void @jinit_huff_encoder(%struct.jpeg_compress_struct* %cinfo) #0 !prof !51 {
+entry:
+  %mem = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 1
+  %0 = load %struct.jpeg_memory_mgr*, %struct.jpeg_memory_mgr** %mem, align 8, !tbaa !8
+  %alloc_small = getelementptr inbounds %struct.jpeg_memory_mgr, %struct.jpeg_memory_mgr* %0, i64 0, i32 0
+  %1 = load i8* (%struct.jpeg_common_struct*, i32, i64)*, i8* (%struct.jpeg_common_struct*, i32, i64)** %alloc_small, align 8, !tbaa !13
+  %2 = bitcast %struct.jpeg_compress_struct* %cinfo to %struct.jpeg_common_struct*
+  %call = tail call i8* %1(%struct.jpeg_common_struct* %2, i32 1, i64 192) #4
+  %entropy1 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 59
+  %3 = bitcast %struct.jpeg_entropy_encoder** %entropy1 to i8**
+  store i8* %call, i8** %3, align 8, !tbaa !52
+  %start_pass = bitcast i8* %call to void (%struct.jpeg_compress_struct*, i32)**
+  store void (%struct.jpeg_compress_struct*, i32)* @start_pass_huff, void (%struct.jpeg_compress_struct*, i32)** %start_pass, align 8, !tbaa !53
+  %ac_derived_tbls = getelementptr inbounds i8, i8* %call, i64 96
+  %dc_derived_tbls = getelementptr inbounds i8, i8* %call, i64 64
+  %ac_count_ptrs = getelementptr inbounds i8, i8* %call, i64 160
+  %dc_count_ptrs = getelementptr inbounds i8, i8* %call, i64 128
+  %4 = bitcast i8* %ac_derived_tbls to <2 x %struct.c_derived_tbl*>*
+  store <2 x %struct.c_derived_tbl*> zeroinitializer, <2 x %struct.c_derived_tbl*>* %4, align 8, !tbaa !3
+  %5 = bitcast i8* %dc_derived_tbls to <2 x %struct.c_derived_tbl*>*
+  store <2 x %struct.c_derived_tbl*> zeroinitializer, <2 x %struct.c_derived_tbl*>* %5, align 8, !tbaa !3
+  %6 = bitcast i8* %ac_count_ptrs to <2 x i64*>*
+  store <2 x i64*> zeroinitializer, <2 x i64*>* %6, align 8, !tbaa !3
+  %7 = bitcast i8* %dc_count_ptrs to <2 x i64*>*
+  store <2 x i64*> zeroinitializer, <2 x i64*>* %7, align 8, !tbaa !3
+  %arrayidx.2 = getelementptr inbounds i8, i8* %call, i64 112
+  %arrayidx3.2 = getelementptr inbounds i8, i8* %call, i64 80
+  %arrayidx5.2 = getelementptr inbounds i8, i8* %call, i64 176
+  %arrayidx7.2 = getelementptr inbounds i8, i8* %call, i64 144
+  %8 = bitcast i8* %arrayidx7.2 to i64**
+  store i64* null, i64** %8, align 8, !tbaa !3
+  %9 = bitcast i8* %arrayidx.2 to <2 x %struct.c_derived_tbl*>*
+  store <2 x %struct.c_derived_tbl*> zeroinitializer, <2 x %struct.c_derived_tbl*>* %9, align 8, !tbaa !3
+  %10 = bitcast i8* %arrayidx3.2 to <2 x %struct.c_derived_tbl*>*
+  store <2 x %struct.c_derived_tbl*> zeroinitializer, <2 x %struct.c_derived_tbl*>* %10, align 8, !tbaa !3
+  %11 = bitcast i8* %arrayidx5.2 to <2 x i64*>*
+  store <2 x i64*> zeroinitializer, <2 x i64*>* %11, align 8, !tbaa !3
+  %arrayidx7.3 = getelementptr inbounds i8, i8* %call, i64 152
+  %12 = bitcast i8* %arrayidx7.3 to i64**
+  store i64* null, i64** %12, align 8, !tbaa !3
+  ret void
+}
+
+; Function Attrs: nounwind uwtable
+define internal void @start_pass_huff(%struct.jpeg_compress_struct* %cinfo, i32 %gather_statistics) #0 !prof !51 {
+entry:
+  %entropy1 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 59
+  %0 = bitcast %struct.jpeg_entropy_encoder** %entropy1 to %struct.huff_entropy_encoder**
+  %1 = load %struct.huff_entropy_encoder*, %struct.huff_entropy_encoder** %0, align 8, !tbaa !52
+  %tobool = icmp ne i32 %gather_statistics, 0
+  %encode_mcu = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 0, i32 1
+  %encode_mcu_gather.encode_mcu_huff = select i1 %tobool, i32 (%struct.jpeg_compress_struct*, [64 x i16]**)* @encode_mcu_gather, i32 (%struct.jpeg_compress_struct*, [64 x i16]**)* @encode_mcu_huff
+  %finish_pass_gather.finish_pass_huff = select i1 %tobool, void (%struct.jpeg_compress_struct*)* @finish_pass_gather, void (%struct.jpeg_compress_struct*)* @finish_pass_huff
+  store i32 (%struct.jpeg_compress_struct*, [64 x i16]**)* %encode_mcu_gather.encode_mcu_huff, i32 (%struct.jpeg_compress_struct*, [64 x i16]**)** %encode_mcu, align 8, !tbaa !57
+  %2 = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 0, i32 2
+  store void (%struct.jpeg_compress_struct*)* %finish_pass_gather.finish_pass_huff, void (%struct.jpeg_compress_struct*)** %2, align 8
+  %comps_in_scan = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 41
+  %3 = load i32, i32* %comps_in_scan, align 4, !tbaa !58
+  %cmp148 = icmp sgt i32 %3, 0
+  br i1 %cmp148, label %for.body.lr.ph, label %for.end
+
+for.body.lr.ph:                                   ; preds = %entry
+  %err = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 0
+  %4 = bitcast %struct.jpeg_compress_struct* %cinfo to %struct.jpeg_common_struct*
+  %mem = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 1
+  br i1 %tobool, label %for.body.us.preheader, label %for.body.preheader
+
+for.body.preheader:                               ; preds = %for.body.lr.ph
+  br label %for.body
+
+for.body.us.preheader:                            ; preds = %for.body.lr.ph
+  br label %for.body.us
+
+for.body.us:                                      ; preds = %for.body.us.preheader, %if.end61.us
+  %indvars.iv = phi i64 [ %indvars.iv.next, %if.end61.us ], [ 0, %for.body.us.preheader ]
+  %arrayidx.us = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 42, i64 %indvars.iv
+  %5 = load %struct.jpeg_component_info*, %struct.jpeg_component_info** %arrayidx.us, align 8, !tbaa !3
+  %dc_tbl_no.us = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %5, i64 0, i32 5
+  %6 = load i32, i32* %dc_tbl_no.us, align 4, !tbaa !59
+  %ac_tbl_no.us = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %5, i64 0, i32 6
+  %7 = load i32, i32* %ac_tbl_no.us, align 8, !tbaa !61
+  %8 = icmp ugt i32 %6, 3
+  br i1 %8, label %if.then14.us, label %if.end18.us
+
+if.then14.us:                                     ; preds = %for.body.us
+  %9 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8, !tbaa !38
+  %msg_code.us = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %9, i64 0, i32 5
+  store i32 49, i32* %msg_code.us, align 8, !tbaa !39
+  %arrayidx16.us = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %9, i64 0, i32 6, i32 0, i64 0
+  store i32 %6, i32* %arrayidx16.us, align 4, !tbaa !25
+  %error_exit.us = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %9, i64 0, i32 0
+  %10 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit.us, align 8, !tbaa !41
+  tail call void %10(%struct.jpeg_common_struct* nonnull %4) #4
+  br label %if.end18.us
+
+if.end18.us:                                      ; preds = %for.body.us, %if.then14.us
+  %11 = icmp ugt i32 %7, 3
+  br i1 %11, label %if.then28.us, label %if.end37.us
+
+if.then28.us:                                     ; preds = %if.end18.us
+  %12 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8, !tbaa !38
+  %msg_code30.us = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %12, i64 0, i32 5
+  store i32 49, i32* %msg_code30.us, align 8, !tbaa !39
+  %arrayidx34.us = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %12, i64 0, i32 6, i32 0, i64 0
+  store i32 %7, i32* %arrayidx34.us, align 4, !tbaa !25
+  %error_exit36.us = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %12, i64 0, i32 0
+  %13 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit36.us, align 8, !tbaa !41
+  tail call void %13(%struct.jpeg_common_struct* %4) #4
+  br label %if.end37.us
+
+if.end37.us:                                      ; preds = %if.end18.us, %if.then28.us
+  %idxprom40.us = sext i32 %6 to i64
+  %arrayidx41.us = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 6, i64 %idxprom40.us
+  %14 = load i64*, i64** %arrayidx41.us, align 8, !tbaa !3
+  %cmp42.us = icmp eq i64* %14, null
+  br i1 %cmp42.us, label %if.then43.us, label %if.end37.us.if.end47.us_crit_edge
+
+if.end37.us.if.end47.us_crit_edge:                ; preds = %if.end37.us
+  %15 = bitcast i64* %14 to i8*
+  br label %if.end47.us
+
+if.then43.us:                                     ; preds = %if.end37.us
+  %16 = load %struct.jpeg_memory_mgr*, %struct.jpeg_memory_mgr** %mem, align 8, !tbaa !8
+  %alloc_small.us = getelementptr inbounds %struct.jpeg_memory_mgr, %struct.jpeg_memory_mgr* %16, i64 0, i32 0
+  %17 = load i8* (%struct.jpeg_common_struct*, i32, i64)*, i8* (%struct.jpeg_common_struct*, i32, i64)** %alloc_small.us, align 8, !tbaa !13
+  %call.us = tail call i8* %17(%struct.jpeg_common_struct* %4, i32 1, i64 2056) #4
+  %18 = bitcast i64** %arrayidx41.us to i8**
+  store i8* %call.us, i8** %18, align 8, !tbaa !3
+  br label %if.end47.us
+
+if.end47.us:                                      ; preds = %if.end37.us.if.end47.us_crit_edge, %if.then43.us
+  %19 = phi i8* [ %call.us, %if.then43.us ], [ %15, %if.end37.us.if.end47.us_crit_edge ]
+  tail call void @llvm.memset.p0i8.i64(i8* %19, i8 0, i64 2056, i32 1, i1 false)
+  %idxprom51.us = sext i32 %7 to i64
+  %arrayidx52.us = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 7, i64 %idxprom51.us
+  %20 = load i64*, i64** %arrayidx52.us, align 8, !tbaa !3
+  %cmp53.us = icmp eq i64* %20, null
+  br i1 %cmp53.us, label %if.then54.us, label %if.end47.us.if.end61.us_crit_edge
+
+if.end47.us.if.end61.us_crit_edge:                ; preds = %if.end47.us
+  %21 = bitcast i64* %20 to i8*
+  br label %if.end61.us
+
+if.then54.us:                                     ; preds = %if.end47.us
+  %22 = load %struct.jpeg_memory_mgr*, %struct.jpeg_memory_mgr** %mem, align 8, !tbaa !8
+  %alloc_small56.us = getelementptr inbounds %struct.jpeg_memory_mgr, %struct.jpeg_memory_mgr* %22, i64 0, i32 0
+  %23 = load i8* (%struct.jpeg_common_struct*, i32, i64)*, i8* (%struct.jpeg_common_struct*, i32, i64)** %alloc_small56.us, align 8, !tbaa !13
+  %call57.us = tail call i8* %23(%struct.jpeg_common_struct* %4, i32 1, i64 2056) #4
+  %24 = bitcast i64** %arrayidx52.us to i8**
+  store i8* %call57.us, i8** %24, align 8, !tbaa !3
+  br label %if.end61.us
+
+if.end61.us:                                      ; preds = %if.end47.us.if.end61.us_crit_edge, %if.then54.us
+  %25 = phi i8* [ %call57.us, %if.then54.us ], [ %21, %if.end47.us.if.end61.us_crit_edge ]
+  tail call void @llvm.memset.p0i8.i64(i8* %25, i8 0, i64 2056, i32 1, i1 false)
+  %arrayidx78.us = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 1, i32 2, i64 %indvars.iv
+  store i32 0, i32* %arrayidx78.us, align 4, !tbaa !25
+  %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+  %26 = load i32, i32* %comps_in_scan, align 4, !tbaa !58
+  %27 = sext i32 %26 to i64
+  %cmp.us = icmp slt i64 %indvars.iv.next, %27
+  br i1 %cmp.us, label %for.body.us, label %for.end.loopexit
+
+for.body:                                         ; preds = %for.body.preheader, %if.end37
+  %indvars.iv151 = phi i64 [ %indvars.iv.next152, %if.end37 ], [ 0, %for.body.preheader ]
+  %arrayidx = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 42, i64 %indvars.iv151
+  %28 = load %struct.jpeg_component_info*, %struct.jpeg_component_info** %arrayidx, align 8, !tbaa !3
+  %dc_tbl_no = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %28, i64 0, i32 5
+  %29 = load i32, i32* %dc_tbl_no, align 4, !tbaa !59
+  %ac_tbl_no = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %28, i64 0, i32 6
+  %30 = load i32, i32* %ac_tbl_no, align 8, !tbaa !61
+  %31 = icmp ugt i32 %29, 3
+  br i1 %31, label %if.then14, label %lor.lhs.false9
+
+lor.lhs.false9:                                   ; preds = %for.body
+  %idxprom10 = sext i32 %29 to i64
+  %arrayidx11 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 16, i64 %idxprom10
+  %32 = load %struct.JHUFF_TBL*, %struct.JHUFF_TBL** %arrayidx11, align 8, !tbaa !3
+  %cmp12 = icmp eq %struct.JHUFF_TBL* %32, null
+  br i1 %cmp12, label %if.then14, label %if.end18
+
+if.then14:                                        ; preds = %lor.lhs.false9, %for.body
+  %33 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8, !tbaa !38
+  %msg_code = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %33, i64 0, i32 5
+  store i32 49, i32* %msg_code, align 8, !tbaa !39
+  %arrayidx16 = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %33, i64 0, i32 6, i32 0, i64 0
+  store i32 %29, i32* %arrayidx16, align 4, !tbaa !25
+  %error_exit = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %33, i64 0, i32 0
+  %34 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit, align 8, !tbaa !41
+  tail call void %34(%struct.jpeg_common_struct* nonnull %4) #4
+  br label %if.end18
+
+if.end18:                                         ; preds = %lor.lhs.false9, %if.then14
+  %35 = icmp ugt i32 %30, 3
+  %.pre157 = sext i32 %30 to i64
+  %.pre = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 17, i64 %.pre157
+  br i1 %35, label %if.then28, label %lor.lhs.false22
+
+lor.lhs.false22:                                  ; preds = %if.end18
+  %36 = load %struct.JHUFF_TBL*, %struct.JHUFF_TBL** %.pre, align 8, !tbaa !3
+  %cmp25 = icmp eq %struct.JHUFF_TBL* %36, null
+  br i1 %cmp25, label %if.then28, label %if.end37
+
+if.then28:                                        ; preds = %if.end18, %lor.lhs.false22
+  %37 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8, !tbaa !38
+  %msg_code30 = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %37, i64 0, i32 5
+  store i32 49, i32* %msg_code30, align 8, !tbaa !39
+  %arrayidx34 = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %37, i64 0, i32 6, i32 0, i64 0
+  store i32 %30, i32* %arrayidx34, align 4, !tbaa !25
+  %error_exit36 = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %37, i64 0, i32 0
+  %38 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit36, align 8, !tbaa !41
+  tail call void %38(%struct.jpeg_common_struct* nonnull %4) #4
+  br label %if.end37
+
+if.end37:                                         ; preds = %lor.lhs.false22, %if.then28
+  %idxprom40 = sext i32 %29 to i64
+  %arrayidx68 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 16, i64 %idxprom40
+  %39 = load %struct.JHUFF_TBL*, %struct.JHUFF_TBL** %arrayidx68, align 8, !tbaa !3
+  %arrayidx70 = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 4, i64 %idxprom40
+  tail call void @jpeg_make_c_derived_tbl(%struct.jpeg_compress_struct* nonnull %cinfo, %struct.JHUFF_TBL* %39, %struct.c_derived_tbl** %arrayidx70)
+  %40 = load %struct.JHUFF_TBL*, %struct.JHUFF_TBL** %.pre, align 8, !tbaa !3
+  %arrayidx75 = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 5, i64 %.pre157
+  tail call void @jpeg_make_c_derived_tbl(%struct.jpeg_compress_struct* nonnull %cinfo, %struct.JHUFF_TBL* %40, %struct.c_derived_tbl** %arrayidx75)
+  %arrayidx78 = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 1, i32 2, i64 %indvars.iv151
+  store i32 0, i32* %arrayidx78, align 4, !tbaa !25
+  %indvars.iv.next152 = add nuw nsw i64 %indvars.iv151, 1
+  %41 = load i32, i32* %comps_in_scan, align 4, !tbaa !58
+  %42 = sext i32 %41 to i64
+  %cmp = icmp slt i64 %indvars.iv.next152, %42
+  br i1 %cmp, label %for.body, label %for.end.loopexit160
+
+for.end.loopexit:                                 ; preds = %if.end61.us
+  br label %for.end
+
+for.end.loopexit160:                              ; preds = %if.end37
+  br label %for.end
+
+for.end:                                          ; preds = %for.end.loopexit160, %for.end.loopexit, %entry
+  %put_buffer = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 1, i32 0
+  store i64 0, i64* %put_buffer, align 8, !tbaa !62
+  %put_bits = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 1, i32 1
+  store i32 0, i32* %put_bits, align 8, !tbaa !63
+  %restart_interval = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 29
+  %43 = load i32, i32* %restart_interval, align 8, !tbaa !64
+  %restarts_to_go = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 2
+  store i32 %43, i32* %restarts_to_go, align 8, !tbaa !65
+  %next_restart_num = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 3
+  store i32 0, i32* %next_restart_num, align 4, !tbaa !66
+  ret void
+}
+
+; Function Attrs: norecurse nounwind uwtable
+define internal i32 @encode_mcu_gather(%struct.jpeg_compress_struct* nocapture readonly %cinfo, [64 x i16]** nocapture readonly %MCU_data) #2 !prof !51 {
+entry:
+  %entropy1 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 59
+  %0 = bitcast %struct.jpeg_entropy_encoder** %entropy1 to %struct.huff_entropy_encoder**
+  %1 = load %struct.huff_entropy_encoder*, %struct.huff_entropy_encoder** %0, align 8, !tbaa !52
+  %restart_interval = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 29
+  %2 = load i32, i32* %restart_interval, align 8, !tbaa !64
+  %tobool = icmp eq i32 %2, 0
+  br i1 %tobool, label %for.cond8.preheader, label %if.then
+
+if.then:                                          ; preds = %entry
+  %restarts_to_go = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 2
+  %3 = load i32, i32* %restarts_to_go, align 8, !tbaa !65
+  %cmp = icmp eq i32 %3, 0
+  br i1 %cmp, label %for.cond.preheader, label %if.end
+
+for.cond.preheader:                               ; preds = %if.then
+  %comps_in_scan = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 41
+  %4 = load i32, i32* %comps_in_scan, align 4, !tbaa !58
+  %cmp367 = icmp sgt i32 %4, 0
+  br i1 %cmp367, label %for.body.preheader, label %for.end
+
+for.body.preheader:                               ; preds = %for.cond.preheader
+  br label %for.body
+
+for.body:                                         ; preds = %for.body.preheader, %for.body
+  %indvars.iv69 = phi i64 [ %indvars.iv.next70, %for.body ], [ 0, %for.body.preheader ]
+  %arrayidx = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 1, i32 2, i64 %indvars.iv69
+  store i32 0, i32* %arrayidx, align 4, !tbaa !25
+  %indvars.iv.next70 = add nuw nsw i64 %indvars.iv69, 1
+  %5 = load i32, i32* %comps_in_scan, align 4, !tbaa !58
+  %6 = sext i32 %5 to i64
+  %cmp3 = icmp slt i64 %indvars.iv.next70, %6
+  br i1 %cmp3, label %for.body, label %for.end.loopexit
+
+for.end.loopexit:                                 ; preds = %for.body
+  %.pre = load i32, i32* %restart_interval, align 8, !tbaa !64
+  br label %for.end
+
+for.end:                                          ; preds = %for.end.loopexit, %for.cond.preheader
+  %7 = phi i32 [ %.pre, %for.end.loopexit ], [ %2, %for.cond.preheader ]
+  store i32 %7, i32* %restarts_to_go, align 8, !tbaa !65
+  br label %if.end
+
+if.end:                                           ; preds = %for.end, %if.then
+  %8 = phi i32 [ %7, %for.end ], [ %3, %if.then ]
+  %dec = add i32 %8, -1
+  store i32 %dec, i32* %restarts_to_go, align 8, !tbaa !65
+  br label %for.cond8.preheader
+
+for.cond8.preheader:                              ; preds = %entry, %if.end
+  %blocks_in_MCU = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 45
+  %9 = load i32, i32* %blocks_in_MCU, align 8, !tbaa !67
+  %cmp965 = icmp sgt i32 %9, 0
+  br i1 %cmp965, label %for.body10.preheader, label %for.end36
+
+for.body10.preheader:                             ; preds = %for.cond8.preheader
+  br label %for.body10
+
+for.body10:                                       ; preds = %for.body10.preheader, %htest_one_block.exit
+  %indvars.iv = phi i64 [ %indvars.iv.next, %htest_one_block.exit ], [ 0, %for.body10.preheader ]
+  %arrayidx12 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 46, i64 %indvars.iv
+  %10 = load i32, i32* %arrayidx12, align 4, !tbaa !25
+  %idxprom13 = sext i32 %10 to i64
+  %arrayidx14 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 42, i64 %idxprom13
+  %11 = load %struct.jpeg_component_info*, %struct.jpeg_component_info** %arrayidx14, align 8, !tbaa !3
+  %arrayidx16 = getelementptr inbounds [64 x i16]*, [64 x i16]** %MCU_data, i64 %indvars.iv
+  %12 = load [64 x i16]*, [64 x i16]** %arrayidx16, align 8, !tbaa !3
+  %arraydecay = getelementptr inbounds [64 x i16], [64 x i16]* %12, i64 0, i64 0
+  %arrayidx21 = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 1, i32 2, i64 %idxprom13
+  %13 = load i32, i32* %arrayidx21, align 4, !tbaa !25
+  %dc_tbl_no = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %11, i64 0, i32 5
+  %14 = load i32, i32* %dc_tbl_no, align 4, !tbaa !59
+  %idxprom22 = sext i32 %14 to i64
+  %arrayidx23 = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 6, i64 %idxprom22
+  %15 = load i64*, i64** %arrayidx23, align 8, !tbaa !3
+  %ac_tbl_no = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %11, i64 0, i32 6
+  %16 = load i32, i32* %ac_tbl_no, align 8, !tbaa !61
+  %idxprom24 = sext i32 %16 to i64
+  %arrayidx25 = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 7, i64 %idxprom24
+  %17 = load i64*, i64** %arrayidx25, align 8, !tbaa !3
+  %18 = load i16, i16* %arraydecay, align 2, !tbaa !68
+  %conv.i = sext i16 %18 to i32
+  %sub.i = sub nsw i32 %conv.i, %13
+  %cmp.i = icmp slt i32 %sub.i, 0
+  %sub2.i = sub nsw i32 0, %sub.i
+  %sub2.sub.i = select i1 %cmp.i, i32 %sub2.i, i32 %sub.i
+  %tobool71.i = icmp eq i32 %sub2.sub.i, 0
+  br i1 %tobool71.i, label %while.end.i, label %while.body.i.preheader
+
+while.body.i.preheader:                           ; preds = %for.body10
+  br label %while.body.i
+
+while.body.i:                                     ; preds = %while.body.i.preheader, %while.body.i
+  %nbits.073.i = phi i32 [ %inc.i, %while.body.i ], [ 0, %while.body.i.preheader ]
+  %temp.172.i = phi i32 [ %shr.i, %while.body.i ], [ %sub2.sub.i, %while.body.i.preheader ]
+  %inc.i = add nuw nsw i32 %nbits.073.i, 1
+  %shr.i = ashr i32 %temp.172.i, 1
+  %tobool.i = icmp eq i32 %shr.i, 0
+  br i1 %tobool.i, label %while.end.loopexit.i, label %while.body.i
+
+while.end.loopexit.i:                             ; preds = %while.body.i
+  %inc.i.lcssa = phi i32 [ %inc.i, %while.body.i ]
+  %phitmp.i = sext i32 %inc.i.lcssa to i64
+  br label %while.end.i
+
+while.end.i:                                      ; preds = %while.end.loopexit.i, %for.body10
+  %nbits.0.lcssa.i = phi i64 [ 0, %for.body10 ], [ %phitmp.i, %while.end.loopexit.i ]
+  %arrayidx3.i = getelementptr inbounds i64, i64* %15, i64 %nbits.0.lcssa.i
+  %19 = load i64, i64* %arrayidx3.i, align 8, !tbaa !30
+  %inc4.i = add nsw i64 %19, 1
+  store i64 %inc4.i, i64* %arrayidx3.i, align 8, !tbaa !30
+  %arrayidx20.i = getelementptr inbounds i64, i64* %17, i64 240
+  br label %for.body.i
+
+for.body.i:                                       ; preds = %for.inc.i, %while.end.i
+  %indvars.iv.i = phi i64 [ 1, %while.end.i ], [ %indvars.iv.next.i, %for.inc.i ]
+  %r.070.i = phi i32 [ 0, %while.end.i ], [ %r.2.i, %for.inc.i ]
+  %arrayidx8.i = getelementptr inbounds [0 x i32], [0 x i32]* @jpeg_natural_order, i64 0, i64 %indvars.iv.i
+  %20 = load i32, i32* %arrayidx8.i, align 4, !tbaa !25
+  %idxprom9.i = sext i32 %20 to i64
+  %arrayidx10.i = getelementptr inbounds [64 x i16], [64 x i16]* %12, i64 0, i64 %idxprom9.i
+  %21 = load i16, i16* %arrayidx10.i, align 2, !tbaa !68
+  %conv11.i = sext i16 %21 to i32
+  %cmp12.i = icmp eq i16 %21, 0
+  br i1 %cmp12.i, label %if.then14.i, label %while.cond16.preheader.i
+
+while.cond16.preheader.i:                         ; preds = %for.body.i
+  %cmp1767.i = icmp sgt i32 %r.070.i, 15
+  br i1 %cmp1767.i, label %while.body19.lr.ph.i, label %while.end23.i
+
+while.body19.lr.ph.i:                             ; preds = %while.cond16.preheader.i
+  %arrayidx20.promoted.i = load i64, i64* %arrayidx20.i, align 8, !tbaa !30
+  %22 = add i32 %r.070.i, -16
+  %23 = lshr i32 %22, 4
+  %24 = shl nuw i32 %23, 4
+  %25 = sub i32 %22, %24
+  %26 = zext i32 %23 to i64
+  %27 = add nuw nsw i64 %26, 1
+  %28 = add i64 %27, %arrayidx20.promoted.i
+  store i64 %28, i64* %arrayidx20.i, align 8, !tbaa !30
+  br label %while.end23.i
+
+if.then14.i:                                      ; preds = %for.body.i
+  %inc15.i = add nsw i32 %r.070.i, 1
+  br label %for.inc.i
+
+while.end23.i:                                    ; preds = %while.body19.lr.ph.i, %while.cond16.preheader.i
+  %r.1.lcssa.i = phi i32 [ %25, %while.body19.lr.ph.i ], [ %r.070.i, %while.cond16.preheader.i ]
+  %cmp24.i = icmp slt i16 %21, 0
+  %sub27.i = sub nsw i32 0, %conv11.i
+  %sub27.conv11.i = select i1 %cmp24.i, i32 %sub27.i, i32 %conv11.i
+  br label %while.cond29.i
+
+while.cond29.i:                                   ; preds = %while.cond29.i, %while.end23.i
+  %temp.3.i = phi i32 [ %sub27.conv11.i, %while.end23.i ], [ %shr30.i, %while.cond29.i ]
+  %nbits.1.i = phi i32 [ 1, %while.end23.i ], [ %inc33.i, %while.cond29.i ]
+  %shr30.i = ashr i32 %temp.3.i, 1
+  %tobool31.i = icmp eq i32 %shr30.i, 0
+  %inc33.i = add nuw nsw i32 %nbits.1.i, 1
+  br i1 %tobool31.i, label %while.end34.i, label %while.cond29.i
+
+while.end34.i:                                    ; preds = %while.cond29.i
+  %nbits.1.i.lcssa = phi i32 [ %nbits.1.i, %while.cond29.i ]
+  %shl.i = shl i32 %r.1.lcssa.i, 4
+  %add.i = add nsw i32 %nbits.1.i.lcssa, %shl.i
+  %idxprom35.i = sext i32 %add.i to i64
+  %arrayidx36.i = getelementptr inbounds i64, i64* %17, i64 %idxprom35.i
+  %29 = load i64, i64* %arrayidx36.i, align 8, !tbaa !30
+  %inc37.i = add nsw i64 %29, 1
+  store i64 %inc37.i, i64* %arrayidx36.i, align 8, !tbaa !30
+  br label %for.inc.i
+
+for.inc.i:                                        ; preds = %while.end34.i, %if.then14.i
+  %r.2.i = phi i32 [ %inc15.i, %if.then14.i ], [ 0, %while.end34.i ]
+  %indvars.iv.next.i = add nuw nsw i64 %indvars.iv.i, 1
+  %exitcond.i = icmp eq i64 %indvars.iv.next.i, 64
+  br i1 %exitcond.i, label %for.end.i, label %for.body.i
+
+for.end.i:                                        ; preds = %for.inc.i
+  %r.2.i.lcssa = phi i32 [ %r.2.i, %for.inc.i ]
+  %cmp40.i = icmp sgt i32 %r.2.i.lcssa, 0
+  br i1 %cmp40.i, label %if.then42.i, label %htest_one_block.exit
+
+if.then42.i:                                      ; preds = %for.end.i
+  %30 = load i64, i64* %17, align 8, !tbaa !30
+  %inc44.i = add nsw i64 %30, 1
+  store i64 %inc44.i, i64* %17, align 8, !tbaa !30
+  br label %htest_one_block.exit
+
+htest_one_block.exit:                             ; preds = %for.end.i, %if.then42.i
+  store i32 %conv.i, i32* %arrayidx21, align 4, !tbaa !25
+  %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+  %31 = load i32, i32* %blocks_in_MCU, align 8, !tbaa !67
+  %32 = sext i32 %31 to i64
+  %cmp9 = icmp slt i64 %indvars.iv.next, %32
+  br i1 %cmp9, label %for.body10, label %for.end36.loopexit
+
+for.end36.loopexit:                               ; preds = %htest_one_block.exit
+  br label %for.end36
+
+for.end36:                                        ; preds = %for.end36.loopexit, %for.cond8.preheader
+  ret i32 1
+}
+
+; Function Attrs: nounwind uwtable
+define internal void @finish_pass_gather(%struct.jpeg_compress_struct* %cinfo) #0 !prof !51 {
+entry:
+  %did_dc = alloca [4 x i32], align 16
+  %did_ac = alloca [4 x i32], align 16
+  %entropy1 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 59
+  %0 = bitcast %struct.jpeg_entropy_encoder** %entropy1 to %struct.huff_entropy_encoder**
+  %1 = load %struct.huff_entropy_encoder*, %struct.huff_entropy_encoder** %0, align 8, !tbaa !52
+  %2 = bitcast [4 x i32]* %did_dc to i8*
+  call void @llvm.lifetime.start(i64 16, i8* %2) #4
+  %3 = bitcast [4 x i32]* %did_ac to i8*
+  call void @llvm.lifetime.start(i64 16, i8* %3) #4
+  call void @llvm.memset.p0i8.i64(i8* %2, i8 0, i64 16, i32 16, i1 false)
+  call void @llvm.memset.p0i8.i64(i8* %3, i8 0, i64 16, i32 16, i1 false)
+  %comps_in_scan = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 41
+  %4 = load i32, i32* %comps_in_scan, align 4, !tbaa !58
+  %cmp58 = icmp sgt i32 %4, 0
+  br i1 %cmp58, label %for.body.lr.ph, label %for.end
+
+for.body.lr.ph:                                   ; preds = %entry
+  %5 = bitcast %struct.jpeg_compress_struct* %cinfo to %struct.jpeg_common_struct*
+  br label %for.body
+
+for.body:                                         ; preds = %for.body.lr.ph, %for.inc
+  %indvars.iv = phi i64 [ 0, %for.body.lr.ph ], [ %indvars.iv.next, %for.inc ]
+  %arrayidx = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 42, i64 %indvars.iv
+  %6 = load %struct.jpeg_component_info*, %struct.jpeg_component_info** %arrayidx, align 8, !tbaa !3
+  %dc_tbl_no = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %6, i64 0, i32 5
+  %7 = load i32, i32* %dc_tbl_no, align 4, !tbaa !59
+  %ac_tbl_no = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %6, i64 0, i32 6
+  %8 = load i32, i32* %ac_tbl_no, align 8, !tbaa !61
+  %idxprom3 = sext i32 %7 to i64
+  %arrayidx4 = getelementptr inbounds [4 x i32], [4 x i32]* %did_dc, i64 0, i64 %idxprom3
+  %9 = load i32, i32* %arrayidx4, align 4, !tbaa !25
+  %tobool = icmp eq i32 %9, 0
+  br i1 %tobool, label %if.then, label %if.end13
+
+if.then:                                          ; preds = %for.body
+  %arrayidx6 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 16, i64 %idxprom3
+  %10 = load %struct.JHUFF_TBL*, %struct.JHUFF_TBL** %arrayidx6, align 8, !tbaa !3
+  %cmp7 = icmp eq %struct.JHUFF_TBL* %10, null
+  br i1 %cmp7, label %if.then8, label %if.end
+
+if.then8:                                         ; preds = %if.then
+  %call = tail call %struct.JHUFF_TBL* @jpeg_alloc_huff_table(%struct.jpeg_common_struct* nonnull %5) #4
+  store %struct.JHUFF_TBL* %call, %struct.JHUFF_TBL** %arrayidx6, align 8, !tbaa !3
+  br label %if.end
+
+if.end:                                           ; preds = %if.then8, %if.then
+  %11 = phi %struct.JHUFF_TBL* [ %call, %if.then8 ], [ %10, %if.then ]
+  %arrayidx10 = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 6, i64 %idxprom3
+  %12 = load i64*, i64** %arrayidx10, align 8, !tbaa !3
+  tail call void @jpeg_gen_optimal_table(%struct.jpeg_compress_struct* nonnull %cinfo, %struct.JHUFF_TBL* %11, i64* %12)
+  store i32 1, i32* %arrayidx4, align 4, !tbaa !25
+  br label %if.end13
+
+if.end13:                                         ; preds = %for.body, %if.end
+  %idxprom14 = sext i32 %8 to i64
+  %arrayidx15 = getelementptr inbounds [4 x i32], [4 x i32]* %did_ac, i64 0, i64 %idxprom14
+  %13 = load i32, i32* %arrayidx15, align 4, !tbaa !25
+  %tobool16 = icmp eq i32 %13, 0
+  br i1 %tobool16, label %if.then17, label %for.inc
+
+if.then17:                                        ; preds = %if.end13
+  %arrayidx19 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 17, i64 %idxprom14
+  %14 = load %struct.JHUFF_TBL*, %struct.JHUFF_TBL** %arrayidx19, align 8, !tbaa !3
+  %cmp20 = icmp eq %struct.JHUFF_TBL* %14, null
+  br i1 %cmp20, label %if.then21, label %if.end23
+
+if.then21:                                        ; preds = %if.then17
+  %call22 = tail call %struct.JHUFF_TBL* @jpeg_alloc_huff_table(%struct.jpeg_common_struct* nonnull %5) #4
+  store %struct.JHUFF_TBL* %call22, %struct.JHUFF_TBL** %arrayidx19, align 8, !tbaa !3
+  br label %if.end23
+
+if.end23:                                         ; preds = %if.then21, %if.then17
+  %15 = phi %struct.JHUFF_TBL* [ %call22, %if.then21 ], [ %14, %if.then17 ]
+  %arrayidx25 = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 7, i64 %idxprom14
+  %16 = load i64*, i64** %arrayidx25, align 8, !tbaa !3
+  tail call void @jpeg_gen_optimal_table(%struct.jpeg_compress_struct* nonnull %cinfo, %struct.JHUFF_TBL* %15, i64* %16)
+  store i32 1, i32* %arrayidx15, align 4, !tbaa !25
+  br label %for.inc
+
+for.inc:                                          ; preds = %if.end13, %if.end23
+  %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+  %17 = load i32, i32* %comps_in_scan, align 4, !tbaa !58
+  %18 = sext i32 %17 to i64
+  %cmp = icmp slt i64 %indvars.iv.next, %18
+  br i1 %cmp, label %for.body, label %for.end.loopexit
+
+for.end.loopexit:                                 ; preds = %for.inc
+  br label %for.end
+
+for.end:                                          ; preds = %for.end.loopexit, %entry
+  call void @llvm.lifetime.end(i64 16, i8* %3) #4
+  call void @llvm.lifetime.end(i64 16, i8* %2) #4
+  ret void
+}
+
+; Function Attrs: nounwind uwtable
+define internal i32 @encode_mcu_huff(%struct.jpeg_compress_struct* %cinfo, [64 x i16]** nocapture readonly %MCU_data) #0 !prof !51 {
+entry:
+  %state = alloca %struct.working_state, align 16
+  %entropy1 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 59
+  %0 = bitcast %struct.jpeg_entropy_encoder** %entropy1 to %struct.huff_entropy_encoder**
+  %1 = load %struct.huff_entropy_encoder*, %struct.huff_entropy_encoder** %0, align 8, !tbaa !52
+  %2 = bitcast %struct.working_state* %state to i8*
+  call void @llvm.lifetime.start(i64 56, i8* %2) #4
+  %dest = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 5
+  %3 = bitcast %struct.jpeg_destination_mgr** %dest to <2 x i64>**
+  %4 = load <2 x i64>*, <2 x i64>** %3, align 8, !tbaa !69
+  %5 = load <2 x i64>, <2 x i64>* %4, align 8, !tbaa !16
+  %free_in_buffer4 = getelementptr inbounds %struct.working_state, %struct.working_state* %state, i64 0, i32 1
+  %6 = bitcast %struct.working_state* %state to <2 x i64>*
+  store <2 x i64> %5, <2 x i64>* %6, align 16, !tbaa !16
+  %cur = getelementptr inbounds %struct.working_state, %struct.working_state* %state, i64 0, i32 2
+  %saved = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 1
+  %7 = bitcast %struct.savable_state* %cur to i8*
+  %8 = bitcast %struct.savable_state* %saved to i8*
+  call void @llvm.memcpy.p0i8.p0i8.i64(i8* %7, i8* %8, i64 32, i32 8, i1 false), !tbaa.struct !70
+  %cinfo5 = getelementptr inbounds %struct.working_state, %struct.working_state* %state, i64 0, i32 3
+  store %struct.jpeg_compress_struct* %cinfo, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %restart_interval = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 29
+  %9 = load i32, i32* %restart_interval, align 8, !tbaa !64
+  %tobool = icmp eq i32 %9, 0
+  %10 = extractelement <2 x i64> %5, i32 0
+  %11 = inttoptr i64 %10 to i8*
+  br i1 %tobool, label %for.cond.preheader, label %if.then
+
+if.then:                                          ; preds = %entry
+  %restarts_to_go = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 2
+  %12 = bitcast i32* %restarts_to_go to i64*
+  %13 = load i64, i64* %12, align 8
+  %14 = trunc i64 %13 to i32
+  %cmp = icmp eq i32 %14, 0
+  %15 = lshr i64 %13, 32
+  %16 = trunc i64 %15 to i8
+  br i1 %cmp, label %if.then6, label %for.cond.preheader
+
+if.then6:                                         ; preds = %if.then
+  %put_bits1.i125 = getelementptr inbounds %struct.working_state, %struct.working_state* %state, i64 0, i32 2, i32 1
+  %17 = load i32, i32* %put_bits1.i125, align 8, !tbaa !73
+  %put_buffer10.i130 = getelementptr inbounds %struct.working_state, %struct.working_state* %state, i64 0, i32 2, i32 0
+  %cmp1188.i132 = icmp sgt i32 %17, 0
+  %next_output_byte.i134 = getelementptr inbounds %struct.working_state, %struct.working_state* %state, i64 0, i32 0
+  br i1 %cmp1188.i132, label %while.body.i145.preheader, label %if.end.i
+
+while.body.i145.preheader:                        ; preds = %if.then6
+  %sub6.i127 = sub i32 17, %17
+  %sh_prom7.i128 = zext i32 %sub6.i127 to i64
+  %shl8.i129 = shl i64 127, %sh_prom7.i128
+  %18 = load i64, i64* %put_buffer10.i130, align 16, !tbaa !74
+  %or.i131 = or i64 %shl8.i129, %18
+  %add.i126 = add nsw i32 %17, 7
+  %19 = bitcast %struct.working_state* %state to <2 x i64>*
+  %20 = bitcast %struct.working_state* %state to <2 x i64>*
+  br label %while.body.i145
+
+while.body.i145:                                  ; preds = %while.body.i145.preheader, %cleanup.i170
+  %21 = phi i8* [ %.pre, %cleanup.i170 ], [ %11, %while.body.i145.preheader ]
+  %put_bits.090.i138 = phi i32 [ %sub39.i168, %cleanup.i170 ], [ %add.i126, %while.body.i145.preheader ]
+  %put_buffer.089.i139 = phi i64 [ %shl38.i167, %cleanup.i170 ], [ %or.i131, %while.body.i145.preheader ]
+  %shr73.i140 = lshr i64 %put_buffer.089.i139, 16
+  %conv15.i141 = trunc i64 %shr73.i140 to i8
+  %incdec.ptr.i142 = getelementptr inbounds i8, i8* %21, i64 1
+  store i8* %incdec.ptr.i142, i8** %next_output_byte.i134, align 16, !tbaa !75
+  store i8 %conv15.i141, i8* %21, align 1, !tbaa !16
+  %22 = load i64, i64* %free_in_buffer4, align 8, !tbaa !76
+  %dec.i143 = add i64 %22, -1
+  store i64 %dec.i143, i64* %free_in_buffer4, align 8, !tbaa !76
+  %cmp16.i144 = icmp eq i64 %dec.i143, 0
+  br i1 %cmp16.i144, label %if.then18.i150, label %if.end21.i155
+
+if.then18.i150:                                   ; preds = %while.body.i145
+  %23 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %dest1.i.i146 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %23, i64 0, i32 5
+  %24 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest1.i.i146, align 8, !tbaa !69
+  %empty_output_buffer.i.i147 = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %24, i64 0, i32 3
+  %25 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i.i147, align 8, !tbaa !77
+  %call.i.i148 = tail call i32 %25(%struct.jpeg_compress_struct* %23) #4
+  %tobool.i.i149 = icmp eq i32 %call.i.i148, 0
+  br i1 %tobool.i.i149, label %cleanup.loopexit524, label %dump_buffer.exit.i152
+
+dump_buffer.exit.i152:                            ; preds = %if.then18.i150
+  %26 = bitcast %struct.jpeg_destination_mgr* %24 to <2 x i64>*
+  %27 = load <2 x i64>, <2 x i64>* %26, align 8, !tbaa !16
+  store <2 x i64> %27, <2 x i64>* %19, align 16, !tbaa !16
+  br label %if.end21.i155
+
+if.end21.i155:                                    ; preds = %dump_buffer.exit.i152, %while.body.i145
+  %conv14.i153 = and i64 %shr73.i140, 255
+  %cmp22.i154 = icmp eq i64 %conv14.i153, 255
+  br i1 %cmp22.i154, label %if.then24.i159, label %cleanup.i170
+
+if.then24.i159:                                   ; preds = %if.end21.i155
+  %28 = load i8*, i8** %next_output_byte.i134, align 16, !tbaa !75
+  %incdec.ptr26.i156 = getelementptr inbounds i8, i8* %28, i64 1
+  store i8* %incdec.ptr26.i156, i8** %next_output_byte.i134, align 16, !tbaa !75
+  store i8 0, i8* %28, align 1, !tbaa !16
+  %29 = load i64, i64* %free_in_buffer4, align 8, !tbaa !76
+  %dec28.i157 = add i64 %29, -1
+  store i64 %dec28.i157, i64* %free_in_buffer4, align 8, !tbaa !76
+  %cmp29.i158 = icmp eq i64 %dec28.i157, 0
+  br i1 %cmp29.i158, label %if.then31.i164, label %cleanup.i170
+
+if.then31.i164:                                   ; preds = %if.then24.i159
+  %30 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %dest1.i75.i160 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %30, i64 0, i32 5
+  %31 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest1.i75.i160, align 8, !tbaa !69
+  %empty_output_buffer.i76.i161 = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %31, i64 0, i32 3
+  %32 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i76.i161, align 8, !tbaa !77
+  %call.i77.i162 = tail call i32 %32(%struct.jpeg_compress_struct* %30) #4
+  %tobool.i78.i163 = icmp eq i32 %call.i77.i162, 0
+  br i1 %tobool.i78.i163, label %cleanup.loopexit524, label %dump_buffer.exit83.i166
+
+dump_buffer.exit83.i166:                          ; preds = %if.then31.i164
+  %33 = bitcast %struct.jpeg_destination_mgr* %31 to <2 x i64>*
+  %34 = load <2 x i64>, <2 x i64>* %33, align 8, !tbaa !16
+  store <2 x i64> %34, <2 x i64>* %20, align 16, !tbaa !16
+  br label %cleanup.i170
+
+cleanup.i170:                                     ; preds = %dump_buffer.exit83.i166, %if.then24.i159, %if.end21.i155
+  %shl38.i167 = shl i64 %put_buffer.089.i139, 8
+  %sub39.i168 = add nsw i32 %put_bits.090.i138, -8
+  %cmp11.i169 = icmp sgt i32 %sub39.i168, 7
+  %.pre = load i8*, i8** %next_output_byte.i134, align 16, !tbaa !75
+  br i1 %cmp11.i169, label %while.body.i145, label %if.end.i.loopexit
+
+if.end.i.loopexit:                                ; preds = %cleanup.i170
+  %.pre.lcssa = phi i8* [ %.pre, %cleanup.i170 ]
+  br label %if.end.i
+
+if.end.i:                                         ; preds = %if.end.i.loopexit, %if.then6
+  %35 = phi i8* [ %11, %if.then6 ], [ %.pre.lcssa, %if.end.i.loopexit ]
+  store i64 0, i64* %put_buffer10.i130, align 16, !tbaa !74
+  store i32 0, i32* %put_bits1.i125, align 8, !tbaa !73
+  %incdec.ptr.i = getelementptr inbounds i8, i8* %35, i64 1
+  store i8* %incdec.ptr.i, i8** %next_output_byte.i134, align 16, !tbaa !75
+  store i8 -1, i8* %35, align 1, !tbaa !16
+  %36 = load i64, i64* %free_in_buffer4, align 8, !tbaa !76
+  %dec.i = add i64 %36, -1
+  store i64 %dec.i, i64* %free_in_buffer4, align 8, !tbaa !76
+  %cmp.i = icmp eq i64 %dec.i, 0
+  br i1 %cmp.i, label %if.then1.i, label %if.end.if.end6_crit_edge.i
+
+if.end.if.end6_crit_edge.i:                       ; preds = %if.end.i
+  %.pre.i = load i8*, i8** %next_output_byte.i134, align 16, !tbaa !75
+  br label %if.end6.i
+
+if.then1.i:                                       ; preds = %if.end.i
+  %37 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %dest1.i.i = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %37, i64 0, i32 5
+  %38 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest1.i.i, align 8, !tbaa !69
+  %empty_output_buffer.i.i = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %38, i64 0, i32 3
+  %39 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i.i, align 8, !tbaa !77
+  %call.i32.i = tail call i32 %39(%struct.jpeg_compress_struct* %37) #4
+  %tobool.i33.i = icmp eq i32 %call.i32.i, 0
+  br i1 %tobool.i33.i, label %cleanup, label %dump_buffer.exit.i
+
+dump_buffer.exit.i:                               ; preds = %if.then1.i
+  %40 = bitcast %struct.jpeg_destination_mgr* %38 to <2 x i64>*
+  %41 = load <2 x i64>, <2 x i64>* %40, align 8, !tbaa !16
+  %42 = bitcast %struct.working_state* %state to <2 x i64>*
+  store <2 x i64> %41, <2 x i64>* %42, align 16, !tbaa !16
+  %43 = extractelement <2 x i64> %41, i32 0
+  %44 = inttoptr i64 %43 to i8*
+  br label %if.end6.i
+
+if.end6.i:                                        ; preds = %dump_buffer.exit.i, %if.end.if.end6_crit_edge.i
+  %45 = phi i8* [ %.pre.i, %if.end.if.end6_crit_edge.i ], [ %44, %dump_buffer.exit.i ]
+  %add.i = add i8 %16, -48
+  %incdec.ptr8.i = getelementptr inbounds i8, i8* %45, i64 1
+  store i8* %incdec.ptr8.i, i8** %next_output_byte.i134, align 16, !tbaa !75
+  store i8 %add.i, i8* %45, align 1, !tbaa !16
+  %46 = load i64, i64* %free_in_buffer4, align 8, !tbaa !76
+  %dec10.i = add i64 %46, -1
+  store i64 %dec10.i, i64* %free_in_buffer4, align 8, !tbaa !76
+  %cmp11.i = icmp eq i64 %dec10.i, 0
+  %47 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  br i1 %cmp11.i, label %if.then13.i, label %for.cond.preheader.i
+
+if.then13.i:                                      ; preds = %if.end6.i
+  %dest1.i37.i = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %47, i64 0, i32 5
+  %48 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest1.i37.i, align 8, !tbaa !69
+  %empty_output_buffer.i38.i = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %48, i64 0, i32 3
+  %49 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i38.i, align 8, !tbaa !77
+  %call.i39.i = tail call i32 %49(%struct.jpeg_compress_struct* %47) #4
+  %tobool.i40.i = icmp eq i32 %call.i39.i, 0
+  br i1 %tobool.i40.i, label %cleanup, label %dump_buffer.exit45.i
+
+dump_buffer.exit45.i:                             ; preds = %if.then13.i
+  %50 = bitcast %struct.jpeg_destination_mgr* %48 to <2 x i64>*
+  %51 = load <2 x i64>, <2 x i64>* %50, align 8, !tbaa !16
+  %52 = bitcast %struct.working_state* %state to <2 x i64>*
+  store <2 x i64> %51, <2 x i64>* %52, align 16, !tbaa !16
+  br label %for.cond.preheader.i
+
+for.cond.preheader.i:                             ; preds = %if.end6.i, %dump_buffer.exit45.i
+  %comps_in_scan49.i = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %47, i64 0, i32 41
+  %53 = load i32, i32* %comps_in_scan49.i, align 4, !tbaa !58
+  %cmp1950.i = icmp sgt i32 %53, 0
+  br i1 %cmp1950.i, label %for.body.i.preheader, label %for.cond.preheader
+
+for.body.i.preheader:                             ; preds = %for.cond.preheader.i
+  br label %for.body.i
+
+for.body.i:                                       ; preds = %for.body.i.preheader, %for.body.i
+  %indvars.iv.i = phi i64 [ %indvars.iv.next.i, %for.body.i ], [ 0, %for.body.i.preheader ]
+  %arrayidx.i = getelementptr inbounds %struct.working_state, %struct.working_state* %state, i64 0, i32 2, i32 2, i64 %indvars.iv.i
+  store i32 0, i32* %arrayidx.i, align 4, !tbaa !25
+  %indvars.iv.next.i = add nuw nsw i64 %indvars.iv.i, 1
+  %54 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %comps_in_scan.i = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %54, i64 0, i32 41
+  %55 = load i32, i32* %comps_in_scan.i, align 4, !tbaa !58
+  %56 = sext i32 %55 to i64
+  %cmp19.i = icmp slt i64 %indvars.iv.next.i, %56
+  br i1 %cmp19.i, label %for.body.i, label %for.cond.preheader.loopexit
+
+for.cond.preheader.loopexit:                      ; preds = %for.body.i
+  br label %for.cond.preheader
+
+for.cond.preheader:                               ; preds = %for.cond.preheader.loopexit, %entry, %if.then, %for.cond.preheader.i
+  %blocks_in_MCU = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 45
+  %57 = load i32, i32* %blocks_in_MCU, align 8, !tbaa !67
+  %cmp11494 = icmp sgt i32 %57, 0
+  br i1 %cmp11494, label %for.body.lr.ph, label %for.end
+
+for.body.lr.ph:                                   ; preds = %for.cond.preheader
+  %put_bits1.i177 = getelementptr inbounds %struct.working_state, %struct.working_state* %state, i64 0, i32 2, i32 1
+  %put_buffer10.i192 = getelementptr inbounds %struct.working_state, %struct.working_state* %state, i64 0, i32 2, i32 0
+  %next_output_byte.i196 = getelementptr inbounds %struct.working_state, %struct.working_state* %state, i64 0, i32 0
+  %58 = bitcast %struct.working_state* %state to <2 x i64>*
+  %59 = bitcast %struct.working_state* %state to <2 x i64>*
+  %60 = bitcast %struct.working_state* %state to <2 x i64>*
+  %61 = bitcast %struct.working_state* %state to <2 x i64>*
+  %62 = bitcast %struct.working_state* %state to <2 x i64>*
+  %63 = bitcast %struct.working_state* %state to <2 x i64>*
+  %64 = bitcast %struct.working_state* %state to <2 x i64>*
+  %65 = bitcast %struct.working_state* %state to <2 x i64>*
+  %66 = bitcast %struct.working_state* %state to <2 x i64>*
+  %67 = bitcast %struct.working_state* %state to <2 x i64>*
+  %68 = bitcast %struct.working_state* %state to <2 x i64>*
+  %69 = bitcast %struct.working_state* %state to <2 x i64>*
+  br label %for.body
+
+for.body:                                         ; preds = %for.body.lr.ph, %if.end27
+  %indvars.iv = phi i64 [ 0, %for.body.lr.ph ], [ %indvars.iv.next, %if.end27 ]
+  %arrayidx = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 46, i64 %indvars.iv
+  %70 = load i32, i32* %arrayidx, align 4, !tbaa !25
+  %idxprom12 = sext i32 %70 to i64
+  %arrayidx13 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 42, i64 %idxprom12
+  %71 = load %struct.jpeg_component_info*, %struct.jpeg_component_info** %arrayidx13, align 8, !tbaa !3
+  %arrayidx15 = getelementptr inbounds [64 x i16]*, [64 x i16]** %MCU_data, i64 %indvars.iv
+  %72 = load [64 x i16]*, [64 x i16]** %arrayidx15, align 8, !tbaa !3
+  %arraydecay = getelementptr inbounds [64 x i16], [64 x i16]* %72, i64 0, i64 0
+  %arrayidx19 = getelementptr inbounds %struct.working_state, %struct.working_state* %state, i64 0, i32 2, i32 2, i64 %idxprom12
+  %73 = load i32, i32* %arrayidx19, align 4, !tbaa !25
+  %dc_tbl_no = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %71, i64 0, i32 5
+  %74 = load i32, i32* %dc_tbl_no, align 4, !tbaa !59
+  %idxprom20 = sext i32 %74 to i64
+  %arrayidx21 = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 4, i64 %idxprom20
+  %75 = load %struct.c_derived_tbl*, %struct.c_derived_tbl** %arrayidx21, align 8, !tbaa !3
+  %ac_tbl_no = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %71, i64 0, i32 6
+  %76 = load i32, i32* %ac_tbl_no, align 8, !tbaa !61
+  %idxprom22 = sext i32 %76 to i64
+  %arrayidx23 = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 5, i64 %idxprom22
+  %77 = load %struct.c_derived_tbl*, %struct.c_derived_tbl** %arrayidx23, align 8, !tbaa !3
+  %78 = load i16, i16* %arraydecay, align 2, !tbaa !68
+  %conv.i96 = sext i16 %78 to i32
+  %sub.i = sub nsw i32 %conv.i96, %73
+  %cmp.i97 = icmp slt i32 %sub.i, 0
+  %sub2.i = sub nsw i32 0, %sub.i
+  %temp.0.i = select i1 %cmp.i97, i32 %sub2.i, i32 %sub.i
+  %sub.lobit.i = ashr i32 %sub.i, 31
+  %temp2.0.i = add nsw i32 %sub.lobit.i, %sub.i
+  %tobool140.i = icmp eq i32 %temp.0.i, 0
+  br i1 %tobool140.i, label %while.end.i, label %while.body.i.preheader
+
+while.body.i.preheader:                           ; preds = %for.body
+  br label %while.body.i
+
+while.body.i:                                     ; preds = %while.body.i.preheader, %while.body.i
+  %nbits.0142.i = phi i32 [ %inc.i, %while.body.i ], [ 0, %while.body.i.preheader ]
+  %temp.1141.i = phi i32 [ %shr.i, %while.body.i ], [ %temp.0.i, %while.body.i.preheader ]
+  %inc.i = add nuw nsw i32 %nbits.0142.i, 1
+  %shr.i = ashr i32 %temp.1141.i, 1
+  %tobool.i = icmp eq i32 %shr.i, 0
+  br i1 %tobool.i, label %while.end.i.loopexit, label %while.body.i
+
+while.end.i.loopexit:                             ; preds = %while.body.i
+  %inc.i.lcssa = phi i32 [ %inc.i, %while.body.i ]
+  br label %while.end.i
+
+while.end.i:                                      ; preds = %while.end.i.loopexit, %for.body
+  %nbits.0.lcssa.i = phi i32 [ 0, %for.body ], [ %inc.i.lcssa, %while.end.i.loopexit ]
+  %idxprom.i = sext i32 %nbits.0.lcssa.i to i64
+  %arrayidx3.i = getelementptr inbounds %struct.c_derived_tbl, %struct.c_derived_tbl* %75, i64 0, i32 0, i64 %idxprom.i
+  %79 = load i32, i32* %arrayidx3.i, align 4, !tbaa !25
+  %arrayidx5.i = getelementptr inbounds %struct.c_derived_tbl, %struct.c_derived_tbl* %75, i64 0, i32 1, i64 %idxprom.i
+  %80 = load i8, i8* %arrayidx5.i, align 1, !tbaa !16
+  %conv6.i = sext i8 %80 to i32
+  %conv.i176 = zext i32 %79 to i64
+  %81 = load i32, i32* %put_bits1.i177, align 8, !tbaa !73
+  %cmp.i178 = icmp eq i8 %80, 0
+  br i1 %cmp.i178, label %if.then.i183, label %if.end.i195
+
+if.then.i183:                                     ; preds = %while.end.i
+  %82 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %err.i180 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %82, i64 0, i32 0
+  %83 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err.i180, align 8, !tbaa !38
+  %msg_code.i181 = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %83, i64 0, i32 5
+  store i32 39, i32* %msg_code.i181, align 8, !tbaa !39
+  %error_exit.i182 = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %83, i64 0, i32 0
+  %84 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit.i182, align 8, !tbaa !41
+  %85 = bitcast %struct.jpeg_compress_struct* %82 to %struct.jpeg_common_struct*
+  tail call void %84(%struct.jpeg_common_struct* %85) #4
+  br label %if.end.i195
+
+if.end.i195:                                      ; preds = %if.then.i183, %while.end.i
+  %sh_prom.i184 = zext i32 %conv6.i to i64
+  %shl.i185 = shl i64 1, %sh_prom.i184
+  %sub.i186 = add i64 %shl.i185, 4294967295
+  %and.i187 = and i64 %sub.i186, %conv.i176
+  %add.i188 = add nsw i32 %81, %conv6.i
+  %sub6.i189 = sub nsw i32 24, %add.i188
+  %sh_prom7.i190 = zext i32 %sub6.i189 to i64
+  %shl8.i191 = shl i64 %and.i187, %sh_prom7.i190
+  %86 = load i64, i64* %put_buffer10.i192, align 16, !tbaa !74
+  %or.i193 = or i64 %86, %shl8.i191
+  %cmp1188.i194 = icmp sgt i32 %add.i188, 7
+  br i1 %cmp1188.i194, label %while.body.i207.preheader, label %if.end9.i
+
+while.body.i207.preheader:                        ; preds = %if.end.i195
+  br label %while.body.i207
+
+while.body.i207:                                  ; preds = %while.body.i207.preheader, %cleanup.i231
+  %put_bits.090.i200 = phi i32 [ %sub39.i229, %cleanup.i231 ], [ %add.i188, %while.body.i207.preheader ]
+  %put_buffer.089.i201 = phi i64 [ %shl38.i228, %cleanup.i231 ], [ %or.i193, %while.body.i207.preheader ]
+  %shr73.i202 = lshr i64 %put_buffer.089.i201, 16
+  %conv15.i203 = trunc i64 %shr73.i202 to i8
+  %87 = load i8*, i8** %next_output_byte.i196, align 16, !tbaa !75
+  %incdec.ptr.i204 = getelementptr inbounds i8, i8* %87, i64 1
+  store i8* %incdec.ptr.i204, i8** %next_output_byte.i196, align 16, !tbaa !75
+  store i8 %conv15.i203, i8* %87, align 1, !tbaa !16
+  %88 = load i64, i64* %free_in_buffer4, align 8, !tbaa !76
+  %dec.i205 = add i64 %88, -1
+  store i64 %dec.i205, i64* %free_in_buffer4, align 8, !tbaa !76
+  %cmp16.i206 = icmp eq i64 %dec.i205, 0
+  br i1 %cmp16.i206, label %if.then18.i211, label %if.end21.i216
+
+if.then18.i211:                                   ; preds = %while.body.i207
+  %89 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %dest1.i.i208 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %89, i64 0, i32 5
+  %90 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest1.i.i208, align 8, !tbaa !69
+  %empty_output_buffer.i.i209 = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %90, i64 0, i32 3
+  %91 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i.i209, align 8, !tbaa !77
+  %call.i.i = tail call i32 %91(%struct.jpeg_compress_struct* %89) #4
+  %tobool.i.i210 = icmp eq i32 %call.i.i, 0
+  br i1 %tobool.i.i210, label %cleanup.loopexit523, label %dump_buffer.exit.i213
+
+dump_buffer.exit.i213:                            ; preds = %if.then18.i211
+  %92 = bitcast %struct.jpeg_destination_mgr* %90 to <2 x i64>*
+  %93 = load <2 x i64>, <2 x i64>* %92, align 8, !tbaa !16
+  store <2 x i64> %93, <2 x i64>* %68, align 16, !tbaa !16
+  br label %if.end21.i216
+
+if.end21.i216:                                    ; preds = %dump_buffer.exit.i213, %while.body.i207
+  %conv14.i214 = and i64 %shr73.i202, 255
+  %cmp22.i215 = icmp eq i64 %conv14.i214, 255
+  br i1 %cmp22.i215, label %if.then24.i220, label %cleanup.i231
+
+if.then24.i220:                                   ; preds = %if.end21.i216
+  %94 = load i8*, i8** %next_output_byte.i196, align 16, !tbaa !75
+  %incdec.ptr26.i217 = getelementptr inbounds i8, i8* %94, i64 1
+  store i8* %incdec.ptr26.i217, i8** %next_output_byte.i196, align 16, !tbaa !75
+  store i8 0, i8* %94, align 1, !tbaa !16
+  %95 = load i64, i64* %free_in_buffer4, align 8, !tbaa !76
+  %dec28.i218 = add i64 %95, -1
+  store i64 %dec28.i218, i64* %free_in_buffer4, align 8, !tbaa !76
+  %cmp29.i219 = icmp eq i64 %dec28.i218, 0
+  br i1 %cmp29.i219, label %if.then31.i225, label %cleanup.i231
+
+if.then31.i225:                                   ; preds = %if.then24.i220
+  %96 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %dest1.i75.i221 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %96, i64 0, i32 5
+  %97 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest1.i75.i221, align 8, !tbaa !69
+  %empty_output_buffer.i76.i222 = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %97, i64 0, i32 3
+  %98 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i76.i222, align 8, !tbaa !77
+  %call.i77.i223 = tail call i32 %98(%struct.jpeg_compress_struct* %96) #4
+  %tobool.i78.i224 = icmp eq i32 %call.i77.i223, 0
+  br i1 %tobool.i78.i224, label %cleanup.loopexit523, label %dump_buffer.exit83.i227
+
+dump_buffer.exit83.i227:                          ; preds = %if.then31.i225
+  %99 = bitcast %struct.jpeg_destination_mgr* %97 to <2 x i64>*
+  %100 = load <2 x i64>, <2 x i64>* %99, align 8, !tbaa !16
+  store <2 x i64> %100, <2 x i64>* %69, align 16, !tbaa !16
+  br label %cleanup.i231
+
+cleanup.i231:                                     ; preds = %dump_buffer.exit83.i227, %if.then24.i220, %if.end21.i216
+  %shl38.i228 = shl i64 %put_buffer.089.i201, 8
+  %sub39.i229 = add nsw i32 %put_bits.090.i200, -8
+  %cmp11.i230 = icmp sgt i32 %sub39.i229, 7
+  br i1 %cmp11.i230, label %while.body.i207, label %if.end9.i.loopexit
+
+if.end9.i.loopexit:                               ; preds = %cleanup.i231
+  %sub39.i229.lcssa = phi i32 [ %sub39.i229, %cleanup.i231 ]
+  %shl38.i228.lcssa = phi i64 [ %shl38.i228, %cleanup.i231 ]
+  br label %if.end9.i
+
+if.end9.i:                                        ; preds = %if.end9.i.loopexit, %if.end.i195
+  %101 = phi i32 [ %add.i188, %if.end.i195 ], [ %sub39.i229.lcssa, %if.end9.i.loopexit ]
+  %102 = phi i64 [ %or.i193, %if.end.i195 ], [ %shl38.i228.lcssa, %if.end9.i.loopexit ]
+  store i64 %102, i64* %put_buffer10.i192, align 16, !tbaa !74
+  store i32 %101, i32* %put_bits1.i177, align 8, !tbaa !73
+  %tobool10.i = icmp eq i32 %nbits.0.lcssa.i, 0
+  br i1 %tobool10.i, label %for.cond.preheader.i98, label %if.end.i256
+
+if.end.i256:                                      ; preds = %if.end9.i
+  %conv.i237 = zext i32 %temp2.0.i to i64
+  %sh_prom.i245 = zext i32 %nbits.0.lcssa.i to i64
+  %shl.i246 = shl i64 1, %sh_prom.i245
+  %sub.i247 = add i64 %shl.i246, 4294967295
+  %and.i248 = and i64 %sub.i247, %conv.i237
+  %add.i249 = add nsw i32 %101, %nbits.0.lcssa.i
+  %sub6.i250 = sub nsw i32 24, %add.i249
+  %sh_prom7.i251 = zext i32 %sub6.i250 to i64
+  %shl8.i252 = shl i64 %and.i248, %sh_prom7.i251
+  %or.i254 = or i64 %shl8.i252, %102
+  %cmp1188.i255 = icmp sgt i32 %add.i249, 7
+  br i1 %cmp1188.i255, label %while.body.i268.preheader, label %emit_bits.exit298
+
+while.body.i268.preheader:                        ; preds = %if.end.i256
+  br label %while.body.i268
+
+while.body.i268:                                  ; preds = %while.body.i268.preheader, %cleanup.i293
+  %put_bits.090.i261 = phi i32 [ %sub39.i291, %cleanup.i293 ], [ %add.i249, %while.body.i268.preheader ]
+  %put_buffer.089.i262 = phi i64 [ %shl38.i290, %cleanup.i293 ], [ %or.i254, %while.body.i268.preheader ]
+  %shr73.i263 = lshr i64 %put_buffer.089.i262, 16
+  %conv15.i264 = trunc i64 %shr73.i263 to i8
+  %103 = load i8*, i8** %next_output_byte.i196, align 16, !tbaa !75
+  %incdec.ptr.i265 = getelementptr inbounds i8, i8* %103, i64 1
+  store i8* %incdec.ptr.i265, i8** %next_output_byte.i196, align 16, !tbaa !75
+  store i8 %conv15.i264, i8* %103, align 1, !tbaa !16
+  %104 = load i64, i64* %free_in_buffer4, align 8, !tbaa !76
+  %dec.i266 = add i64 %104, -1
+  store i64 %dec.i266, i64* %free_in_buffer4, align 8, !tbaa !76
+  %cmp16.i267 = icmp eq i64 %dec.i266, 0
+  br i1 %cmp16.i267, label %if.then18.i273, label %if.end21.i278
+
+if.then18.i273:                                   ; preds = %while.body.i268
+  %105 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %dest1.i.i269 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %105, i64 0, i32 5
+  %106 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest1.i.i269, align 8, !tbaa !69
+  %empty_output_buffer.i.i270 = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %106, i64 0, i32 3
+  %107 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i.i270, align 8, !tbaa !77
+  %call.i.i271 = tail call i32 %107(%struct.jpeg_compress_struct* %105) #4
+  %tobool.i.i272 = icmp eq i32 %call.i.i271, 0
+  br i1 %tobool.i.i272, label %cleanup.loopexit522, label %dump_buffer.exit.i275
+
+dump_buffer.exit.i275:                            ; preds = %if.then18.i273
+  %108 = bitcast %struct.jpeg_destination_mgr* %106 to <2 x i64>*
+  %109 = load <2 x i64>, <2 x i64>* %108, align 8, !tbaa !16
+  store <2 x i64> %109, <2 x i64>* %66, align 16, !tbaa !16
+  br label %if.end21.i278
+
+if.end21.i278:                                    ; preds = %dump_buffer.exit.i275, %while.body.i268
+  %conv14.i276 = and i64 %shr73.i263, 255
+  %cmp22.i277 = icmp eq i64 %conv14.i276, 255
+  br i1 %cmp22.i277, label %if.then24.i282, label %cleanup.i293
+
+if.then24.i282:                                   ; preds = %if.end21.i278
+  %110 = load i8*, i8** %next_output_byte.i196, align 16, !tbaa !75
+  %incdec.ptr26.i279 = getelementptr inbounds i8, i8* %110, i64 1
+  store i8* %incdec.ptr26.i279, i8** %next_output_byte.i196, align 16, !tbaa !75
+  store i8 0, i8* %110, align 1, !tbaa !16
+  %111 = load i64, i64* %free_in_buffer4, align 8, !tbaa !76
+  %dec28.i280 = add i64 %111, -1
+  store i64 %dec28.i280, i64* %free_in_buffer4, align 8, !tbaa !76
+  %cmp29.i281 = icmp eq i64 %dec28.i280, 0
+  br i1 %cmp29.i281, label %if.then31.i287, label %cleanup.i293
+
+if.then31.i287:                                   ; preds = %if.then24.i282
+  %112 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %dest1.i75.i283 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %112, i64 0, i32 5
+  %113 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest1.i75.i283, align 8, !tbaa !69
+  %empty_output_buffer.i76.i284 = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %113, i64 0, i32 3
+  %114 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i76.i284, align 8, !tbaa !77
+  %call.i77.i285 = tail call i32 %114(%struct.jpeg_compress_struct* %112) #4
+  %tobool.i78.i286 = icmp eq i32 %call.i77.i285, 0
+  br i1 %tobool.i78.i286, label %cleanup.loopexit522, label %dump_buffer.exit83.i289
+
+dump_buffer.exit83.i289:                          ; preds = %if.then31.i287
+  %115 = bitcast %struct.jpeg_destination_mgr* %113 to <2 x i64>*
+  %116 = load <2 x i64>, <2 x i64>* %115, align 8, !tbaa !16
+  store <2 x i64> %116, <2 x i64>* %67, align 16, !tbaa !16
+  br label %cleanup.i293
+
+cleanup.i293:                                     ; preds = %dump_buffer.exit83.i289, %if.then24.i282, %if.end21.i278
+  %shl38.i290 = shl i64 %put_buffer.089.i262, 8
+  %sub39.i291 = add nsw i32 %put_bits.090.i261, -8
+  %cmp11.i292 = icmp sgt i32 %sub39.i291, 7
+  br i1 %cmp11.i292, label %while.body.i268, label %emit_bits.exit298.loopexit
+
+emit_bits.exit298.loopexit:                       ; preds = %cleanup.i293
+  %sub39.i291.lcssa = phi i32 [ %sub39.i291, %cleanup.i293 ]
+  %shl38.i290.lcssa = phi i64 [ %shl38.i290, %cleanup.i293 ]
+  br label %emit_bits.exit298
+
+emit_bits.exit298:                                ; preds = %emit_bits.exit298.loopexit, %if.end.i256
+  %put_bits.0.lcssa.i294 = phi i32 [ %add.i249, %if.end.i256 ], [ %sub39.i291.lcssa, %emit_bits.exit298.loopexit ]
+  %put_buffer.0.lcssa.i295 = phi i64 [ %or.i254, %if.end.i256 ], [ %shl38.i290.lcssa, %emit_bits.exit298.loopexit ]
+  store i64 %put_buffer.0.lcssa.i295, i64* %put_buffer10.i192, align 16, !tbaa !74
+  store i32 %put_bits.0.lcssa.i294, i32* %put_bits1.i177, align 8, !tbaa !73
+  br label %for.cond.preheader.i98
+
+for.cond.preheader.i98:                           ; preds = %emit_bits.exit298, %if.end9.i
+  %117 = phi i64 [ %put_buffer.0.lcssa.i295, %emit_bits.exit298 ], [ %102, %if.end9.i ]
+  %118 = phi i32 [ %put_bits.0.lcssa.i294, %emit_bits.exit298 ], [ %101, %if.end9.i ]
+  %arrayidx33.i = getelementptr inbounds %struct.c_derived_tbl, %struct.c_derived_tbl* %77, i64 0, i32 0, i64 240
+  %arrayidx35.i = getelementptr inbounds %struct.c_derived_tbl, %struct.c_derived_tbl* %77, i64 0, i32 1, i64 240
+  br label %for.body.i100
+
+for.body.i100:                                    ; preds = %for.inc.i, %for.cond.preheader.i98
+  %119 = phi i64 [ %117, %for.cond.preheader.i98 ], [ %182, %for.inc.i ]
+  %120 = phi i32 [ %118, %for.cond.preheader.i98 ], [ %183, %for.inc.i ]
+  %indvars.iv.i99 = phi i64 [ 1, %for.cond.preheader.i98 ], [ %indvars.iv.next.i102, %for.inc.i ]
+  %r.0139.i = phi i32 [ 0, %for.cond.preheader.i98 ], [ %r.2.i, %for.inc.i ]
+  %arrayidx20.i = getelementptr inbounds [0 x i32], [0 x i32]* @jpeg_natural_order, i64 0, i64 %indvars.iv.i99
+  %121 = load i32, i32* %arrayidx20.i, align 4, !tbaa !25
+  %idxprom21.i = sext i32 %121 to i64
+  %arrayidx22.i = getelementptr inbounds [64 x i16], [64 x i16]* %72, i64 0, i64 %idxprom21.i
+  %122 = load i16, i16* %arrayidx22.i, align 2, !tbaa !68
+  %conv23.i = sext i16 %122 to i32
+  %cmp24.i = icmp eq i16 %122, 0
+  br i1 %cmp24.i, label %if.then26.i, label %while.cond28.preheader.i
+
+while.cond28.preheader.i:                         ; preds = %for.body.i100
+  %cmp29136.i = icmp sgt i32 %r.0139.i, 15
+  br i1 %cmp29136.i, label %while.body31.i.preheader, label %while.end42.i
+
+while.body31.i.preheader:                         ; preds = %while.cond28.preheader.i
+  br label %while.body31.i
+
+if.then26.i:                                      ; preds = %for.body.i100
+  %inc27.i = add nsw i32 %r.0139.i, 1
+  br label %for.inc.i
+
+while.body31.i:                                   ; preds = %while.body31.i.preheader, %if.end40.i
+  %123 = phi i64 [ %put_buffer.0.lcssa.i357, %if.end40.i ], [ %119, %while.body31.i.preheader ]
+  %124 = phi i32 [ %put_bits.0.lcssa.i356, %if.end40.i ], [ %120, %while.body31.i.preheader ]
+  %r.1137.i = phi i32 [ %sub41.i, %if.end40.i ], [ %r.0139.i, %while.body31.i.preheader ]
+  %125 = load i32, i32* %arrayidx33.i, align 4, !tbaa !25
+  %126 = load i8, i8* %arrayidx35.i, align 4, !tbaa !16
+  %conv36.i = sext i8 %126 to i32
+  %conv.i299 = zext i32 %125 to i64
+  %cmp.i301 = icmp eq i8 %126, 0
+  br i1 %cmp.i301, label %if.then.i306, label %if.end.i318
+
+if.then.i306:                                     ; preds = %while.body31.i
+  %127 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %err.i303 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %127, i64 0, i32 0
+  %128 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err.i303, align 8, !tbaa !38
+  %msg_code.i304 = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %128, i64 0, i32 5
+  store i32 39, i32* %msg_code.i304, align 8, !tbaa !39
+  %error_exit.i305 = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %128, i64 0, i32 0
+  %129 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit.i305, align 8, !tbaa !41
+  %130 = bitcast %struct.jpeg_compress_struct* %127 to %struct.jpeg_common_struct*
+  tail call void %129(%struct.jpeg_common_struct* %130) #4
+  br label %if.end.i318
+
+if.end.i318:                                      ; preds = %if.then.i306, %while.body31.i
+  %sh_prom.i307 = zext i32 %conv36.i to i64
+  %shl.i308 = shl i64 1, %sh_prom.i307
+  %sub.i309 = add i64 %shl.i308, 4294967295
+  %and.i310 = and i64 %sub.i309, %conv.i299
+  %add.i311 = add nsw i32 %124, %conv36.i
+  %sub6.i312 = sub nsw i32 24, %add.i311
+  %sh_prom7.i313 = zext i32 %sub6.i312 to i64
+  %shl8.i314 = shl i64 %and.i310, %sh_prom7.i313
+  %or.i316 = or i64 %123, %shl8.i314
+  %cmp1188.i317 = icmp sgt i32 %add.i311, 7
+  br i1 %cmp1188.i317, label %while.body.i330.preheader, label %if.end40.i
+
+while.body.i330.preheader:                        ; preds = %if.end.i318
+  br label %while.body.i330
+
+while.body.i330:                                  ; preds = %while.body.i330.preheader, %cleanup.i355
+  %put_bits.090.i323 = phi i32 [ %sub39.i353, %cleanup.i355 ], [ %add.i311, %while.body.i330.preheader ]
+  %put_buffer.089.i324 = phi i64 [ %shl38.i352, %cleanup.i355 ], [ %or.i316, %while.body.i330.preheader ]
+  %shr73.i325 = lshr i64 %put_buffer.089.i324, 16
+  %conv15.i326 = trunc i64 %shr73.i325 to i8
+  %131 = load i8*, i8** %next_output_byte.i196, align 16, !tbaa !75
+  %incdec.ptr.i327 = getelementptr inbounds i8, i8* %131, i64 1
+  store i8* %incdec.ptr.i327, i8** %next_output_byte.i196, align 16, !tbaa !75
+  store i8 %conv15.i326, i8* %131, align 1, !tbaa !16
+  %132 = load i64, i64* %free_in_buffer4, align 8, !tbaa !76
+  %dec.i328 = add i64 %132, -1
+  store i64 %dec.i328, i64* %free_in_buffer4, align 8, !tbaa !76
+  %cmp16.i329 = icmp eq i64 %dec.i328, 0
+  br i1 %cmp16.i329, label %if.then18.i335, label %if.end21.i340
+
+if.then18.i335:                                   ; preds = %while.body.i330
+  %133 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %dest1.i.i331 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %133, i64 0, i32 5
+  %134 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest1.i.i331, align 8, !tbaa !69
+  %empty_output_buffer.i.i332 = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %134, i64 0, i32 3
+  %135 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i.i332, align 8, !tbaa !77
+  %call.i.i333 = tail call i32 %135(%struct.jpeg_compress_struct* %133) #4
+  %tobool.i.i334 = icmp eq i32 %call.i.i333, 0
+  br i1 %tobool.i.i334, label %cleanup.loopexit, label %dump_buffer.exit.i337
+
+dump_buffer.exit.i337:                            ; preds = %if.then18.i335
+  %136 = bitcast %struct.jpeg_destination_mgr* %134 to <2 x i64>*
+  %137 = load <2 x i64>, <2 x i64>* %136, align 8, !tbaa !16
+  store <2 x i64> %137, <2 x i64>* %62, align 16, !tbaa !16
+  br label %if.end21.i340
+
+if.end21.i340:                                    ; preds = %dump_buffer.exit.i337, %while.body.i330
+  %conv14.i338 = and i64 %shr73.i325, 255
+  %cmp22.i339 = icmp eq i64 %conv14.i338, 255
+  br i1 %cmp22.i339, label %if.then24.i344, label %cleanup.i355
+
+if.then24.i344:                                   ; preds = %if.end21.i340
+  %138 = load i8*, i8** %next_output_byte.i196, align 16, !tbaa !75
+  %incdec.ptr26.i341 = getelementptr inbounds i8, i8* %138, i64 1
+  store i8* %incdec.ptr26.i341, i8** %next_output_byte.i196, align 16, !tbaa !75
+  store i8 0, i8* %138, align 1, !tbaa !16
+  %139 = load i64, i64* %free_in_buffer4, align 8, !tbaa !76
+  %dec28.i342 = add i64 %139, -1
+  store i64 %dec28.i342, i64* %free_in_buffer4, align 8, !tbaa !76
+  %cmp29.i343 = icmp eq i64 %dec28.i342, 0
+  br i1 %cmp29.i343, label %if.then31.i349, label %cleanup.i355
+
+if.then31.i349:                                   ; preds = %if.then24.i344
+  %140 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %dest1.i75.i345 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %140, i64 0, i32 5
+  %141 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest1.i75.i345, align 8, !tbaa !69
+  %empty_output_buffer.i76.i346 = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %141, i64 0, i32 3
+  %142 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i76.i346, align 8, !tbaa !77
+  %call.i77.i347 = tail call i32 %142(%struct.jpeg_compress_struct* %140) #4
+  %tobool.i78.i348 = icmp eq i32 %call.i77.i347, 0
+  br i1 %tobool.i78.i348, label %cleanup.loopexit, label %dump_buffer.exit83.i351
+
+dump_buffer.exit83.i351:                          ; preds = %if.then31.i349
+  %143 = bitcast %struct.jpeg_destination_mgr* %141 to <2 x i64>*
+  %144 = load <2 x i64>, <2 x i64>* %143, align 8, !tbaa !16
+  store <2 x i64> %144, <2 x i64>* %63, align 16, !tbaa !16
+  br label %cleanup.i355
+
+cleanup.i355:                                     ; preds = %dump_buffer.exit83.i351, %if.then24.i344, %if.end21.i340
+  %shl38.i352 = shl i64 %put_buffer.089.i324, 8
+  %sub39.i353 = add nsw i32 %put_bits.090.i323, -8
+  %cmp11.i354 = icmp sgt i32 %sub39.i353, 7
+  br i1 %cmp11.i354, label %while.body.i330, label %if.end40.i.loopexit
+
+if.end40.i.loopexit:                              ; preds = %cleanup.i355
+  %sub39.i353.lcssa = phi i32 [ %sub39.i353, %cleanup.i355 ]
+  %shl38.i352.lcssa = phi i64 [ %shl38.i352, %cleanup.i355 ]
+  br label %if.end40.i
+
+if.end40.i:                                       ; preds = %if.end40.i.loopexit, %if.end.i318
+  %put_bits.0.lcssa.i356 = phi i32 [ %add.i311, %if.end.i318 ], [ %sub39.i353.lcssa, %if.end40.i.loopexit ]
+  %put_buffer.0.lcssa.i357 = phi i64 [ %or.i316, %if.end.i318 ], [ %shl38.i352.lcssa, %if.end40.i.loopexit ]
+  store i64 %put_buffer.0.lcssa.i357, i64* %put_buffer10.i192, align 16, !tbaa !74
+  store i32 %put_bits.0.lcssa.i356, i32* %put_bits1.i177, align 8, !tbaa !73
+  %sub41.i = add nsw i32 %r.1137.i, -16
+  %cmp29.i = icmp sgt i32 %sub41.i, 15
+  br i1 %cmp29.i, label %while.body31.i, label %while.end42.i.loopexit
+
+while.end42.i.loopexit:                           ; preds = %if.end40.i
+  %sub41.i.lcssa = phi i32 [ %sub41.i, %if.end40.i ]
+  %put_buffer.0.lcssa.i357.lcssa = phi i64 [ %put_buffer.0.lcssa.i357, %if.end40.i ]
+  %put_bits.0.lcssa.i356.lcssa = phi i32 [ %put_bits.0.lcssa.i356, %if.end40.i ]
+  br label %while.end42.i
+
+while.end42.i:                                    ; preds = %while.end42.i.loopexit, %while.cond28.preheader.i
+  %145 = phi i64 [ %119, %while.cond28.preheader.i ], [ %put_buffer.0.lcssa.i357.lcssa, %while.end42.i.loopexit ]
+  %146 = phi i32 [ %120, %while.cond28.preheader.i ], [ %put_bits.0.lcssa.i356.lcssa, %while.end42.i.loopexit ]
+  %r.1.lcssa.i = phi i32 [ %r.0139.i, %while.cond28.preheader.i ], [ %sub41.i.lcssa, %while.end42.i.loopexit ]
+  %cmp43.i = icmp slt i16 %122, 0
+  %sub46.i = sub nsw i32 0, %conv23.i
+  %temp.2.i = select i1 %cmp43.i, i32 %sub46.i, i32 %conv23.i
+  %.lobit.i = ashr i16 %122, 15
+  br label %while.cond49.i
+
+while.cond49.i:                                   ; preds = %while.cond49.i, %while.end42.i
+  %temp.3.i = phi i32 [ %shr50.i, %while.cond49.i ], [ %temp.2.i, %while.end42.i ]
+  %nbits.1.i = phi i32 [ %inc53.i, %while.cond49.i ], [ 1, %while.end42.i ]
+  %shr50.i = ashr i32 %temp.3.i, 1
+  %tobool51.i = icmp eq i32 %shr50.i, 0
+  %inc53.i = add nuw nsw i32 %nbits.1.i, 1
+  br i1 %tobool51.i, label %while.end54.i, label %while.cond49.i
+
+while.end54.i:                                    ; preds = %while.cond49.i
+  %nbits.1.i.lcssa = phi i32 [ %nbits.1.i, %while.cond49.i ]
+  %147 = sext i16 %.lobit.i to i32
+  %shl.i = shl i32 %r.1.lcssa.i, 4
+  %add.i101 = add nsw i32 %nbits.1.i.lcssa, %shl.i
+  %idxprom55.i = sext i32 %add.i101 to i64
+  %arrayidx57.i = getelementptr inbounds %struct.c_derived_tbl, %struct.c_derived_tbl* %77, i64 0, i32 0, i64 %idxprom55.i
+  %148 = load i32, i32* %arrayidx57.i, align 4, !tbaa !25
+  %arrayidx60.i = getelementptr inbounds %struct.c_derived_tbl, %struct.c_derived_tbl* %77, i64 0, i32 1, i64 %idxprom55.i
+  %149 = load i8, i8* %arrayidx60.i, align 1, !tbaa !16
+  %conv61.i = sext i8 %149 to i32
+  %conv.i361 = zext i32 %148 to i64
+  %cmp.i363 = icmp eq i8 %149, 0
+  br i1 %cmp.i363, label %if.then.i368, label %if.end.i380
+
+if.then.i368:                                     ; preds = %while.end54.i
+  %150 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %err.i365 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %150, i64 0, i32 0
+  %151 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err.i365, align 8, !tbaa !38
+  %msg_code.i366 = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %151, i64 0, i32 5
+  store i32 39, i32* %msg_code.i366, align 8, !tbaa !39
+  %error_exit.i367 = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %151, i64 0, i32 0
+  %152 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit.i367, align 8, !tbaa !41
+  %153 = bitcast %struct.jpeg_compress_struct* %150 to %struct.jpeg_common_struct*
+  tail call void %152(%struct.jpeg_common_struct* %153) #4
+  br label %if.end.i380
+
+if.end.i380:                                      ; preds = %if.then.i368, %while.end54.i
+  %sh_prom.i369 = zext i32 %conv61.i to i64
+  %shl.i370 = shl i64 1, %sh_prom.i369
+  %sub.i371 = add i64 %shl.i370, 4294967295
+  %and.i372 = and i64 %sub.i371, %conv.i361
+  %add.i373 = add nsw i32 %146, %conv61.i
+  %sub6.i374 = sub nsw i32 24, %add.i373
+  %sh_prom7.i375 = zext i32 %sub6.i374 to i64
+  %shl8.i376 = shl i64 %and.i372, %sh_prom7.i375
+  %or.i378 = or i64 %145, %shl8.i376
+  %cmp1188.i379 = icmp sgt i32 %add.i373, 7
+  br i1 %cmp1188.i379, label %while.body.i392.preheader, label %if.end65.i
+
+while.body.i392.preheader:                        ; preds = %if.end.i380
+  br label %while.body.i392
+
+while.body.i392:                                  ; preds = %while.body.i392.preheader, %cleanup.i417
+  %put_bits.090.i385 = phi i32 [ %sub39.i415, %cleanup.i417 ], [ %add.i373, %while.body.i392.preheader ]
+  %put_buffer.089.i386 = phi i64 [ %shl38.i414, %cleanup.i417 ], [ %or.i378, %while.body.i392.preheader ]
+  %shr73.i387 = lshr i64 %put_buffer.089.i386, 16
+  %conv15.i388 = trunc i64 %shr73.i387 to i8
+  %154 = load i8*, i8** %next_output_byte.i196, align 16, !tbaa !75
+  %incdec.ptr.i389 = getelementptr inbounds i8, i8* %154, i64 1
+  store i8* %incdec.ptr.i389, i8** %next_output_byte.i196, align 16, !tbaa !75
+  store i8 %conv15.i388, i8* %154, align 1, !tbaa !16
+  %155 = load i64, i64* %free_in_buffer4, align 8, !tbaa !76
+  %dec.i390 = add i64 %155, -1
+  store i64 %dec.i390, i64* %free_in_buffer4, align 8, !tbaa !76
+  %cmp16.i391 = icmp eq i64 %dec.i390, 0
+  br i1 %cmp16.i391, label %if.then18.i397, label %if.end21.i402
+
+if.then18.i397:                                   ; preds = %while.body.i392
+  %156 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %dest1.i.i393 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %156, i64 0, i32 5
+  %157 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest1.i.i393, align 8, !tbaa !69
+  %empty_output_buffer.i.i394 = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %157, i64 0, i32 3
+  %158 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i.i394, align 8, !tbaa !77
+  %call.i.i395 = tail call i32 %158(%struct.jpeg_compress_struct* %156) #4
+  %tobool.i.i396 = icmp eq i32 %call.i.i395, 0
+  br i1 %tobool.i.i396, label %cleanup.loopexit520, label %dump_buffer.exit.i399
+
+dump_buffer.exit.i399:                            ; preds = %if.then18.i397
+  %159 = bitcast %struct.jpeg_destination_mgr* %157 to <2 x i64>*
+  %160 = load <2 x i64>, <2 x i64>* %159, align 8, !tbaa !16
+  store <2 x i64> %160, <2 x i64>* %60, align 16, !tbaa !16
+  br label %if.end21.i402
+
+if.end21.i402:                                    ; preds = %dump_buffer.exit.i399, %while.body.i392
+  %conv14.i400 = and i64 %shr73.i387, 255
+  %cmp22.i401 = icmp eq i64 %conv14.i400, 255
+  br i1 %cmp22.i401, label %if.then24.i406, label %cleanup.i417
+
+if.then24.i406:                                   ; preds = %if.end21.i402
+  %161 = load i8*, i8** %next_output_byte.i196, align 16, !tbaa !75
+  %incdec.ptr26.i403 = getelementptr inbounds i8, i8* %161, i64 1
+  store i8* %incdec.ptr26.i403, i8** %next_output_byte.i196, align 16, !tbaa !75
+  store i8 0, i8* %161, align 1, !tbaa !16
+  %162 = load i64, i64* %free_in_buffer4, align 8, !tbaa !76
+  %dec28.i404 = add i64 %162, -1
+  store i64 %dec28.i404, i64* %free_in_buffer4, align 8, !tbaa !76
+  %cmp29.i405 = icmp eq i64 %dec28.i404, 0
+  br i1 %cmp29.i405, label %if.then31.i411, label %cleanup.i417
+
+if.then31.i411:                                   ; preds = %if.then24.i406
+  %163 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %dest1.i75.i407 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %163, i64 0, i32 5
+  %164 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest1.i75.i407, align 8, !tbaa !69
+  %empty_output_buffer.i76.i408 = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %164, i64 0, i32 3
+  %165 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i76.i408, align 8, !tbaa !77
+  %call.i77.i409 = tail call i32 %165(%struct.jpeg_compress_struct* %163) #4
+  %tobool.i78.i410 = icmp eq i32 %call.i77.i409, 0
+  br i1 %tobool.i78.i410, label %cleanup.loopexit520, label %dump_buffer.exit83.i413
+
+dump_buffer.exit83.i413:                          ; preds = %if.then31.i411
+  %166 = bitcast %struct.jpeg_destination_mgr* %164 to <2 x i64>*
+  %167 = load <2 x i64>, <2 x i64>* %166, align 8, !tbaa !16
+  store <2 x i64> %167, <2 x i64>* %61, align 16, !tbaa !16
+  br label %cleanup.i417
+
+cleanup.i417:                                     ; preds = %dump_buffer.exit83.i413, %if.then24.i406, %if.end21.i402
+  %shl38.i414 = shl i64 %put_buffer.089.i386, 8
+  %sub39.i415 = add nsw i32 %put_bits.090.i385, -8
+  %cmp11.i416 = icmp sgt i32 %sub39.i415, 7
+  br i1 %cmp11.i416, label %while.body.i392, label %if.end65.i.loopexit
+
+if.end65.i.loopexit:                              ; preds = %cleanup.i417
+  %sub39.i415.lcssa = phi i32 [ %sub39.i415, %cleanup.i417 ]
+  %shl38.i414.lcssa = phi i64 [ %shl38.i414, %cleanup.i417 ]
+  br label %if.end65.i
+
+if.end65.i:                                       ; preds = %if.end65.i.loopexit, %if.end.i380
+  %put_bits.0.lcssa.i418 = phi i32 [ %add.i373, %if.end.i380 ], [ %sub39.i415.lcssa, %if.end65.i.loopexit ]
+  %put_buffer.0.lcssa.i419 = phi i64 [ %or.i378, %if.end.i380 ], [ %shl38.i414.lcssa, %if.end65.i.loopexit ]
+  store i64 %put_buffer.0.lcssa.i419, i64* %put_buffer10.i192, align 16, !tbaa !74
+  store i32 %put_bits.0.lcssa.i418, i32* %put_bits1.i177, align 8, !tbaa !73
+  %temp2.1.i = add nsw i32 %147, %conv23.i
+  %conv.i423 = zext i32 %temp2.1.i to i64
+  %sh_prom.i425 = zext i32 %nbits.1.i.lcssa to i64
+  %shl.i426 = shl i64 1, %sh_prom.i425
+  %sub.i427 = add i64 %shl.i426, 4294967295
+  %and.i428 = and i64 %sub.i427, %conv.i423
+  %add.i429 = add nsw i32 %put_bits.0.lcssa.i418, %nbits.1.i.lcssa
+  %sub6.i430 = sub nsw i32 24, %add.i429
+  %sh_prom7.i431 = zext i32 %sub6.i430 to i64
+  %shl8.i432 = shl i64 %and.i428, %sh_prom7.i431
+  %or.i434 = or i64 %put_buffer.0.lcssa.i419, %shl8.i432
+  %cmp1188.i435 = icmp sgt i32 %add.i429, 7
+  br i1 %cmp1188.i435, label %while.body.i448.preheader, label %emit_bits.exit478
+
+while.body.i448.preheader:                        ; preds = %if.end65.i
+  br label %while.body.i448
+
+while.body.i448:                                  ; preds = %while.body.i448.preheader, %cleanup.i473
+  %put_bits.090.i441 = phi i32 [ %sub39.i471, %cleanup.i473 ], [ %add.i429, %while.body.i448.preheader ]
+  %put_buffer.089.i442 = phi i64 [ %shl38.i470, %cleanup.i473 ], [ %or.i434, %while.body.i448.preheader ]
+  %shr73.i443 = lshr i64 %put_buffer.089.i442, 16
+  %conv15.i444 = trunc i64 %shr73.i443 to i8
+  %168 = load i8*, i8** %next_output_byte.i196, align 16, !tbaa !75
+  %incdec.ptr.i445 = getelementptr inbounds i8, i8* %168, i64 1
+  store i8* %incdec.ptr.i445, i8** %next_output_byte.i196, align 16, !tbaa !75
+  store i8 %conv15.i444, i8* %168, align 1, !tbaa !16
+  %169 = load i64, i64* %free_in_buffer4, align 8, !tbaa !76
+  %dec.i446 = add i64 %169, -1
+  store i64 %dec.i446, i64* %free_in_buffer4, align 8, !tbaa !76
+  %cmp16.i447 = icmp eq i64 %dec.i446, 0
+  br i1 %cmp16.i447, label %if.then18.i453, label %if.end21.i458
+
+if.then18.i453:                                   ; preds = %while.body.i448
+  %170 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %dest1.i.i449 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %170, i64 0, i32 5
+  %171 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest1.i.i449, align 8, !tbaa !69
+  %empty_output_buffer.i.i450 = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %171, i64 0, i32 3
+  %172 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i.i450, align 8, !tbaa !77
+  %call.i.i451 = tail call i32 %172(%struct.jpeg_compress_struct* %170) #4
+  %tobool.i.i452 = icmp eq i32 %call.i.i451, 0
+  br i1 %tobool.i.i452, label %cleanup.loopexit519, label %dump_buffer.exit.i455
+
+dump_buffer.exit.i455:                            ; preds = %if.then18.i453
+  %173 = bitcast %struct.jpeg_destination_mgr* %171 to <2 x i64>*
+  %174 = load <2 x i64>, <2 x i64>* %173, align 8, !tbaa !16
+  store <2 x i64> %174, <2 x i64>* %58, align 16, !tbaa !16
+  br label %if.end21.i458
+
+if.end21.i458:                                    ; preds = %dump_buffer.exit.i455, %while.body.i448
+  %conv14.i456 = and i64 %shr73.i443, 255
+  %cmp22.i457 = icmp eq i64 %conv14.i456, 255
+  br i1 %cmp22.i457, label %if.then24.i462, label %cleanup.i473
+
+if.then24.i462:                                   ; preds = %if.end21.i458
+  %175 = load i8*, i8** %next_output_byte.i196, align 16, !tbaa !75
+  %incdec.ptr26.i459 = getelementptr inbounds i8, i8* %175, i64 1
+  store i8* %incdec.ptr26.i459, i8** %next_output_byte.i196, align 16, !tbaa !75
+  store i8 0, i8* %175, align 1, !tbaa !16
+  %176 = load i64, i64* %free_in_buffer4, align 8, !tbaa !76
+  %dec28.i460 = add i64 %176, -1
+  store i64 %dec28.i460, i64* %free_in_buffer4, align 8, !tbaa !76
+  %cmp29.i461 = icmp eq i64 %dec28.i460, 0
+  br i1 %cmp29.i461, label %if.then31.i467, label %cleanup.i473
+
+if.then31.i467:                                   ; preds = %if.then24.i462
+  %177 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %dest1.i75.i463 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %177, i64 0, i32 5
+  %178 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest1.i75.i463, align 8, !tbaa !69
+  %empty_output_buffer.i76.i464 = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %178, i64 0, i32 3
+  %179 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i76.i464, align 8, !tbaa !77
+  %call.i77.i465 = tail call i32 %179(%struct.jpeg_compress_struct* %177) #4
+  %tobool.i78.i466 = icmp eq i32 %call.i77.i465, 0
+  br i1 %tobool.i78.i466, label %cleanup.loopexit519, label %dump_buffer.exit83.i469
+
+dump_buffer.exit83.i469:                          ; preds = %if.then31.i467
+  %180 = bitcast %struct.jpeg_destination_mgr* %178 to <2 x i64>*
+  %181 = load <2 x i64>, <2 x i64>* %180, align 8, !tbaa !16
+  store <2 x i64> %181, <2 x i64>* %59, align 16, !tbaa !16
+  br label %cleanup.i473
+
+cleanup.i473:                                     ; preds = %dump_buffer.exit83.i469, %if.then24.i462, %if.end21.i458
+  %shl38.i470 = shl i64 %put_buffer.089.i442, 8
+  %sub39.i471 = add nsw i32 %put_bits.090.i441, -8
+  %cmp11.i472 = icmp sgt i32 %sub39.i471, 7
+  br i1 %cmp11.i472, label %while.body.i448, label %emit_bits.exit478.loopexit
+
+emit_bits.exit478.loopexit:                       ; preds = %cleanup.i473
+  %sub39.i471.lcssa = phi i32 [ %sub39.i471, %cleanup.i473 ]
+  %shl38.i470.lcssa = phi i64 [ %shl38.i470, %cleanup.i473 ]
+  br label %emit_bits.exit478
+
+emit_bits.exit478:                                ; preds = %emit_bits.exit478.loopexit, %if.end65.i
+  %put_bits.0.lcssa.i474 = phi i32 [ %add.i429, %if.end65.i ], [ %sub39.i471.lcssa, %emit_bits.exit478.loopexit ]
+  %put_buffer.0.lcssa.i475 = phi i64 [ %or.i434, %if.end65.i ], [ %shl38.i470.lcssa, %emit_bits.exit478.loopexit ]
+  store i64 %put_buffer.0.lcssa.i475, i64* %put_buffer10.i192, align 16, !tbaa !74
+  store i32 %put_bits.0.lcssa.i474, i32* %put_bits1.i177, align 8, !tbaa !73
+  br label %for.inc.i
+
+for.inc.i:                                        ; preds = %emit_bits.exit478, %if.then26.i
+  %182 = phi i64 [ %119, %if.then26.i ], [ %put_buffer.0.lcssa.i475, %emit_bits.exit478 ]
+  %183 = phi i32 [ %120, %if.then26.i ], [ %put_bits.0.lcssa.i474, %emit_bits.exit478 ]
+  %r.2.i = phi i32 [ %inc27.i, %if.then26.i ], [ 0, %emit_bits.exit478 ]
+  %indvars.iv.next.i102 = add nuw nsw i64 %indvars.iv.i99, 1
+  %cmp17.i = icmp slt i64 %indvars.iv.next.i102, 64
+  br i1 %cmp17.i, label %for.body.i100, label %for.end.i
+
+for.end.i:                                        ; preds = %for.inc.i
+  %r.2.i.lcssa = phi i32 [ %r.2.i, %for.inc.i ]
+  %.lcssa526 = phi i32 [ %183, %for.inc.i ]
+  %.lcssa = phi i64 [ %182, %for.inc.i ]
+  %cmp72.i = icmp sgt i32 %r.2.i.lcssa, 0
+  br i1 %cmp72.i, label %if.then74.i, label %if.end27
+
+if.then74.i:                                      ; preds = %for.end.i
+  %arrayidx76.i = getelementptr inbounds %struct.c_derived_tbl, %struct.c_derived_tbl* %77, i64 0, i32 0, i64 0
+  %184 = load i32, i32* %arrayidx76.i, align 4, !tbaa !25
+  %arrayidx78.i = getelementptr inbounds %struct.c_derived_tbl, %struct.c_derived_tbl* %77, i64 0, i32 1, i64 0
+  %185 = load i8, i8* %arrayidx78.i, align 4, !tbaa !16
+  %conv79.i = sext i8 %185 to i32
+  %conv.i104 = zext i32 %184 to i64
+  %cmp.i105 = icmp eq i8 %185, 0
+  br i1 %cmp.i105, label %if.then.i, label %if.end.i109
+
+if.then.i:                                        ; preds = %if.then74.i
+  %186 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %err.i = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %186, i64 0, i32 0
+  %187 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err.i, align 8, !tbaa !38
+  %msg_code.i = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %187, i64 0, i32 5
+  store i32 39, i32* %msg_code.i, align 8, !tbaa !39
+  %error_exit.i = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %187, i64 0, i32 0
+  %188 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit.i, align 8, !tbaa !41
+  %189 = bitcast %struct.jpeg_compress_struct* %186 to %struct.jpeg_common_struct*
+  tail call void %188(%struct.jpeg_common_struct* %189) #4
+  br label %if.end.i109
+
+if.end.i109:                                      ; preds = %if.then.i, %if.then74.i
+  %sh_prom.i = zext i32 %conv79.i to i64
+  %shl.i106 = shl i64 1, %sh_prom.i
+  %sub.i107 = add i64 %shl.i106, 4294967295
+  %and.i = and i64 %sub.i107, %conv.i104
+  %add.i108 = add nsw i32 %.lcssa526, %conv79.i
+  %sub6.i = sub nsw i32 24, %add.i108
+  %sh_prom7.i = zext i32 %sub6.i to i64
+  %shl8.i = shl i64 %and.i, %sh_prom7.i
+  %or.i = or i64 %.lcssa, %shl8.i
+  %cmp1188.i = icmp sgt i32 %add.i108, 7
+  br i1 %cmp1188.i, label %while.body.i115.preheader, label %emit_bits.exit
+
+while.body.i115.preheader:                        ; preds = %if.end.i109
+  br label %while.body.i115
+
+while.body.i115:                                  ; preds = %while.body.i115.preheader, %cleanup.i
+  %put_bits.090.i = phi i32 [ %sub39.i, %cleanup.i ], [ %add.i108, %while.body.i115.preheader ]
+  %put_buffer.089.i = phi i64 [ %shl38.i, %cleanup.i ], [ %or.i, %while.body.i115.preheader ]
+  %shr73.i = lshr i64 %put_buffer.089.i, 16
+  %conv15.i = trunc i64 %shr73.i to i8
+  %190 = load i8*, i8** %next_output_byte.i196, align 16, !tbaa !75
+  %incdec.ptr.i113 = getelementptr inbounds i8, i8* %190, i64 1
+  store i8* %incdec.ptr.i113, i8** %next_output_byte.i196, align 16, !tbaa !75
+  store i8 %conv15.i, i8* %190, align 1, !tbaa !16
+  %191 = load i64, i64* %free_in_buffer4, align 8, !tbaa !76
+  %dec.i114 = add i64 %191, -1
+  store i64 %dec.i114, i64* %free_in_buffer4, align 8, !tbaa !76
+  %cmp16.i = icmp eq i64 %dec.i114, 0
+  br i1 %cmp16.i, label %if.then18.i, label %if.end21.i
+
+if.then18.i:                                      ; preds = %while.body.i115
+  %192 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %dest1.i.i116 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %192, i64 0, i32 5
+  %193 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest1.i.i116, align 8, !tbaa !69
+  %empty_output_buffer.i.i117 = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %193, i64 0, i32 3
+  %194 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i.i117, align 8, !tbaa !77
+  %call.i.i118 = tail call i32 %194(%struct.jpeg_compress_struct* %192) #4
+  %tobool.i.i119 = icmp eq i32 %call.i.i118, 0
+  br i1 %tobool.i.i119, label %cleanup.loopexit521, label %dump_buffer.exit.i121
+
+dump_buffer.exit.i121:                            ; preds = %if.then18.i
+  %195 = bitcast %struct.jpeg_destination_mgr* %193 to <2 x i64>*
+  %196 = load <2 x i64>, <2 x i64>* %195, align 8, !tbaa !16
+  store <2 x i64> %196, <2 x i64>* %64, align 16, !tbaa !16
+  br label %if.end21.i
+
+if.end21.i:                                       ; preds = %dump_buffer.exit.i121, %while.body.i115
+  %conv14.i = and i64 %shr73.i, 255
+  %cmp22.i = icmp eq i64 %conv14.i, 255
+  br i1 %cmp22.i, label %if.then24.i, label %cleanup.i
+
+if.then24.i:                                      ; preds = %if.end21.i
+  %197 = load i8*, i8** %next_output_byte.i196, align 16, !tbaa !75
+  %incdec.ptr26.i = getelementptr inbounds i8, i8* %197, i64 1
+  store i8* %incdec.ptr26.i, i8** %next_output_byte.i196, align 16, !tbaa !75
+  store i8 0, i8* %197, align 1, !tbaa !16
+  %198 = load i64, i64* %free_in_buffer4, align 8, !tbaa !76
+  %dec28.i = add i64 %198, -1
+  store i64 %dec28.i, i64* %free_in_buffer4, align 8, !tbaa !76
+  %cmp29.i122 = icmp eq i64 %dec28.i, 0
+  br i1 %cmp29.i122, label %if.then31.i, label %cleanup.i
+
+if.then31.i:                                      ; preds = %if.then24.i
+  %199 = load %struct.jpeg_compress_struct*, %struct.jpeg_compress_struct** %cinfo5, align 16, !tbaa !71
+  %dest1.i75.i = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %199, i64 0, i32 5
+  %200 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest1.i75.i, align 8, !tbaa !69
+  %empty_output_buffer.i76.i = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %200, i64 0, i32 3
+  %201 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i76.i, align 8, !tbaa !77
+  %call.i77.i = tail call i32 %201(%struct.jpeg_compress_struct* %199) #4
+  %tobool.i78.i = icmp eq i32 %call.i77.i, 0
+  br i1 %tobool.i78.i, label %cleanup.loopexit521, label %dump_buffer.exit83.i
+
+dump_buffer.exit83.i:                             ; preds = %if.then31.i
+  %202 = bitcast %struct.jpeg_destination_mgr* %200 to <2 x i64>*
+  %203 = load <2 x i64>, <2 x i64>* %202, align 8, !tbaa !16
+  store <2 x i64> %203, <2 x i64>* %65, align 16, !tbaa !16
+  br label %cleanup.i
+
+cleanup.i:                                        ; preds = %dump_buffer.exit83.i, %if.then24.i, %if.end21.i
+  %shl38.i = shl i64 %put_buffer.089.i, 8
+  %sub39.i = add nsw i32 %put_bits.090.i, -8
+  %cmp11.i123 = icmp sgt i32 %sub39.i, 7
+  br i1 %cmp11.i123, label %while.body.i115, label %emit_bits.exit.loopexit
+
+emit_bits.exit.loopexit:                          ; preds = %cleanup.i
+  %sub39.i.lcssa = phi i32 [ %sub39.i, %cleanup.i ]
+  %shl38.i.lcssa = phi i64 [ %shl38.i, %cleanup.i ]
+  br label %emit_bits.exit
+
+emit_bits.exit:                                   ; preds = %emit_bits.exit.loopexit, %if.end.i109
+  %put_bits.0.lcssa.i = phi i32 [ %add.i108, %if.end.i109 ], [ %sub39.i.lcssa, %emit_bits.exit.loopexit ]
+  %put_buffer.0.lcssa.i = phi i64 [ %or.i, %if.end.i109 ], [ %shl38.i.lcssa, %emit_bits.exit.loopexit ]
+  store i64 %put_buffer.0.lcssa.i, i64* %put_buffer10.i192, align 16, !tbaa !74
+  store i32 %put_bits.0.lcssa.i, i32* %put_bits1.i177, align 8, !tbaa !73
+  br label %if.end27
+
+if.end27:                                         ; preds = %emit_bits.exit, %for.end.i
+  %204 = load [64 x i16]*, [64 x i16]** %arrayidx15, align 8, !tbaa !3
+  %arrayidx31 = getelementptr inbounds [64 x i16], [64 x i16]* %204, i64 0, i64 0
+  %205 = load i16, i16* %arrayidx31, align 2, !tbaa !68
+  %conv = sext i16 %205 to i32
+  store i32 %conv, i32* %arrayidx19, align 4, !tbaa !25
+  %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+  %206 = load i32, i32* %blocks_in_MCU, align 8, !tbaa !67
+  %207 = sext i32 %206 to i64
+  %cmp11 = icmp slt i64 %indvars.iv.next, %207
+  br i1 %cmp11, label %for.body, label %for.end.loopexit
+
+for.end.loopexit:                                 ; preds = %if.end27
+  br label %for.end
+
+for.end:                                          ; preds = %for.end.loopexit, %for.cond.preheader
+  %208 = bitcast %struct.jpeg_destination_mgr** %dest to <2 x i64>**
+  %209 = load <2 x i64>*, <2 x i64>** %208, align 8, !tbaa !69
+  %210 = bitcast %struct.working_state* %state to <2 x i64>*
+  %211 = load <2 x i64>, <2 x i64>* %210, align 16, !tbaa !16
+  store <2 x i64> %211, <2 x i64>* %209, align 8, !tbaa !16
+  call void @llvm.memcpy.p0i8.p0i8.i64(i8* %8, i8* %7, i64 32, i32 8, i1 false), !tbaa.struct !70
+  %212 = load i32, i32* %restart_interval, align 8, !tbaa !64
+  %tobool45 = icmp eq i32 %212, 0
+  br i1 %tobool45, label %cleanup, label %if.then46
+
+if.then46:                                        ; preds = %for.end
+  %restarts_to_go47 = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 2
+  %213 = bitcast i32* %restarts_to_go47 to i64*
+  %214 = load i64, i64* %213, align 8
+  %215 = trunc i64 %214 to i32
+  %cmp48 = icmp eq i32 %215, 0
+  br i1 %cmp48, label %if.then50, label %if.end56
+
+if.then50:                                        ; preds = %if.then46
+  %216 = lshr i64 %214, 32
+  %217 = trunc i64 %216 to i32
+  store i32 %212, i32* %restarts_to_go47, align 8, !tbaa !65
+  %next_restart_num53 = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 3
+  %inc54 = add nsw i32 %217, 1
+  %and = and i32 %inc54, 7
+  store i32 %and, i32* %next_restart_num53, align 4, !tbaa !66
+  br label %if.end56
+
+if.end56:                                         ; preds = %if.then50, %if.then46
+  %218 = phi i32 [ %212, %if.then50 ], [ %215, %if.then46 ]
+  %dec = add i32 %218, -1
+  store i32 %dec, i32* %restarts_to_go47, align 8, !tbaa !65
+  br label %cleanup
+
+cleanup.loopexit:                                 ; preds = %if.then18.i335, %if.then31.i349
+  br label %cleanup
+
+cleanup.loopexit519:                              ; preds = %if.then18.i453, %if.then31.i467
+  br label %cleanup
+
+cleanup.loopexit520:                              ; preds = %if.then18.i397, %if.then31.i411
+  br label %cleanup
+
+cleanup.loopexit521:                              ; preds = %if.then18.i, %if.then31.i
+  br label %cleanup
+
+cleanup.loopexit522:                              ; preds = %if.then18.i273, %if.then31.i287
+  br label %cleanup
+
+cleanup.loopexit523:                              ; preds = %if.then18.i211, %if.then31.i225
+  br label %cleanup
+
+cleanup.loopexit524:                              ; preds = %if.then18.i150, %if.then31.i164
+  br label %cleanup
+
+cleanup:                                          ; preds = %cleanup.loopexit524, %cleanup.loopexit523, %cleanup.loopexit522, %cleanup.loopexit521, %cleanup.loopexit520, %cleanup.loopexit519, %cleanup.loopexit, %if.then13.i, %if.then1.i, %if.end56, %for.end
+  %retval.0 = phi i32 [ 1, %for.end ], [ 1, %if.end56 ], [ 0, %if.then1.i ], [ 0, %if.then13.i ], [ 0, %cleanup.loopexit ], [ 0, %cleanup.loopexit519 ], [ 0, %cleanup.loopexit520 ], [ 0, %cleanup.loopexit521 ], [ 0, %cleanup.loopexit522 ], [ 0, %cleanup.loopexit523 ], [ 0, %cleanup.loopexit524 ]
+  call void @llvm.lifetime.end(i64 56, i8* nonnull %2) #4
+  ret i32 %retval.0
+}
+
+; Function Attrs: nounwind uwtable
+define internal void @finish_pass_huff(%struct.jpeg_compress_struct* %cinfo) #0 !prof !51 {
+entry:
+  %state.sroa.26 = alloca [20 x i8], align 4
+  %entropy1 = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 59
+  %0 = bitcast %struct.jpeg_entropy_encoder** %entropy1 to %struct.huff_entropy_encoder**
+  %1 = load %struct.huff_entropy_encoder*, %struct.huff_entropy_encoder** %0, align 8, !tbaa !52
+  %state.sroa.26.0..sroa_idx48 = getelementptr inbounds [20 x i8], [20 x i8]* %state.sroa.26, i64 0, i64 0
+  call void @llvm.lifetime.start(i64 20, i8* %state.sroa.26.0..sroa_idx48)
+  %dest = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 5
+  %2 = bitcast %struct.jpeg_destination_mgr** %dest to i64**
+  %3 = load i64*, i64** %2, align 8, !tbaa !69
+  %4 = load i64, i64* %3, align 8, !tbaa !79
+  %5 = getelementptr inbounds i64, i64* %3, i64 1
+  %6 = load i64, i64* %5, align 8, !tbaa !80
+  %state.sroa.18.16..sroa_idx = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 1, i32 0
+  %state.sroa.18.16.copyload = load i64, i64* %state.sroa.18.16..sroa_idx, align 8
+  %state.sroa.23.16..sroa_idx36 = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 1, i32 1
+  %state.sroa.23.16.copyload = load i32, i32* %state.sroa.23.16..sroa_idx36, align 8
+  %state.sroa.26.16..sroa_idx = getelementptr inbounds %struct.huff_entropy_encoder, %struct.huff_entropy_encoder* %1, i64 0, i32 1, i32 2
+  %state.sroa.26.16..sroa_cast = bitcast [4 x i32]* %state.sroa.26.16..sroa_idx to i8*
+  call void @llvm.memcpy.p0i8.p0i8.i64(i8* %state.sroa.26.0..sroa_idx48, i8* %state.sroa.26.16..sroa_cast, i64 20, i32 4, i1 false)
+  %cmp1188.i = icmp sgt i32 %state.sroa.23.16.copyload, 0
+  br i1 %cmp1188.i, label %while.body.i.preheader, label %if.end
+
+while.body.i.preheader:                           ; preds = %entry
+  %sub6.i = sub i32 17, %state.sroa.23.16.copyload
+  %sh_prom7.i = zext i32 %sub6.i to i64
+  %shl8.i = shl i64 127, %sh_prom7.i
+  %or.i = or i64 %shl8.i, %state.sroa.18.16.copyload
+  %add.i = add nsw i32 %state.sroa.23.16.copyload, 7
+  br label %while.body.i
+
+while.body.i:                                     ; preds = %while.body.i.preheader, %cleanup.i
+  %state.sroa.10.0 = phi i64 [ %state.sroa.10.2, %cleanup.i ], [ %6, %while.body.i.preheader ]
+  %state.sroa.0.0 = phi i64 [ %state.sroa.0.2, %cleanup.i ], [ %4, %while.body.i.preheader ]
+  %put_bits.090.i = phi i32 [ %sub39.i, %cleanup.i ], [ %add.i, %while.body.i.preheader ]
+  %put_buffer.089.i = phi i64 [ %shl38.i, %cleanup.i ], [ %or.i, %while.body.i.preheader ]
+  %shr73.i = lshr i64 %put_buffer.089.i, 16
+  %conv15.i = trunc i64 %shr73.i to i8
+  %7 = inttoptr i64 %state.sroa.0.0 to i8*
+  %incdec.ptr.i = getelementptr inbounds i8, i8* %7, i64 1
+  %8 = ptrtoint i8* %incdec.ptr.i to i64
+  store i8 %conv15.i, i8* %7, align 1, !tbaa !16
+  %dec.i = add i64 %state.sroa.10.0, -1
+  %cmp16.i = icmp eq i64 %dec.i, 0
+  br i1 %cmp16.i, label %if.then18.i, label %if.end21.i
+
+if.then18.i:                                      ; preds = %while.body.i
+  %9 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest, align 8, !tbaa !69
+  %empty_output_buffer.i.i = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %9, i64 0, i32 3
+  %10 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i.i, align 8, !tbaa !77
+  %call.i.i = tail call i32 %10(%struct.jpeg_compress_struct* %cinfo) #4
+  %tobool.i.i = icmp eq i32 %call.i.i, 0
+  br i1 %tobool.i.i, label %if.then, label %dump_buffer.exit.i
+
+dump_buffer.exit.i:                               ; preds = %if.then18.i
+  %11 = bitcast %struct.jpeg_destination_mgr* %9 to i64*
+  %12 = load i64, i64* %11, align 8, !tbaa !79
+  %free_in_buffer.i.i = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %9, i64 0, i32 1
+  %13 = load i64, i64* %free_in_buffer.i.i, align 8, !tbaa !80
+  br label %if.end21.i
+
+if.end21.i:                                       ; preds = %dump_buffer.exit.i, %while.body.i
+  %state.sroa.10.1 = phi i64 [ %13, %dump_buffer.exit.i ], [ %dec.i, %while.body.i ]
+  %state.sroa.0.1 = phi i64 [ %12, %dump_buffer.exit.i ], [ %8, %while.body.i ]
+  %conv14.i = and i64 %shr73.i, 255
+  %cmp22.i = icmp eq i64 %conv14.i, 255
+  br i1 %cmp22.i, label %if.then24.i, label %cleanup.i
+
+if.then24.i:                                      ; preds = %if.end21.i
+  %14 = inttoptr i64 %state.sroa.0.1 to i8*
+  %incdec.ptr26.i = getelementptr inbounds i8, i8* %14, i64 1
+  %15 = ptrtoint i8* %incdec.ptr26.i to i64
+  store i8 0, i8* %14, align 1, !tbaa !16
+  %dec28.i = add i64 %state.sroa.10.1, -1
+  %cmp29.i = icmp eq i64 %dec28.i, 0
+  br i1 %cmp29.i, label %if.then31.i, label %cleanup.i
+
+if.then31.i:                                      ; preds = %if.then24.i
+  %16 = load %struct.jpeg_destination_mgr*, %struct.jpeg_destination_mgr** %dest, align 8, !tbaa !69
+  %empty_output_buffer.i76.i = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %16, i64 0, i32 3
+  %17 = load i32 (%struct.jpeg_compress_struct*)*, i32 (%struct.jpeg_compress_struct*)** %empty_output_buffer.i76.i, align 8, !tbaa !77
+  %call.i77.i = tail call i32 %17(%struct.jpeg_compress_struct* %cinfo) #4
+  %tobool.i78.i = icmp eq i32 %call.i77.i, 0
+  br i1 %tobool.i78.i, label %if.then, label %dump_buffer.exit83.i
+
+dump_buffer.exit83.i:                             ; preds = %if.then31.i
+  %18 = bitcast %struct.jpeg_destination_mgr* %16 to i64*
+  %19 = load i64, i64* %18, align 8, !tbaa !79
+  %free_in_buffer.i79.i = getelementptr inbounds %struct.jpeg_destination_mgr, %struct.jpeg_destination_mgr* %16, i64 0, i32 1
+  %20 = load i64, i64* %free_in_buffer.i79.i, align 8, !tbaa !80
+  br label %cleanup.i
+
+cleanup.i:                                        ; preds = %dump_buffer.exit83.i, %if.then24.i, %if.end21.i
+  %state.sroa.10.2 = phi i64 [ %20, %dump_buffer.exit83.i ], [ %dec28.i, %if.then24.i ], [ %state.sroa.10.1, %if.end21.i ]
+  %state.sroa.0.2 = phi i64 [ %19, %dump_buffer.exit83.i ], [ %15, %if.then24.i ], [ %state.sroa.0.1, %if.end21.i ]
+  %shl38.i = shl i64 %put_buffer.089.i, 8
+  %sub39.i = add nsw i32 %put_bits.090.i, -8
+  %cmp11.i = icmp sgt i32 %sub39.i, 7
+  br i1 %cmp11.i, label %while.body.i, label %if.end.loopexit
+
+if.then:                                          ; preds = %if.then31.i, %if.then18.i
+  %state.sroa.0.4.ph = phi i64 [ %15, %if.then31.i ], [ %8, %if.then18.i ]
+  %err = getelementptr inbounds %struct.jpeg_compress_struct, %struct.jpeg_compress_struct* %cinfo, i64 0, i32 0
+  %21 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8, !tbaa !38
+  %msg_code = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %21, i64 0, i32 5
+  store i32 22, i32* %msg_code, align 8, !tbaa !39
+  %error_exit = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %21, i64 0, i32 0
+  %22 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit, align 8, !tbaa !41
+  %23 = bitcast %struct.jpeg_compress_struct* %cinfo to %struct.jpeg_common_struct*
+  tail call void %22(%struct.jpeg_common_struct* %23) #4
+  br label %if.end
+
+if.end.loopexit:                                  ; preds = %cleanup.i
+  %state.sroa.0.2.lcssa = phi i64 [ %state.sroa.0.2, %cleanup.i ]
+  %state.sroa.10.2.lcssa = phi i64 [ %state.sroa.10.2, %cleanup.i ]
+  br label %if.end
+
+if.end:                                           ; preds = %if.end.loopexit, %entry, %if.then
+  %state.sroa.18.156 = phi i64 [ %state.sroa.18.16.copyload, %if.then ], [ 0, %entry ], [ 0, %if.end.loopexit ]
+  %state.sroa.23.155 = phi i32 [ %state.sroa.23.16.copyload, %if.then ], [ 0, %entry ], [ 0, %if.end.loopexit ]
+  %state.sroa.10.45054 = phi i64 [ 0, %if.then ], [ %6, %entry ], [ %state.sroa.10.2.lcssa, %if.end.loopexit ]
+  %state.sroa.0.45153 = phi i64 [ %state.sroa.0.4.ph, %if.then ], [ %4, %entry ], [ %state.sroa.0.2.lcssa, %if.end.loopexit ]
+  %24 = load i64*, i64** %2, align 8, !tbaa !69
+  store i64 %state.sroa.0.45153, i64* %24, align 8, !tbaa !79
+  %25 = getelementptr inbounds i64, i64* %24, i64 1
+  store i64 %state.sroa.10.45054, i64* %25, align 8, !tbaa !80
+  store i64 %state.sroa.18.156, i64* %state.sroa.18.16..sroa_idx, align 8
+  store i32 %state.sroa.23.155, i32* %state.sroa.23.16..sroa_idx36, align 8
+  call void @llvm.memcpy.p0i8.p0i8.i64(i8* %state.sroa.26.16..sroa_cast, i8* %state.sroa.26.0..sroa_idx48, i64 20, i32 4, i1 false)
+  call void @llvm.lifetime.end(i64 20, i8* %state.sroa.26.0..sroa_idx48)
+  ret void
+}
+
+declare %struct.JHUFF_TBL* @jpeg_alloc_huff_table(%struct.jpeg_common_struct*) #3
+
+attributes #0 = { nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #1 = { argmemonly nounwind }
+attributes #2 = { norecurse nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #3 = { "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #4 = { nounwind }
+
+!llvm.module.flags = !{!0}
+!llvm.ident = !{!1}
+
+!0 = !{i32 1, !"MaxFunctionCount", i32 150581}
+!1 = !{!"clang version 3.8.0 (trunk 257473)"}
+!2 = !{!"function_entry_count", i64 11}
+!3 = !{!4, !4, i64 0}
+!4 = !{!"any pointer", !5, i64 0}
+!5 = !{!"omnipotent char", !6, i64 0}
+!6 = !{!"Simple C/C++ TBAA"}
+!7 = !{!"branch_weights", i32 3, i32 10}
+!8 = !{!9, !4, i64 8}
+!9 = !{!"jpeg_compress_struct", !4, i64 0, !4, i64 8, !4, i64 16, !10, i64 24, !10, i64 28, !4, i64 32, !10, i64 40, !10, i64 44, !10, i64 48, !5, i64 52, !11, i64 56, !10, i64 64, !10, i64 68, !5, i64 72, !4, i64 80, !5, i64 88, !5, i64 120, !5, i64 152, !5, i64 184, !5, i64 200, !5, i64 216, !10, i64 232, !4, i64 240, !10, i64 248, !10, i64 252, !10, i64 256, !10, i64 260, !10, i64 264, !5, i64 268, !10, i64 272, !10, i64 276, !10, i64 280, !5, i64 284, !12, i64 286, !12, i64 288, !10, i64 292, !10, i64 296, !10, i64 300, !10, i64 304, !10, i64 308, !10, i64 312, !10, i64 316, !5, i64 320, !10, i64 352, !10, i64 356, !10, i64 360, !5, i64 364, !10, i64 404, !10, i64 408, !10, i64 412, !10, i64 416, !4, i64 424, !4, i64 432, !4, i64 440, !4, i64 448, !4, i64 456, !4, i64 464, !4, i64 472, !4, i64 480, !4, i64 488}
+!10 = !{!"int", !5, i64 0}
+!11 = !{!"double", !5, i64 0}
+!12 = !{!"short", !5, i64 0}
+!13 = !{!14, !4, i64 0}
+!14 = !{!"jpeg_memory_mgr", !4, i64 0, !4, i64 8, !4, i64 16, !4, i64 24, !4, i64 32, !4, i64 40, !4, i64 48, !4, i64 56, !4, i64 64, !4, i64 72, !4, i64 80, !15, i64 88}
+!15 = !{!"long", !5, i64 0}
+!16 = !{!5, !5, i64 0}
+!17 = !{!"branch_weights", i32 177, i32 240}
+!18 = distinct !{!18, !19}
+!19 = !{!"llvm.loop.unroll.disable"}
+!20 = !{!"branch_weights", i32 240, i32 177}
+!21 = !{!"branch_weights", i32 12, i32 177}
+!22 = !{!"branch_weights", i32 12, i32 101}
+!23 = !{!"branch_weights", i32 240, i32 101}
+!24 = distinct !{!24, !19}
+!25 = !{!10, !10, i64 0}
+!26 = !{!"branch_weights", i32 315806419, i32 1831677229}
+!27 = !{!"branch_weights", i32 240, i32 12}
+!28 = !{!"branch_weights", i32 12, i32 240}
+!29 = !{!"function_entry_count", i64 10}
+!30 = !{!15, !15, i64 0}
+!31 = !{!"branch_weights", i32 62452, i32 244}
+!32 = !{!"branch_weights", i32 244, i32 62452}
+!33 = !{!"branch_weights", i32 11, i32 234}
+!34 = !{!"branch_weights", i32 505, i32 234}
+!35 = !{!"branch_weights", i32 736, i32 234}
+!36 = !{!"branch_weights", i32 2328, i32 244}
+!37 = !{!"branch_weights", i32 1, i32 244}
+!38 = !{!9, !4, i64 0}
+!39 = !{!40, !10, i64 40}
+!40 = !{!"jpeg_error_mgr", !4, i64 0, !4, i64 8, !4, i64 16, !4, i64 24, !4, i64 32, !10, i64 40, !5, i64 44, !10, i64 124, !15, i64 128, !4, i64 136, !10, i64 144, !4, i64 152, !10, i64 160, !10, i64 164}
+!41 = !{!40, !4, i64 0}
+!42 = !{!"branch_weights", i32 11, i32 2571}
+!43 = !{!"branch_weights", i32 161, i32 1}
+!44 = !{!"branch_weights", i32 161, i32 11}
+!45 = !{!"branch_weights", i32 62, i32 11}
+!46 = !{!"branch_weights", i32 234, i32 81688}
+!47 = !{!"branch_weights", i32 11, i32 321}
+!48 = !{!49, !10, i64 276}
+!49 = !{!"", !5, i64 0, !5, i64 17, !10, i64 276}
+!50 = !{!"branch_weights", i32 321, i32 81921}
+!51 = !{!"function_entry_count", i64 0}
+!52 = !{!9, !4, i64 488}
+!53 = !{!54, !4, i64 0}
+!54 = !{!"", !55, i64 0, !56, i64 24, !10, i64 56, !10, i64 60, !5, i64 64, !5, i64 96, !5, i64 128, !5, i64 160}
+!55 = !{!"jpeg_entropy_encoder", !4, i64 0, !4, i64 8, !4, i64 16}
+!56 = !{!"", !15, i64 0, !10, i64 8, !5, i64 12}
+!57 = !{!54, !4, i64 8}
+!58 = !{!9, !10, i64 316}
+!59 = !{!60, !10, i64 20}
+!60 = !{!"", !10, i64 0, !10, i64 4, !10, i64 8, !10, i64 12, !10, i64 16, !10, i64 20, !10, i64 24, !10, i64 28, !10, i64 32, !10, i64 36, !10, i64 40, !10, i64 44, !10, i64 48, !10, i64 52, !10, i64 56, !10, i64 60, !10, i64 64, !10, i64 68, !10, i64 72, !4, i64 80, !4, i64 88}
+!61 = !{!60, !10, i64 24}
+!62 = !{!54, !15, i64 24}
+!63 = !{!54, !10, i64 32}
+!64 = !{!9, !10, i64 272}
+!65 = !{!54, !10, i64 56}
+!66 = !{!54, !10, i64 60}
+!67 = !{!9, !10, i64 360}
+!68 = !{!12, !12, i64 0}
+!69 = !{!9, !4, i64 32}
+!70 = !{i64 0, i64 8, !30, i64 8, i64 4, !25, i64 12, i64 16, !16}
+!71 = !{!72, !4, i64 48}
+!72 = !{!"", !4, i64 0, !15, i64 8, !56, i64 16, !4, i64 48}
+!73 = !{!72, !10, i64 24}
+!74 = !{!72, !15, i64 16}
+!75 = !{!72, !4, i64 0}
+!76 = !{!72, !15, i64 8}
+!77 = !{!78, !4, i64 24}
+!78 = !{!"jpeg_destination_mgr", !4, i64 0, !15, i64 8, !4, i64 16, !4, i64 24, !4, i64 32}
+!79 = !{!78, !4, i64 0}
+!80 = !{!78, !15, i64 8}

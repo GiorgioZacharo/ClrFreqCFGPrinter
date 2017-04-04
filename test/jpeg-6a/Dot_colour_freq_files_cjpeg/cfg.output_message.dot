@@ -1,0 +1,5 @@
+digraph "CFG for 'output_message' function" {
+	label="CFG for 'output_message' function";
+
+	Node0x53dd4a0 [shape=record,label="{entry:\l  %buffer = alloca [200 x i8], align 16\l  %0 = getelementptr inbounds [200 x i8], [200 x i8]* %buffer, i64 0, i64 0\l  call void @llvm.lifetime.start(i64 200, i8* %0) #7\l  %err = getelementptr inbounds %struct.jpeg_common_struct,\l... %struct.jpeg_common_struct* %cinfo, i64 0, i32 0\l  %1 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8,\l... !tbaa !3\l  %format_message = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %1, i64 0, i32 3\l  %2 = load void (%struct.jpeg_common_struct*, i8*)*, void\l... (%struct.jpeg_common_struct*, i8*)** %format_message, align 8, !tbaa !9\l  call void %2(%struct.jpeg_common_struct* %cinfo, i8* %0) #7\l  %3 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !12\l  %call = call i32 (%struct._IO_FILE*, i8*, ...) @fprintf(%struct._IO_FILE*\l... %3, i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str.120, i64 0, i64 0),\l... i8* %0) #8\l  call void @llvm.lifetime.end(i64 200, i8* %0) #7\l  ret void\l}"];
+}

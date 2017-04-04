@@ -1,0 +1,158 @@
+; ModuleID = 'jfdctflt.c'
+target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+; Function Attrs: norecurse nounwind uwtable
+define void @jpeg_fdct_float(float* nocapture %data) #0 !prof !2 {
+entry:
+  br label %for.body
+
+for.body:                                         ; preds = %entry, %for.body
+  %ctr.0263 = phi i32 [ 7, %entry ], [ %dec, %for.body ]
+  %dataptr.0262 = phi float* [ %data, %entry ], [ %add.ptr, %for.body ]
+  %0 = load float, float* %dataptr.0262, align 4, !tbaa !3
+  %arrayidx1 = getelementptr inbounds float, float* %dataptr.0262, i64 7
+  %1 = load float, float* %arrayidx1, align 4, !tbaa !3
+  %add = fadd float %0, %1
+  %sub = fsub float %0, %1
+  %arrayidx4 = getelementptr inbounds float, float* %dataptr.0262, i64 1
+  %2 = load float, float* %arrayidx4, align 4, !tbaa !3
+  %arrayidx5 = getelementptr inbounds float, float* %dataptr.0262, i64 6
+  %3 = load float, float* %arrayidx5, align 4, !tbaa !3
+  %add6 = fadd float %2, %3
+  %sub9 = fsub float %2, %3
+  %arrayidx10 = getelementptr inbounds float, float* %dataptr.0262, i64 2
+  %4 = load float, float* %arrayidx10, align 4, !tbaa !3
+  %arrayidx11 = getelementptr inbounds float, float* %dataptr.0262, i64 5
+  %5 = load float, float* %arrayidx11, align 4, !tbaa !3
+  %add12 = fadd float %4, %5
+  %sub15 = fsub float %4, %5
+  %arrayidx16 = getelementptr inbounds float, float* %dataptr.0262, i64 3
+  %6 = load float, float* %arrayidx16, align 4, !tbaa !3
+  %arrayidx17 = getelementptr inbounds float, float* %dataptr.0262, i64 4
+  %7 = load float, float* %arrayidx17, align 4, !tbaa !3
+  %add18 = fadd float %6, %7
+  %sub21 = fsub float %6, %7
+  %add22 = fadd float %add, %add18
+  %sub23 = fsub float %add, %add18
+  %add24 = fadd float %add6, %add12
+  %sub25 = fsub float %add6, %add12
+  %add26 = fadd float %add24, %add22
+  store float %add26, float* %dataptr.0262, align 4, !tbaa !3
+  %sub28 = fsub float %add22, %add24
+  store float %sub28, float* %arrayidx17, align 4, !tbaa !3
+  %add30 = fadd float %sub25, %sub23
+  %mul = fmul float %add30, 0x3FE6A09E60000000
+  %add31 = fadd float %sub23, %mul
+  store float %add31, float* %arrayidx10, align 4, !tbaa !3
+  %sub33 = fsub float %sub23, %mul
+  store float %sub33, float* %arrayidx5, align 4, !tbaa !3
+  %add35 = fadd float %sub15, %sub21
+  %add36 = fadd float %sub9, %sub15
+  %add37 = fadd float %sub, %sub9
+  %sub38 = fsub float %add35, %add37
+  %mul39 = fmul float %sub38, 0x3FD87DE2A0000000
+  %mul40 = fmul float %add35, 0x3FE1517A80000000
+  %add41 = fadd float %mul40, %mul39
+  %mul42 = fmul float %add37, 0x3FF4E7AEA0000000
+  %add43 = fadd float %mul42, %mul39
+  %mul44 = fmul float %add36, 0x3FE6A09E60000000
+  %add45 = fadd float %sub, %mul44
+  %sub46 = fsub float %sub, %mul44
+  %add47 = fadd float %sub46, %add41
+  store float %add47, float* %arrayidx11, align 4, !tbaa !3
+  %sub49 = fsub float %sub46, %add41
+  store float %sub49, float* %arrayidx16, align 4, !tbaa !3
+  %add51 = fadd float %add45, %add43
+  store float %add51, float* %arrayidx4, align 4, !tbaa !3
+  %sub53 = fsub float %add45, %add43
+  store float %sub53, float* %arrayidx1, align 4, !tbaa !3
+  %add.ptr = getelementptr inbounds float, float* %dataptr.0262, i64 8
+  %dec = add nsw i32 %ctr.0263, -1
+  %cmp = icmp sgt i32 %ctr.0263, 0
+  br i1 %cmp, label %for.body, label %for.body57.preheader
+
+for.body57.preheader:                             ; preds = %for.body
+  br label %for.body57
+
+for.body57:                                       ; preds = %for.body57.preheader, %for.body57
+  %ctr.1261 = phi i32 [ %dec117, %for.body57 ], [ 7, %for.body57.preheader ]
+  %dataptr.1260 = phi float* [ %incdec.ptr, %for.body57 ], [ %data, %for.body57.preheader ]
+  %8 = load float, float* %dataptr.1260, align 4, !tbaa !3
+  %arrayidx59 = getelementptr inbounds float, float* %dataptr.1260, i64 56
+  %9 = load float, float* %arrayidx59, align 4, !tbaa !3
+  %add60 = fadd float %8, %9
+  %sub63 = fsub float %8, %9
+  %arrayidx64 = getelementptr inbounds float, float* %dataptr.1260, i64 8
+  %10 = load float, float* %arrayidx64, align 4, !tbaa !3
+  %arrayidx65 = getelementptr inbounds float, float* %dataptr.1260, i64 48
+  %11 = load float, float* %arrayidx65, align 4, !tbaa !3
+  %add66 = fadd float %10, %11
+  %sub69 = fsub float %10, %11
+  %arrayidx70 = getelementptr inbounds float, float* %dataptr.1260, i64 16
+  %12 = load float, float* %arrayidx70, align 4, !tbaa !3
+  %arrayidx71 = getelementptr inbounds float, float* %dataptr.1260, i64 40
+  %13 = load float, float* %arrayidx71, align 4, !tbaa !3
+  %add72 = fadd float %12, %13
+  %sub75 = fsub float %12, %13
+  %arrayidx76 = getelementptr inbounds float, float* %dataptr.1260, i64 24
+  %14 = load float, float* %arrayidx76, align 4, !tbaa !3
+  %arrayidx77 = getelementptr inbounds float, float* %dataptr.1260, i64 32
+  %15 = load float, float* %arrayidx77, align 4, !tbaa !3
+  %add78 = fadd float %14, %15
+  %sub81 = fsub float %14, %15
+  %add82 = fadd float %add60, %add78
+  %sub83 = fsub float %add60, %add78
+  %add84 = fadd float %add66, %add72
+  %sub85 = fsub float %add66, %add72
+  %add86 = fadd float %add84, %add82
+  store float %add86, float* %dataptr.1260, align 4, !tbaa !3
+  %sub88 = fsub float %add82, %add84
+  store float %sub88, float* %arrayidx77, align 4, !tbaa !3
+  %add90 = fadd float %sub85, %sub83
+  %mul91 = fmul float %add90, 0x3FE6A09E60000000
+  %add92 = fadd float %sub83, %mul91
+  store float %add92, float* %arrayidx70, align 4, !tbaa !3
+  %sub94 = fsub float %sub83, %mul91
+  store float %sub94, float* %arrayidx65, align 4, !tbaa !3
+  %add96 = fadd float %sub75, %sub81
+  %add97 = fadd float %sub69, %sub75
+  %add98 = fadd float %sub63, %sub69
+  %sub99 = fsub float %add96, %add98
+  %mul100 = fmul float %sub99, 0x3FD87DE2A0000000
+  %mul101 = fmul float %add96, 0x3FE1517A80000000
+  %add102 = fadd float %mul101, %mul100
+  %mul103 = fmul float %add98, 0x3FF4E7AEA0000000
+  %add104 = fadd float %mul103, %mul100
+  %mul105 = fmul float %add97, 0x3FE6A09E60000000
+  %add106 = fadd float %sub63, %mul105
+  %sub107 = fsub float %sub63, %mul105
+  %add108 = fadd float %sub107, %add102
+  store float %add108, float* %arrayidx71, align 4, !tbaa !3
+  %sub110 = fsub float %sub107, %add102
+  store float %sub110, float* %arrayidx76, align 4, !tbaa !3
+  %add112 = fadd float %add106, %add104
+  store float %add112, float* %arrayidx64, align 4, !tbaa !3
+  %sub114 = fsub float %add106, %add104
+  store float %sub114, float* %arrayidx59, align 4, !tbaa !3
+  %incdec.ptr = getelementptr inbounds float, float* %dataptr.1260, i64 1
+  %dec117 = add nsw i32 %ctr.1261, -1
+  %cmp56 = icmp sgt i32 %ctr.1261, 0
+  br i1 %cmp56, label %for.body57, label %for.end118
+
+for.end118:                                       ; preds = %for.body57
+  ret void
+}
+
+attributes #0 = { norecurse nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+
+!llvm.module.flags = !{!0}
+!llvm.ident = !{!1}
+
+!0 = !{i32 1, !"MaxFunctionCount", i32 150581}
+!1 = !{!"clang version 3.8.0 (trunk 257473)"}
+!2 = !{!"function_entry_count", i64 0}
+!3 = !{!4, !4, i64 0}
+!4 = !{!"float", !5, i64 0}
+!5 = !{!"omnipotent char", !6, i64 0}
+!6 = !{!"Simple C/C++ TBAA"}

@@ -1,0 +1,5 @@
+digraph "CFG for 'finish_pass_1_quant' function" {
+	label="CFG for 'finish_pass_1_quant' function";
+
+	Node0x6a479f0 [shape=record,label="{entry:\l  ret void\l}"];
+}

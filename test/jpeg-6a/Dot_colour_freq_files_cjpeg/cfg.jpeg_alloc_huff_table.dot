@@ -1,0 +1,5 @@
+digraph "CFG for 'jpeg_alloc_huff_table' function" {
+	label="CFG for 'jpeg_alloc_huff_table' function";
+
+	Node0x6980f80 [shape=record,label="{entry:\l  %mem = getelementptr inbounds %struct.jpeg_common_struct,\l... %struct.jpeg_common_struct* %cinfo, i64 0, i32 1\l  %0 = load %struct.jpeg_memory_mgr*, %struct.jpeg_memory_mgr** %mem, align 8,\l... !tbaa !3\l  %alloc_small = getelementptr inbounds %struct.jpeg_memory_mgr,\l... %struct.jpeg_memory_mgr* %0, i64 0, i32 0\l  %1 = load i8* (%struct.jpeg_common_struct*, i32, i64)*, i8*\l... (%struct.jpeg_common_struct*, i32, i64)** %alloc_small, align 8, !tbaa !9\l  %call = tail call i8* %1(%struct.jpeg_common_struct* %cinfo, i32 0, i64 280)\l... #1\l  %2 = bitcast i8* %call to %struct.JHUFF_TBL*\l  %sent_table = getelementptr inbounds i8, i8* %call, i64 276\l  %3 = bitcast i8* %sent_table to i32*\l  store i32 0, i32* %3, align 4, !tbaa !12\l  ret %struct.JHUFF_TBL* %2\l}"];
+}

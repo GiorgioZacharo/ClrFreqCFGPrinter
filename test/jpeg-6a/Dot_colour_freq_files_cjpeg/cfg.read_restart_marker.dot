@@ -1,0 +1,23 @@
+digraph "CFG for 'read_restart_marker' function" {
+	label="CFG for 'read_restart_marker' function";
+
+	Node0x6988170 [shape=record,label="{entry:\l  %unread_marker = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 72\l  %0 = load i32, i32* %unread_marker, align 4, !tbaa !2\l  %cmp = icmp eq i32 %0, 0\l  br i1 %cmp, label %if.then, label %if.end2\l|{<s0>T|<s1>F}}"];
+	Node0x6988170:s0 -> Node0x69882e0;
+	Node0x6988170:s1 -> Node0x6988390;
+	Node0x69882e0 [shape=record,label="{if.then:                                          \l  %call = tail call fastcc i32 @next_marker(%struct.jpeg_decompress_struct*\l... nonnull %cinfo)\l  %tobool = icmp eq i32 %call, 0\l  br i1 %tobool, label %return, label %if.then.if.end2_crit_edge\l|{<s0>T|<s1>F}}"];
+	Node0x69882e0:s0 -> Node0x6988670;
+	Node0x69882e0:s1 -> Node0x6988710;
+	Node0x6988710 [shape=record,label="{if.then.if.end2_crit_edge:                        \l  %.pre = load i32, i32* %unread_marker, align 4, !tbaa !2\l  br label %if.end2\l}"];
+	Node0x6988710 -> Node0x6988390;
+	Node0x6988390 [shape=record,label="{if.end2:                                          \l  %1 = phi i32 [ %.pre, %if.then.if.end2_crit_edge ], [ %0, %entry ]\l  %marker = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 78\l  %2 = load %struct.jpeg_marker_reader*, %struct.jpeg_marker_reader** %marker,\l... align 8, !tbaa !10\l  %next_restart_num = getelementptr inbounds %struct.jpeg_marker_reader,\l... %struct.jpeg_marker_reader* %2, i64 0, i32 7\l  %3 = load i32, i32* %next_restart_num, align 8, !tbaa !11\l  %add = add nsw i32 %3, 208\l  %cmp4 = icmp eq i32 %1, %add\l  br i1 %cmp4, label %if.then5, label %if.else\l|{<s0>T|<s1>F}}"];
+	Node0x6988390:s0 -> Node0x6988120;
+	Node0x6988390:s1 -> Node0x6988ea0;
+	Node0x6988120 [shape=record,label="{if.then5:                                         \l  %err = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 0\l  %4 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8,\l... !tbaa !13\l  %msg_code = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %4, i64 0, i32 5\l  store i32 97, i32* %msg_code, align 8, !tbaa !14\l  %arrayidx = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %4, i64 0, i32 6, i32 0, i64 0\l  store i32 %3, i32* %arrayidx, align 4, !tbaa !17\l  %emit_message = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %4, i64 0, i32 1\l  %5 = load void (%struct.jpeg_common_struct*, i32)*, void\l... (%struct.jpeg_common_struct*, i32)** %emit_message, align 8, !tbaa !18\l  %6 = bitcast %struct.jpeg_decompress_struct* %cinfo to\l... %struct.jpeg_common_struct*\l  tail call void %5(%struct.jpeg_common_struct* %6, i32 3) #4\l  store i32 0, i32* %unread_marker, align 4, !tbaa !2\l  br label %if.end18\l}"];
+	Node0x6988120 -> Node0x694bfb0;
+	Node0x6988ea0 [shape=record,label="{if.else:                                          \l  %src = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 5\l  %7 = load %struct.jpeg_source_mgr*, %struct.jpeg_source_mgr** %src, align 8,\l... !tbaa !19\l  %resync_to_restart = getelementptr inbounds %struct.jpeg_source_mgr,\l... %struct.jpeg_source_mgr* %7, i64 0, i32 5\l  %resync_to_restart11 = bitcast \{\}** %resync_to_restart to i32\l... (%struct.jpeg_decompress_struct*, i32)**\l  %8 = load i32 (%struct.jpeg_decompress_struct*, i32)*, i32\l... (%struct.jpeg_decompress_struct*, i32)** %resync_to_restart11, align 8, !tbaa\l... !20\l  %call14 = tail call i32 %8(%struct.jpeg_decompress_struct* nonnull %cinfo,\l... i32 %3) #4\l  %tobool15 = icmp eq i32 %call14, 0\l  br i1 %tobool15, label %return, label %if.end18\l|{<s0>T|<s1>F}}"];
+	Node0x6988ea0:s0 -> Node0x6988670;
+	Node0x6988ea0:s1 -> Node0x694bfb0;
+	Node0x694bfb0 [shape=record,label="{if.end18:                                         \l  %9 = load %struct.jpeg_marker_reader*, %struct.jpeg_marker_reader** %marker,\l... align 8, !tbaa !10\l  %next_restart_num20 = getelementptr inbounds %struct.jpeg_marker_reader,\l... %struct.jpeg_marker_reader* %9, i64 0, i32 7\l  %10 = load i32, i32* %next_restart_num20, align 8, !tbaa !11\l  %add21 = add nsw i32 %10, 1\l  %and = and i32 %add21, 7\l  store i32 %and, i32* %next_restart_num20, align 8, !tbaa !11\l  br label %return\l}"];
+	Node0x694bfb0 -> Node0x6988670;
+	Node0x6988670 [shape=record,label="{return:                                           \l  %retval.0 = phi i32 [ 1, %if.end18 ], [ 0, %if.then ], [ 0, %if.else ]\l  ret i32 %retval.0\l}"];
+}

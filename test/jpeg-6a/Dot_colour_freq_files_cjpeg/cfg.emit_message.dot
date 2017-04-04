@@ -1,0 +1,23 @@
+digraph "CFG for 'emit_message' function" {
+	label="CFG for 'emit_message' function";
+
+	Node0x53dd060 [shape=record,label="{entry:\l  %err1 = getelementptr inbounds %struct.jpeg_common_struct,\l... %struct.jpeg_common_struct* %cinfo, i64 0, i32 0\l  %0 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err1, align 8,\l... !tbaa !3\l  %cmp = icmp slt i32 %msg_level, 0\l  br i1 %cmp, label %if.then, label %if.else, !prof !9\l|{<s0>T|<s1>F}}"];
+	Node0x53dd060:s0 -> Node0x53e1830;
+	Node0x53dd060:s1 -> Node0x53e1900;
+	Node0x53e1830 [shape=record,label="{if.then:                                          \l  %num_warnings = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %0, i64 0, i32 8\l  %1 = load i64, i64* %num_warnings, align 8, !tbaa !10\l  %cmp2 = icmp eq i64 %1, 0\l  br i1 %cmp2, label %if.then4, label %lor.lhs.false\l|{<s0>T|<s1>F}}"];
+	Node0x53e1830:s0 -> Node0x53e2310;
+	Node0x53e1830:s1 -> Node0x53e23f0;
+	Node0x53e23f0 [shape=record,label="{lor.lhs.false:                                    \l  %trace_level = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %0, i64 0, i32 7\l  %2 = load i32, i32* %trace_level, align 4, !tbaa !13\l  %cmp3 = icmp sgt i32 %2, 2\l  br i1 %cmp3, label %if.then4, label %if.end\l|{<s0>T|<s1>F}}"];
+	Node0x53e23f0:s0 -> Node0x53e2310;
+	Node0x53e23f0:s1 -> Node0x53e0950;
+	Node0x53e2310 [shape=record,label="{if.then4:                                         \l  %output_message = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %0, i64 0, i32 2\l  %3 = load void (%struct.jpeg_common_struct*)*, void\l... (%struct.jpeg_common_struct*)** %output_message, align 8, !tbaa !14\l  tail call void %3(%struct.jpeg_common_struct* nonnull %cinfo) #7\l  %.pre = load i64, i64* %num_warnings, align 8, !tbaa !10\l  br label %if.end\l}"];
+	Node0x53e2310 -> Node0x53e0950;
+	Node0x53e0950 [shape=record,label="{if.end:                                           \l  %4 = phi i64 [ %.pre, %if.then4 ], [ %1, %lor.lhs.false ]\l  %inc = add nsw i64 %4, 1\l  store i64 %inc, i64* %num_warnings, align 8, !tbaa !10\l  br label %if.end11\l}"];
+	Node0x53e0950 -> Node0x53e34a0;
+	Node0x53e1900 [shape=record,label="{if.else:                                          \l  %trace_level6 = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %0, i64 0, i32 7\l  %5 = load i32, i32* %trace_level6, align 4, !tbaa !13\l  %cmp7 = icmp slt i32 %5, %msg_level\l  br i1 %cmp7, label %if.end11, label %if.then8, !prof !15\l|{<s0>T|<s1>F}}"];
+	Node0x53e1900:s0 -> Node0x53e34a0;
+	Node0x53e1900:s1 -> Node0x53e3720;
+	Node0x53e3720 [shape=record,label="{if.then8:                                         \l  %output_message9 = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %0, i64 0, i32 2\l  %6 = load void (%struct.jpeg_common_struct*)*, void\l... (%struct.jpeg_common_struct*)** %output_message9, align 8, !tbaa !14\l  tail call void %6(%struct.jpeg_common_struct* nonnull %cinfo) #7\l  br label %if.end11\l}"];
+	Node0x53e3720 -> Node0x53e34a0;
+	Node0x53e34a0 [shape=record,label="{if.end11:                                         \l  ret void\l}"];
+}

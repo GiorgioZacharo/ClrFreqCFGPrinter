@@ -1,0 +1,12 @@
+digraph "CFG for 'jpeg_set_quality' function" {
+	label="CFG for 'jpeg_set_quality' function";
+
+	Node0x6602aa0 [shape=record,label="{entry:\l  %cmp.i = icmp slt i32 %quality, 1\l  %.quality.i = select i1 %cmp.i, i32 1, i32 %quality\l  %cmp1.i = icmp sgt i32 %.quality.i, 100\l  %..quality.i = select i1 %cmp1.i, i32 100, i32 %.quality.i\l  %cmp4.i = icmp slt i32 %..quality.i, 50\l  br i1 %cmp4.i, label %if.then5.i, label %if.else.i, !prof !3\l|{<s0>T|<s1>F}}"];
+	Node0x6602aa0:s0 -> Node0x6602e50;
+	Node0x6602aa0:s1 -> Node0x6602ed0;
+	Node0x6602e50 [shape=record,label="{if.then5.i:                                       \l  %div.i = sdiv i32 5000, %..quality.i\l  br label %jpeg_quality_scaling.exit\l}"];
+	Node0x6602e50 -> Node0x6603720;
+	Node0x6602ed0 [shape=record,label="{if.else.i:                                        \l  %mul.i = shl nsw i32 %..quality.i, 1\l  %sub.i = sub nsw i32 200, %mul.i\l  br label %jpeg_quality_scaling.exit\l}"];
+	Node0x6602ed0 -> Node0x6603720;
+	Node0x6603720 [shape=record,label="{jpeg_quality_scaling.exit:                        \l  %quality.addr.0.i = phi i32 [ %div.i, %if.then5.i ], [ %sub.i, %if.else.i ]\l  tail call void @jpeg_add_quant_table(%struct.jpeg_compress_struct* %cinfo,\l... i32 0, i32* nonnull getelementptr inbounds ([64 x i32], [64 x i32]*\l... @jpeg_set_linear_quality.std_luminance_quant_tbl, i64 0, i64 0), i32\l... %quality.addr.0.i, i32 %force_baseline) #4\l  tail call void @jpeg_add_quant_table(%struct.jpeg_compress_struct* %cinfo,\l... i32 1, i32* nonnull getelementptr inbounds ([64 x i32], [64 x i32]*\l... @jpeg_set_linear_quality.std_chrominance_quant_tbl, i64 0, i64 0), i32\l... %quality.addr.0.i, i32 %force_baseline) #4\l  ret void\l}"];
+}

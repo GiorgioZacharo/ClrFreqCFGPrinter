@@ -1,0 +1,12 @@
+digraph "CFG for 'start_output_gif' function" {
+	label="CFG for 'start_output_gif' function";
+
+	Node0x4bba270 [shape=record,label="{entry:\l  %0 = bitcast %struct.djpeg_dest_struct* %dinfo to %struct.gif_dest_struct*\l  %quantize_colors = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 19\l  %1 = load i32, i32* %quantize_colors, align 4, !tbaa !2\l  %tobool = icmp eq i32 %1, 0\l  br i1 %tobool, label %if.else, label %if.then\l|{<s0>T|<s1>F}}"];
+	Node0x4bba270:s0 -> Node0x4bbaa70;
+	Node0x4bba270:s1 -> Node0x4bbab40;
+	Node0x4bbab40 [shape=record,label="{if.then:                                          \l  %actual_number_of_colors = getelementptr inbounds\l... %struct.jpeg_decompress_struct, %struct.jpeg_decompress_struct* %cinfo, i64\l... 0, i32 31\l  %2 = load i32, i32* %actual_number_of_colors, align 4, !tbaa !10\l  %colormap = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 32\l  %3 = load i8**, i8*** %colormap, align 8, !tbaa !11\l  tail call fastcc void @emit_header(%struct.gif_dest_struct* %0, i32 %2, i8**\l... %3)\l  br label %if.end\l}"];
+	Node0x4bbab40 -> Node0x4bbb480;
+	Node0x4bbaa70 [shape=record,label="{if.else:                                          \l  tail call fastcc void @emit_header(%struct.gif_dest_struct* %0, i32 256,\l... i8** null)\l  br label %if.end\l}"];
+	Node0x4bbaa70 -> Node0x4bbb480;
+	Node0x4bbb480 [shape=record,label="{if.end:                                           \l  ret void\l}"];
+}

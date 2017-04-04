@@ -1,0 +1,188 @@
+; ModuleID = 'jfdctfst.c'
+target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+; Function Attrs: norecurse nounwind uwtable
+define void @jpeg_fdct_ifast(i32* nocapture %data) #0 !prof !2 {
+entry:
+  br label %for.body
+
+for.body:                                         ; preds = %entry, %for.body
+  %ctr.0302 = phi i32 [ 7, %entry ], [ %dec, %for.body ]
+  %dataptr.0301 = phi i32* [ %data, %entry ], [ %add.ptr, %for.body ]
+  %0 = load i32, i32* %dataptr.0301, align 4, !tbaa !3
+  %arrayidx1 = getelementptr inbounds i32, i32* %dataptr.0301, i64 7
+  %1 = load i32, i32* %arrayidx1, align 4, !tbaa !3
+  %add = add nsw i32 %1, %0
+  %sub = sub nsw i32 %0, %1
+  %arrayidx4 = getelementptr inbounds i32, i32* %dataptr.0301, i64 1
+  %2 = load i32, i32* %arrayidx4, align 4, !tbaa !3
+  %arrayidx5 = getelementptr inbounds i32, i32* %dataptr.0301, i64 6
+  %3 = load i32, i32* %arrayidx5, align 4, !tbaa !3
+  %add6 = add nsw i32 %3, %2
+  %sub9 = sub nsw i32 %2, %3
+  %arrayidx10 = getelementptr inbounds i32, i32* %dataptr.0301, i64 2
+  %4 = load i32, i32* %arrayidx10, align 4, !tbaa !3
+  %arrayidx11 = getelementptr inbounds i32, i32* %dataptr.0301, i64 5
+  %5 = load i32, i32* %arrayidx11, align 4, !tbaa !3
+  %add12 = add nsw i32 %5, %4
+  %sub15 = sub nsw i32 %4, %5
+  %arrayidx16 = getelementptr inbounds i32, i32* %dataptr.0301, i64 3
+  %6 = load i32, i32* %arrayidx16, align 4, !tbaa !3
+  %arrayidx17 = getelementptr inbounds i32, i32* %dataptr.0301, i64 4
+  %7 = load i32, i32* %arrayidx17, align 4, !tbaa !3
+  %add18 = add nsw i32 %7, %6
+  %sub21 = sub nsw i32 %6, %7
+  %add22 = add nsw i32 %add18, %add
+  %sub23 = sub nsw i32 %add, %add18
+  %add24 = add nsw i32 %add12, %add6
+  %sub25 = sub i32 %add6, %add12
+  %add26 = add nsw i32 %add22, %add24
+  store i32 %add26, i32* %dataptr.0301, align 4, !tbaa !3
+  %sub28 = sub nsw i32 %add22, %add24
+  store i32 %sub28, i32* %arrayidx17, align 4, !tbaa !3
+  %add30 = add nsw i32 %sub25, %sub23
+  %conv = sext i32 %add30 to i64
+  %mul = mul nsw i64 %conv, 181
+  %shr294 = lshr i64 %mul, 8
+  %conv31 = trunc i64 %shr294 to i32
+  %add32 = add nsw i32 %conv31, %sub23
+  store i32 %add32, i32* %arrayidx10, align 4, !tbaa !3
+  %sub34 = sub nsw i32 %sub23, %conv31
+  store i32 %sub34, i32* %arrayidx5, align 4, !tbaa !3
+  %add36 = add nsw i32 %sub21, %sub15
+  %add37 = add nsw i32 %sub15, %sub9
+  %add38 = add nsw i32 %sub9, %sub
+  %sub39 = sub nsw i32 %add36, %add38
+  %conv40 = sext i32 %sub39 to i64
+  %mul41 = mul nsw i64 %conv40, 98
+  %shr42295 = lshr i64 %mul41, 8
+  %conv43 = trunc i64 %shr42295 to i32
+  %conv44 = sext i32 %add36 to i64
+  %mul45 = mul nsw i64 %conv44, 139
+  %shr46296 = lshr i64 %mul45, 8
+  %conv47 = trunc i64 %shr46296 to i32
+  %add48 = add nsw i32 %conv43, %conv47
+  %conv49 = sext i32 %add38 to i64
+  %mul50 = mul nsw i64 %conv49, 334
+  %shr51297 = lshr i64 %mul50, 8
+  %conv52 = trunc i64 %shr51297 to i32
+  %add53 = add nsw i32 %conv43, %conv52
+  %conv54 = sext i32 %add37 to i64
+  %mul55 = mul nsw i64 %conv54, 181
+  %shr56298 = lshr i64 %mul55, 8
+  %conv57 = trunc i64 %shr56298 to i32
+  %add58 = add nsw i32 %conv57, %sub
+  %sub59 = sub nsw i32 %sub, %conv57
+  %add60 = add nsw i32 %add48, %sub59
+  store i32 %add60, i32* %arrayidx11, align 4, !tbaa !3
+  %sub62 = sub nsw i32 %sub59, %add48
+  store i32 %sub62, i32* %arrayidx16, align 4, !tbaa !3
+  %add64 = add nsw i32 %add53, %add58
+  store i32 %add64, i32* %arrayidx4, align 4, !tbaa !3
+  %sub66 = sub nsw i32 %add58, %add53
+  store i32 %sub66, i32* %arrayidx1, align 4, !tbaa !3
+  %add.ptr = getelementptr inbounds i32, i32* %dataptr.0301, i64 8
+  %dec = add nsw i32 %ctr.0302, -1
+  %cmp = icmp sgt i32 %ctr.0302, 0
+  br i1 %cmp, label %for.body, label %for.body71.preheader
+
+for.body71.preheader:                             ; preds = %for.body
+  br label %for.body71
+
+for.body71:                                       ; preds = %for.body71.preheader, %for.body71
+  %ctr.1300 = phi i32 [ %dec146, %for.body71 ], [ 7, %for.body71.preheader ]
+  %dataptr.1299 = phi i32* [ %incdec.ptr, %for.body71 ], [ %data, %for.body71.preheader ]
+  %8 = load i32, i32* %dataptr.1299, align 4, !tbaa !3
+  %arrayidx73 = getelementptr inbounds i32, i32* %dataptr.1299, i64 56
+  %9 = load i32, i32* %arrayidx73, align 4, !tbaa !3
+  %add74 = add nsw i32 %9, %8
+  %sub77 = sub nsw i32 %8, %9
+  %arrayidx78 = getelementptr inbounds i32, i32* %dataptr.1299, i64 8
+  %10 = load i32, i32* %arrayidx78, align 4, !tbaa !3
+  %arrayidx79 = getelementptr inbounds i32, i32* %dataptr.1299, i64 48
+  %11 = load i32, i32* %arrayidx79, align 4, !tbaa !3
+  %add80 = add nsw i32 %11, %10
+  %sub83 = sub nsw i32 %10, %11
+  %arrayidx84 = getelementptr inbounds i32, i32* %dataptr.1299, i64 16
+  %12 = load i32, i32* %arrayidx84, align 4, !tbaa !3
+  %arrayidx85 = getelementptr inbounds i32, i32* %dataptr.1299, i64 40
+  %13 = load i32, i32* %arrayidx85, align 4, !tbaa !3
+  %add86 = add nsw i32 %13, %12
+  %sub89 = sub nsw i32 %12, %13
+  %arrayidx90 = getelementptr inbounds i32, i32* %dataptr.1299, i64 24
+  %14 = load i32, i32* %arrayidx90, align 4, !tbaa !3
+  %arrayidx91 = getelementptr inbounds i32, i32* %dataptr.1299, i64 32
+  %15 = load i32, i32* %arrayidx91, align 4, !tbaa !3
+  %add92 = add nsw i32 %15, %14
+  %sub95 = sub nsw i32 %14, %15
+  %add96 = add nsw i32 %add92, %add74
+  %sub97 = sub nsw i32 %add74, %add92
+  %add98 = add nsw i32 %add86, %add80
+  %sub99 = sub i32 %add80, %add86
+  %add100 = add nsw i32 %add96, %add98
+  store i32 %add100, i32* %dataptr.1299, align 4, !tbaa !3
+  %sub102 = sub nsw i32 %add96, %add98
+  store i32 %sub102, i32* %arrayidx91, align 4, !tbaa !3
+  %add104 = add nsw i32 %sub99, %sub97
+  %conv105 = sext i32 %add104 to i64
+  %mul106 = mul nsw i64 %conv105, 181
+  %shr107289 = lshr i64 %mul106, 8
+  %conv108 = trunc i64 %shr107289 to i32
+  %add109 = add nsw i32 %conv108, %sub97
+  store i32 %add109, i32* %arrayidx84, align 4, !tbaa !3
+  %sub111 = sub nsw i32 %sub97, %conv108
+  store i32 %sub111, i32* %arrayidx79, align 4, !tbaa !3
+  %add113 = add nsw i32 %sub95, %sub89
+  %add114 = add nsw i32 %sub89, %sub83
+  %add115 = add nsw i32 %sub83, %sub77
+  %sub116 = sub nsw i32 %add113, %add115
+  %conv117 = sext i32 %sub116 to i64
+  %mul118 = mul nsw i64 %conv117, 98
+  %shr119290 = lshr i64 %mul118, 8
+  %conv120 = trunc i64 %shr119290 to i32
+  %conv121 = sext i32 %add113 to i64
+  %mul122 = mul nsw i64 %conv121, 139
+  %shr123291 = lshr i64 %mul122, 8
+  %conv124 = trunc i64 %shr123291 to i32
+  %add125 = add nsw i32 %conv120, %conv124
+  %conv126 = sext i32 %add115 to i64
+  %mul127 = mul nsw i64 %conv126, 334
+  %shr128292 = lshr i64 %mul127, 8
+  %conv129 = trunc i64 %shr128292 to i32
+  %add130 = add nsw i32 %conv120, %conv129
+  %conv131 = sext i32 %add114 to i64
+  %mul132 = mul nsw i64 %conv131, 181
+  %shr133293 = lshr i64 %mul132, 8
+  %conv134 = trunc i64 %shr133293 to i32
+  %add135 = add nsw i32 %conv134, %sub77
+  %sub136 = sub nsw i32 %sub77, %conv134
+  %add137 = add nsw i32 %add125, %sub136
+  store i32 %add137, i32* %arrayidx85, align 4, !tbaa !3
+  %sub139 = sub nsw i32 %sub136, %add125
+  store i32 %sub139, i32* %arrayidx90, align 4, !tbaa !3
+  %add141 = add nsw i32 %add130, %add135
+  store i32 %add141, i32* %arrayidx78, align 4, !tbaa !3
+  %sub143 = sub nsw i32 %add135, %add130
+  store i32 %sub143, i32* %arrayidx73, align 4, !tbaa !3
+  %incdec.ptr = getelementptr inbounds i32, i32* %dataptr.1299, i64 1
+  %dec146 = add nsw i32 %ctr.1300, -1
+  %cmp69 = icmp sgt i32 %ctr.1300, 0
+  br i1 %cmp69, label %for.body71, label %for.end147
+
+for.end147:                                       ; preds = %for.body71
+  ret void
+}
+
+attributes #0 = { norecurse nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+
+!llvm.module.flags = !{!0}
+!llvm.ident = !{!1}
+
+!0 = !{i32 1, !"MaxFunctionCount", i32 150581}
+!1 = !{!"clang version 3.8.0 (trunk 257473)"}
+!2 = !{!"function_entry_count", i64 0}
+!3 = !{!4, !4, i64 0}
+!4 = !{!"int", !5, i64 0}
+!5 = !{!"omnipotent char", !6, i64 0}
+!6 = !{!"Simple C/C++ TBAA"}

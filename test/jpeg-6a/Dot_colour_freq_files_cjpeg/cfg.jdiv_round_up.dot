@@ -1,0 +1,5 @@
+digraph "CFG for 'jdiv_round_up' function" {
+	label="CFG for 'jdiv_round_up' function";
+
+	Node0x57ee550 [shape=record,label="{entry:\l  %add = add i64 %a, -1\l  %sub = add i64 %add, %b\l  %div = sdiv i64 %sub, %b\l  ret i64 %div\l}"];
+}

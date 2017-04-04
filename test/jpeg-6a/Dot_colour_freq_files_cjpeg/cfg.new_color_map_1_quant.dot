@@ -1,0 +1,5 @@
+digraph "CFG for 'new_color_map_1_quant' function" {
+	label="CFG for 'new_color_map_1_quant' function";
+
+	Node0x6a47c20 [shape=record,label="{entry:\l  %err = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 0\l  %0 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8,\l... !tbaa !2\l  %msg_code = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %0, i64 0, i32 5\l  store i32 45, i32* %msg_code, align 8, !tbaa !10\l  %error_exit = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %0, i64 0, i32 0\l  %1 = load void (%struct.jpeg_common_struct*)*, void\l... (%struct.jpeg_common_struct*)** %error_exit, align 8, !tbaa !13\l  %2 = bitcast %struct.jpeg_decompress_struct* %cinfo to\l... %struct.jpeg_common_struct*\l  tail call void %1(%struct.jpeg_common_struct* %2) #5\l  ret void\l}"];
+}

@@ -1,0 +1,336 @@
+; ModuleID = 'jidctflt.c'
+target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+%struct.jpeg_decompress_struct = type { %struct.jpeg_error_mgr*, %struct.jpeg_memory_mgr*, %struct.jpeg_progress_mgr*, i32, i32, %struct.jpeg_source_mgr*, i32, i32, i32, i32, i32, i32, i32, double, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i8**, i32, i32, i32, i32, i32, [64 x i32]*, [4 x %struct.JQUANT_TBL*], [4 x %struct.JHUFF_TBL*], [4 x %struct.JHUFF_TBL*], i32, %struct.jpeg_component_info*, i32, i32, [16 x i8], [16 x i8], [16 x i8], i32, i32, i8, i16, i16, i32, i8, i32, i32, i32, i32, i32, i8*, i32, [4 x %struct.jpeg_component_info*], i32, i32, i32, [10 x i32], i32, i32, i32, i32, i32, %struct.jpeg_decomp_master*, %struct.jpeg_d_main_controller*, %struct.jpeg_d_coef_controller*, %struct.jpeg_d_post_controller*, %struct.jpeg_input_controller*, %struct.jpeg_marker_reader*, %struct.jpeg_entropy_decoder*, %struct.jpeg_inverse_dct*, %struct.jpeg_upsampler*, %struct.jpeg_color_deconverter*, %struct.jpeg_color_quantizer* }
+%struct.jpeg_error_mgr = type { void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*, i32)*, void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*, i8*)*, void (%struct.jpeg_common_struct*)*, i32, %union.anon, i32, i64, i8**, i32, i8**, i32, i32 }
+%struct.jpeg_common_struct = type { %struct.jpeg_error_mgr*, %struct.jpeg_memory_mgr*, %struct.jpeg_progress_mgr*, i32, i32 }
+%union.anon = type { [8 x i32], [48 x i8] }
+%struct.jpeg_memory_mgr = type { i8* (%struct.jpeg_common_struct*, i32, i64)*, i8* (%struct.jpeg_common_struct*, i32, i64)*, i8** (%struct.jpeg_common_struct*, i32, i32, i32)*, [64 x i16]** (%struct.jpeg_common_struct*, i32, i32, i32)*, %struct.jvirt_sarray_control* (%struct.jpeg_common_struct*, i32, i32, i32, i32, i32)*, %struct.jvirt_barray_control* (%struct.jpeg_common_struct*, i32, i32, i32, i32, i32)*, {}*, i8** (%struct.jpeg_common_struct*, %struct.jvirt_sarray_control*, i32, i32, i32)*, [64 x i16]** (%struct.jpeg_common_struct*, %struct.jvirt_barray_control*, i32, i32, i32)*, void (%struct.jpeg_common_struct*, i32)*, {}*, i64 }
+%struct.jvirt_sarray_control = type opaque
+%struct.jvirt_barray_control = type opaque
+%struct.jpeg_progress_mgr = type { {}*, i64, i64, i32, i32 }
+%struct.jpeg_source_mgr = type { i8*, i64, void (%struct.jpeg_decompress_struct*)*, i32 (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*, i64)*, i32 (%struct.jpeg_decompress_struct*, i32)*, void (%struct.jpeg_decompress_struct*)* }
+%struct.JQUANT_TBL = type { [64 x i16], i32 }
+%struct.JHUFF_TBL = type { [17 x i8], [256 x i8], i32 }
+%struct.jpeg_decomp_master = type { void (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*)*, i32 }
+%struct.jpeg_d_main_controller = type { void (%struct.jpeg_decompress_struct*, i32)*, void (%struct.jpeg_decompress_struct*, i8**, i32*, i32)* }
+%struct.jpeg_d_coef_controller = type { void (%struct.jpeg_decompress_struct*)*, i32 (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*)*, i32 (%struct.jpeg_decompress_struct*, i8***)*, %struct.jvirt_barray_control** }
+%struct.jpeg_d_post_controller = type { void (%struct.jpeg_decompress_struct*, i32)*, void (%struct.jpeg_decompress_struct*, i8***, i32*, i32, i8**, i32*, i32)* }
+%struct.jpeg_input_controller = type { i32 (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*)*, i32, i32 }
+%struct.jpeg_marker_reader = type { void (%struct.jpeg_decompress_struct*)*, i32 (%struct.jpeg_decompress_struct*)*, i32 (%struct.jpeg_decompress_struct*)*, i32 (%struct.jpeg_decompress_struct*)*, [16 x i32 (%struct.jpeg_decompress_struct*)*], i32, i32, i32, i32 }
+%struct.jpeg_entropy_decoder = type { void (%struct.jpeg_decompress_struct*)*, i32 (%struct.jpeg_decompress_struct*, [64 x i16]**)* }
+%struct.jpeg_inverse_dct = type { void (%struct.jpeg_decompress_struct*)*, [10 x {}*] }
+%struct.jpeg_upsampler = type { void (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*, i8***, i32*, i32, i8**, i32*, i32)*, i32 }
+%struct.jpeg_color_deconverter = type { void (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*, i8***, i32, i8**, i32)* }
+%struct.jpeg_color_quantizer = type { void (%struct.jpeg_decompress_struct*, i32)*, void (%struct.jpeg_decompress_struct*, i8**, i8**, i32)*, void (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*)* }
+%struct.jpeg_component_info = type { i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, %struct.JQUANT_TBL*, i8* }
+
+; Function Attrs: norecurse nounwind uwtable
+define void @jpeg_idct_float(%struct.jpeg_decompress_struct* nocapture readonly %cinfo, %struct.jpeg_component_info* nocapture readonly %compptr, i16* nocapture readonly %coef_block, i8** nocapture readonly %output_buf, i32 %output_col) #0 {
+entry:
+  %workspace = alloca [64 x float], align 16
+  %sample_range_limit = getelementptr inbounds %struct.jpeg_decompress_struct, %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 61
+  %0 = load i8*, i8** %sample_range_limit, align 8, !tbaa !2
+  %1 = bitcast [64 x float]* %workspace to i8*
+  call void @llvm.lifetime.start(i64 256, i8* %1) #2
+  %dct_table = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %compptr, i64 0, i32 20
+  %2 = bitcast i8** %dct_table to float**
+  %3 = load float*, float** %2, align 8, !tbaa !10
+  %arraydecay = getelementptr inbounds [64 x float], [64 x float]* %workspace, i64 0, i64 0
+  br label %for.body
+
+for.cond109.preheader:                            ; preds = %for.inc
+  %add.ptr = getelementptr inbounds i8, i8* %0, i64 128
+  %idx.ext = zext i32 %output_col to i64
+  br label %for.body112
+
+for.body:                                         ; preds = %entry, %for.inc
+  %ctr.0450 = phi i32 [ 8, %entry ], [ %dec, %for.inc ]
+  %wsptr.0449 = phi float* [ %arraydecay, %entry ], [ %wsptr.1, %for.inc ]
+  %quantptr.0448 = phi float* [ %3, %entry ], [ %quantptr.1, %for.inc ]
+  %inptr.0447 = phi i16* [ %coef_block, %entry ], [ %inptr.1, %for.inc ]
+  %arrayidx = getelementptr inbounds i16, i16* %inptr.0447, i64 8
+  %4 = load i16, i16* %arrayidx, align 2, !tbaa !12
+  %arrayidx1 = getelementptr inbounds i16, i16* %inptr.0447, i64 16
+  %5 = load i16, i16* %arrayidx1, align 2, !tbaa !12
+  %or437 = or i16 %5, %4
+  %arrayidx3 = getelementptr inbounds i16, i16* %inptr.0447, i64 24
+  %6 = load i16, i16* %arrayidx3, align 2, !tbaa !12
+  %or5438 = or i16 %or437, %6
+  %arrayidx6 = getelementptr inbounds i16, i16* %inptr.0447, i64 32
+  %7 = load i16, i16* %arrayidx6, align 2, !tbaa !12
+  %or8439 = or i16 %or5438, %7
+  %arrayidx9 = getelementptr inbounds i16, i16* %inptr.0447, i64 40
+  %8 = load i16, i16* %arrayidx9, align 2, !tbaa !12
+  %or11440 = or i16 %or8439, %8
+  %arrayidx12 = getelementptr inbounds i16, i16* %inptr.0447, i64 48
+  %9 = load i16, i16* %arrayidx12, align 2, !tbaa !12
+  %or14441 = or i16 %or11440, %9
+  %arrayidx15 = getelementptr inbounds i16, i16* %inptr.0447, i64 56
+  %10 = load i16, i16* %arrayidx15, align 2, !tbaa !12
+  %or17442 = or i16 %or14441, %10
+  %cmp18 = icmp eq i16 %or17442, 0
+  %11 = load i16, i16* %inptr.0447, align 2, !tbaa !12
+  %conv21 = sitofp i16 %11 to float
+  %12 = load float, float* %quantptr.0448, align 4, !tbaa !13
+  %mul = fmul float %conv21, %12
+  br i1 %cmp18, label %if.then, label %if.end
+
+if.then:                                          ; preds = %for.body
+  store float %mul, float* %wsptr.0449, align 4, !tbaa !13
+  br label %for.inc
+
+if.end:                                           ; preds = %for.body
+  %conv38 = sitofp i16 %5 to float
+  %arrayidx39 = getelementptr inbounds float, float* %quantptr.0448, i64 16
+  %13 = load float, float* %arrayidx39, align 4, !tbaa !13
+  %mul40 = fmul float %conv38, %13
+  %conv42 = sitofp i16 %7 to float
+  %arrayidx43 = getelementptr inbounds float, float* %quantptr.0448, i64 32
+  %14 = load float, float* %arrayidx43, align 4, !tbaa !13
+  %mul44 = fmul float %conv42, %14
+  %conv46 = sitofp i16 %9 to float
+  %arrayidx47 = getelementptr inbounds float, float* %quantptr.0448, i64 48
+  %15 = load float, float* %arrayidx47, align 4, !tbaa !13
+  %mul48 = fmul float %conv46, %15
+  %add = fadd float %mul, %mul44
+  %sub = fsub float %mul, %mul44
+  %add49 = fadd float %mul40, %mul48
+  %sub50 = fsub float %mul40, %mul48
+  %mul51 = fmul float %sub50, 0x3FF6A09E60000000
+  %sub52 = fsub float %mul51, %add49
+  %add53 = fadd float %add, %add49
+  %sub54 = fsub float %add, %add49
+  %add55 = fadd float %sub, %sub52
+  %sub56 = fsub float %sub, %sub52
+  %conv58 = sitofp i16 %4 to float
+  %arrayidx59 = getelementptr inbounds float, float* %quantptr.0448, i64 8
+  %16 = load float, float* %arrayidx59, align 4, !tbaa !13
+  %mul60 = fmul float %conv58, %16
+  %conv62 = sitofp i16 %6 to float
+  %arrayidx63 = getelementptr inbounds float, float* %quantptr.0448, i64 24
+  %17 = load float, float* %arrayidx63, align 4, !tbaa !13
+  %mul64 = fmul float %conv62, %17
+  %conv66 = sitofp i16 %8 to float
+  %arrayidx67 = getelementptr inbounds float, float* %quantptr.0448, i64 40
+  %18 = load float, float* %arrayidx67, align 4, !tbaa !13
+  %mul68 = fmul float %conv66, %18
+  %conv70 = sitofp i16 %10 to float
+  %arrayidx71 = getelementptr inbounds float, float* %quantptr.0448, i64 56
+  %19 = load float, float* %arrayidx71, align 4, !tbaa !13
+  %mul72 = fmul float %conv70, %19
+  %add73 = fadd float %mul64, %mul68
+  %sub74 = fsub float %mul68, %mul64
+  %add75 = fadd float %mul60, %mul72
+  %sub76 = fsub float %mul60, %mul72
+  %add77 = fadd float %add73, %add75
+  %sub78 = fsub float %add75, %add73
+  %mul79 = fmul float %sub78, 0x3FF6A09E60000000
+  %add80 = fadd float %sub74, %sub76
+  %mul81 = fmul float %add80, 0x3FFD906BC0000000
+  %mul82 = fmul float %sub76, 0x3FF1517A80000000
+  %sub83 = fsub float %mul82, %mul81
+  %mul84 = fmul float %sub74, 0x4004E7AEA0000000
+  %add85443 = fsub float %mul81, %mul84
+  %sub86 = fsub float %add85443, %add77
+  %sub87 = fsub float %mul79, %sub86
+  %add88 = fadd float %sub83, %sub87
+  %add89 = fadd float %add53, %add77
+  store float %add89, float* %wsptr.0449, align 4, !tbaa !13
+  %sub91 = fsub float %add53, %add77
+  %add93 = fadd float %add55, %sub86
+  %sub95 = fsub float %add55, %sub86
+  %add97 = fadd float %sub56, %sub87
+  %sub99 = fsub float %sub56, %sub87
+  %add101 = fadd float %sub54, %add88
+  %sub103 = fsub float %sub54, %add88
+  br label %for.inc
+
+for.inc:                                          ; preds = %if.end, %if.then
+  %mul.sink456 = phi float [ %sub91, %if.end ], [ %mul, %if.then ]
+  %mul.sink455 = phi float [ %add93, %if.end ], [ %mul, %if.then ]
+  %mul.sink454 = phi float [ %sub95, %if.end ], [ %mul, %if.then ]
+  %mul.sink453 = phi float [ %add97, %if.end ], [ %mul, %if.then ]
+  %mul.sink452 = phi float [ %sub99, %if.end ], [ %mul, %if.then ]
+  %mul.sink451 = phi float [ %add101, %if.end ], [ %mul, %if.then ]
+  %mul.sink = phi float [ %sub103, %if.end ], [ %mul, %if.then ]
+  %20 = getelementptr inbounds float, float* %wsptr.0449, i64 56
+  store float %mul.sink456, float* %20, align 4
+  %21 = getelementptr inbounds float, float* %wsptr.0449, i64 8
+  store float %mul.sink455, float* %21, align 4
+  %22 = getelementptr inbounds float, float* %wsptr.0449, i64 48
+  store float %mul.sink454, float* %22, align 4
+  %23 = getelementptr inbounds float, float* %wsptr.0449, i64 16
+  store float %mul.sink453, float* %23, align 4
+  %24 = getelementptr inbounds float, float* %wsptr.0449, i64 40
+  store float %mul.sink452, float* %24, align 4
+  %25 = getelementptr inbounds float, float* %wsptr.0449, i64 32
+  store float %mul.sink451, float* %25, align 4
+  %26 = getelementptr inbounds float, float* %wsptr.0449, i64 24
+  store float %mul.sink, float* %26, align 4
+  %wsptr.1 = getelementptr inbounds float, float* %wsptr.0449, i64 1
+  %quantptr.1 = getelementptr inbounds float, float* %quantptr.0448, i64 1
+  %inptr.1 = getelementptr inbounds i16, i16* %inptr.0447, i64 1
+  %dec = add nsw i32 %ctr.0450, -1
+  %cmp = icmp sgt i32 %ctr.0450, 1
+  br i1 %cmp, label %for.body, label %for.cond109.preheader
+
+for.body112:                                      ; preds = %for.body112, %for.cond109.preheader
+  %indvars.iv = phi i64 [ 0, %for.cond109.preheader ], [ %indvars.iv.next, %for.body112 ]
+  %wsptr.2445 = phi float* [ %arraydecay, %for.cond109.preheader ], [ %add.ptr227, %for.body112 ]
+  %arrayidx113 = getelementptr inbounds i8*, i8** %output_buf, i64 %indvars.iv
+  %27 = load i8*, i8** %arrayidx113, align 8, !tbaa !15
+  %add.ptr114 = getelementptr inbounds i8, i8* %27, i64 %idx.ext
+  %28 = load float, float* %wsptr.2445, align 4, !tbaa !13
+  %arrayidx116 = getelementptr inbounds float, float* %wsptr.2445, i64 4
+  %29 = load float, float* %arrayidx116, align 4, !tbaa !13
+  %add117 = fadd float %28, %29
+  %sub120 = fsub float %28, %29
+  %arrayidx121 = getelementptr inbounds float, float* %wsptr.2445, i64 2
+  %30 = load float, float* %arrayidx121, align 4, !tbaa !13
+  %arrayidx122 = getelementptr inbounds float, float* %wsptr.2445, i64 6
+  %31 = load float, float* %arrayidx122, align 4, !tbaa !13
+  %add123 = fadd float %30, %31
+  %sub126 = fsub float %30, %31
+  %mul127 = fmul float %sub126, 0x3FF6A09E60000000
+  %sub128 = fsub float %mul127, %add123
+  %add129 = fadd float %add117, %add123
+  %sub130 = fsub float %add117, %add123
+  %add131 = fadd float %sub120, %sub128
+  %sub132 = fsub float %sub120, %sub128
+  %arrayidx133 = getelementptr inbounds float, float* %wsptr.2445, i64 5
+  %32 = load float, float* %arrayidx133, align 4, !tbaa !13
+  %arrayidx134 = getelementptr inbounds float, float* %wsptr.2445, i64 3
+  %33 = load float, float* %arrayidx134, align 4, !tbaa !13
+  %add135 = fadd float %32, %33
+  %sub138 = fsub float %32, %33
+  %arrayidx139 = getelementptr inbounds float, float* %wsptr.2445, i64 1
+  %34 = load float, float* %arrayidx139, align 4, !tbaa !13
+  %arrayidx140 = getelementptr inbounds float, float* %wsptr.2445, i64 7
+  %35 = load float, float* %arrayidx140, align 4, !tbaa !13
+  %add141 = fadd float %34, %35
+  %sub144 = fsub float %34, %35
+  %add145 = fadd float %add135, %add141
+  %sub146 = fsub float %add141, %add135
+  %mul147 = fmul float %sub146, 0x3FF6A09E60000000
+  %add148 = fadd float %sub138, %sub144
+  %mul149 = fmul float %add148, 0x3FFD906BC0000000
+  %mul150 = fmul float %sub144, 0x3FF1517A80000000
+  %sub151 = fsub float %mul150, %mul149
+  %mul152 = fmul float %sub138, 0x4004E7AEA0000000
+  %add153444 = fsub float %mul149, %mul152
+  %sub154 = fsub float %add153444, %add145
+  %sub155 = fsub float %mul147, %sub154
+  %add156 = fadd float %sub151, %sub155
+  %add157 = fadd float %add129, %add145
+  %conv158 = fptosi float %add157 to i64
+  %add159 = add nsw i64 %conv158, 4
+  %shr421 = lshr i64 %add159, 3
+  %and = and i64 %shr421, 1023
+  %arrayidx162 = getelementptr inbounds i8, i8* %add.ptr, i64 %and
+  %36 = load i8, i8* %arrayidx162, align 1, !tbaa !16
+  store i8 %36, i8* %add.ptr114, align 1, !tbaa !16
+  %sub164 = fsub float %add129, %add145
+  %conv165 = fptosi float %sub164 to i64
+  %add166 = add nsw i64 %conv165, 4
+  %shr167423 = lshr i64 %add166, 3
+  %and169 = and i64 %shr167423, 1023
+  %arrayidx171 = getelementptr inbounds i8, i8* %add.ptr, i64 %and169
+  %37 = load i8, i8* %arrayidx171, align 1, !tbaa !16
+  %arrayidx172 = getelementptr inbounds i8, i8* %add.ptr114, i64 7
+  store i8 %37, i8* %arrayidx172, align 1, !tbaa !16
+  %add173 = fadd float %add131, %sub154
+  %conv174 = fptosi float %add173 to i64
+  %add175 = add nsw i64 %conv174, 4
+  %shr176425 = lshr i64 %add175, 3
+  %and178 = and i64 %shr176425, 1023
+  %arrayidx180 = getelementptr inbounds i8, i8* %add.ptr, i64 %and178
+  %38 = load i8, i8* %arrayidx180, align 1, !tbaa !16
+  %arrayidx181 = getelementptr inbounds i8, i8* %add.ptr114, i64 1
+  store i8 %38, i8* %arrayidx181, align 1, !tbaa !16
+  %sub182 = fsub float %add131, %sub154
+  %conv183 = fptosi float %sub182 to i64
+  %add184 = add nsw i64 %conv183, 4
+  %shr185427 = lshr i64 %add184, 3
+  %and187 = and i64 %shr185427, 1023
+  %arrayidx189 = getelementptr inbounds i8, i8* %add.ptr, i64 %and187
+  %39 = load i8, i8* %arrayidx189, align 1, !tbaa !16
+  %arrayidx190 = getelementptr inbounds i8, i8* %add.ptr114, i64 6
+  store i8 %39, i8* %arrayidx190, align 1, !tbaa !16
+  %add191 = fadd float %sub132, %sub155
+  %conv192 = fptosi float %add191 to i64
+  %add193 = add nsw i64 %conv192, 4
+  %shr194429 = lshr i64 %add193, 3
+  %and196 = and i64 %shr194429, 1023
+  %arrayidx198 = getelementptr inbounds i8, i8* %add.ptr, i64 %and196
+  %40 = load i8, i8* %arrayidx198, align 1, !tbaa !16
+  %arrayidx199 = getelementptr inbounds i8, i8* %add.ptr114, i64 2
+  store i8 %40, i8* %arrayidx199, align 1, !tbaa !16
+  %sub200 = fsub float %sub132, %sub155
+  %conv201 = fptosi float %sub200 to i64
+  %add202 = add nsw i64 %conv201, 4
+  %shr203431 = lshr i64 %add202, 3
+  %and205 = and i64 %shr203431, 1023
+  %arrayidx207 = getelementptr inbounds i8, i8* %add.ptr, i64 %and205
+  %41 = load i8, i8* %arrayidx207, align 1, !tbaa !16
+  %arrayidx208 = getelementptr inbounds i8, i8* %add.ptr114, i64 5
+  store i8 %41, i8* %arrayidx208, align 1, !tbaa !16
+  %add209 = fadd float %sub130, %add156
+  %conv210 = fptosi float %add209 to i64
+  %add211 = add nsw i64 %conv210, 4
+  %shr212433 = lshr i64 %add211, 3
+  %and214 = and i64 %shr212433, 1023
+  %arrayidx216 = getelementptr inbounds i8, i8* %add.ptr, i64 %and214
+  %42 = load i8, i8* %arrayidx216, align 1, !tbaa !16
+  %arrayidx217 = getelementptr inbounds i8, i8* %add.ptr114, i64 4
+  store i8 %42, i8* %arrayidx217, align 1, !tbaa !16
+  %sub218 = fsub float %sub130, %add156
+  %conv219 = fptosi float %sub218 to i64
+  %add220 = add nsw i64 %conv219, 4
+  %shr221435 = lshr i64 %add220, 3
+  %and223 = and i64 %shr221435, 1023
+  %arrayidx225 = getelementptr inbounds i8, i8* %add.ptr, i64 %and223
+  %43 = load i8, i8* %arrayidx225, align 1, !tbaa !16
+  %arrayidx226 = getelementptr inbounds i8, i8* %add.ptr114, i64 3
+  store i8 %43, i8* %arrayidx226, align 1, !tbaa !16
+  %add.ptr227 = getelementptr inbounds float, float* %wsptr.2445, i64 8
+  %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+  %exitcond = icmp eq i64 %indvars.iv.next, 8
+  br i1 %exitcond, label %for.end229, label %for.body112
+
+for.end229:                                       ; preds = %for.body112
+  call void @llvm.lifetime.end(i64 256, i8* %1) #2
+  ret void
+}
+
+; Function Attrs: argmemonly nounwind
+declare void @llvm.lifetime.start(i64, i8* nocapture) #1
+
+; Function Attrs: argmemonly nounwind
+declare void @llvm.lifetime.end(i64, i8* nocapture) #1
+
+attributes #0 = { norecurse nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #1 = { argmemonly nounwind }
+attributes #2 = { nounwind }
+
+!llvm.module.flags = !{!0}
+!llvm.ident = !{!1}
+
+!0 = !{i32 1, !"MaxFunctionCount", i32 150581}
+!1 = !{!"clang version 3.8.0 (trunk 257473)"}
+!2 = !{!3, !4, i64 408}
+!3 = !{!"jpeg_decompress_struct", !4, i64 0, !4, i64 8, !4, i64 16, !7, i64 24, !7, i64 28, !4, i64 32, !7, i64 40, !7, i64 44, !7, i64 48, !5, i64 52, !5, i64 56, !7, i64 60, !7, i64 64, !8, i64 72, !7, i64 80, !7, i64 84, !5, i64 88, !7, i64 92, !7, i64 96, !7, i64 100, !5, i64 104, !7, i64 108, !7, i64 112, !7, i64 116, !7, i64 120, !7, i64 124, !7, i64 128, !7, i64 132, !7, i64 136, !7, i64 140, !7, i64 144, !7, i64 148, !4, i64 152, !7, i64 160, !7, i64 164, !7, i64 168, !7, i64 172, !7, i64 176, !4, i64 184, !5, i64 192, !5, i64 224, !5, i64 256, !7, i64 288, !4, i64 296, !7, i64 304, !7, i64 308, !5, i64 312, !5, i64 328, !5, i64 344, !7, i64 360, !7, i64 364, !5, i64 368, !9, i64 370, !9, i64 372, !7, i64 376, !5, i64 380, !7, i64 384, !7, i64 388, !7, i64 392, !7, i64 396, !7, i64 400, !4, i64 408, !7, i64 416, !5, i64 424, !7, i64 456, !7, i64 460, !7, i64 464, !5, i64 468, !7, i64 508, !7, i64 512, !7, i64 516, !7, i64 520, !7, i64 524, !4, i64 528, !4, i64 536, !4, i64 544, !4, i64 552, !4, i64 560, !4, i64 568, !4, i64 576, !4, i64 584, !4, i64 592, !4, i64 600, !4, i64 608}
+!4 = !{!"any pointer", !5, i64 0}
+!5 = !{!"omnipotent char", !6, i64 0}
+!6 = !{!"Simple C/C++ TBAA"}
+!7 = !{!"int", !5, i64 0}
+!8 = !{!"double", !5, i64 0}
+!9 = !{!"short", !5, i64 0}
+!10 = !{!11, !4, i64 88}
+!11 = !{!"", !7, i64 0, !7, i64 4, !7, i64 8, !7, i64 12, !7, i64 16, !7, i64 20, !7, i64 24, !7, i64 28, !7, i64 32, !7, i64 36, !7, i64 40, !7, i64 44, !7, i64 48, !7, i64 52, !7, i64 56, !7, i64 60, !7, i64 64, !7, i64 68, !7, i64 72, !4, i64 80, !4, i64 88}
+!12 = !{!9, !9, i64 0}
+!13 = !{!14, !14, i64 0}
+!14 = !{!"float", !5, i64 0}
+!15 = !{!4, !4, i64 0}
+!16 = !{!5, !5, i64 0}

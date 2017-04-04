@@ -1,0 +1,33 @@
+digraph "CFG for 'jpeg_finish_output' function" {
+	label="CFG for 'jpeg_finish_output' function";
+
+	Node0x52f8e70 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  %global_state = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 4\l  %0 = load i32, i32* %global_state, align 4, !tbaa !2\l  %.off = add i32 %0, -205\l  %switch = icmp ult i32 %.off, 2\l  br i1 %switch, label %land.lhs.true, label %if.else\l|{<s0>T|<s1>F}}"];
+	Node0x52f8e70:s0 -> Node0x52f9140;
+	Node0x52f8e70:s1 -> Node0x52f9220;
+	Node0x52f9140 [shape=record, style = filled, fillcolor = blue, label="{land.lhs.true:                                    \l  %buffered_image = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 14\l  %1 = load i32, i32* %buffered_image, align 8, !tbaa !10\l  %tobool = icmp eq i32 %1, 0\l  br i1 %tobool, label %if.then6, label %if.then\l|{<s0>T|<s1>F}}"];
+	Node0x52f9140:s0 -> Node0x52f94f0;
+	Node0x52f9140:s1 -> Node0x52f95d0;
+	Node0x52f95d0 [shape=record, style = filled, fillcolor = blue, label="{if.then:                                          \l  %master = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 73\l  %2 = load %struct.jpeg_decomp_master*, %struct.jpeg_decomp_master** %master,\l... align 8, !tbaa !11\l  %finish_output_pass = getelementptr inbounds %struct.jpeg_decomp_master,\l... %struct.jpeg_decomp_master* %2, i64 0, i32 1\l  %3 = load void (%struct.jpeg_decompress_struct*)*, void\l... (%struct.jpeg_decompress_struct*)** %finish_output_pass, align 8, !tbaa !12\l  tail call void %3(%struct.jpeg_decompress_struct* nonnull %cinfo) #3\l  store i32 208, i32* %global_state, align 4, !tbaa !2\l  br label %while.cond.preheader\l}"];
+	Node0x52f95d0 -> Node0x52f9c60;
+	Node0x52f9220 [shape=record, style = filled, fillcolor = blue, label="{if.else:                                          \l  %cmp5 = icmp eq i32 %0, 208\l  br i1 %cmp5, label %while.cond.preheader, label %if.then6\l|{<s0>T|<s1>F}}"];
+	Node0x52f9220:s0 -> Node0x52f9c60;
+	Node0x52f9220:s1 -> Node0x52f94f0;
+	Node0x52f94f0 [shape=record, style = filled, fillcolor = blue, label="{if.then6:                                         \l  %err = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 0\l  %4 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8,\l... !tbaa !14\l  %msg_code = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %4, i64 0, i32 5\l  store i32 18, i32* %msg_code, align 8, !tbaa !15\l  %arrayidx = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %4, i64 0, i32 6, i32 0, i64 0\l  store i32 %0, i32* %arrayidx, align 4, !tbaa !18\l  %error_exit = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %4, i64 0, i32 0\l  %5 = load void (%struct.jpeg_common_struct*)*, void\l... (%struct.jpeg_common_struct*)** %error_exit, align 8, !tbaa !19\l  %6 = bitcast %struct.jpeg_decompress_struct* %cinfo to\l... %struct.jpeg_common_struct*\l  tail call void %5(%struct.jpeg_common_struct* %6) #3\l  br label %while.cond.preheader\l}"];
+	Node0x52f94f0 -> Node0x52f9c60;
+	Node0x52f9c60 [shape=record, style = filled, fillcolor = blue, label="{while.cond.preheader:                             \l  %input_scan_number = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 34\l  %output_scan_number = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 36\l  %inputctl = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 77\l  br label %while.cond\l}"];
+	Node0x52f9c60 -> Node0x52fab90;
+	Node0x52fab90 [shape=record, style = filled, fillcolor = blue, label="{while.cond:                                       \l  %7 = load i32, i32* %input_scan_number, align 4, !tbaa !20\l  %8 = load i32, i32* %output_scan_number, align 4, !tbaa !21\l  %cmp11 = icmp sgt i32 %7, %8\l  br i1 %cmp11, label %while.end, label %land.rhs\l|{<s0>T|<s1>F}}"];
+	Node0x52fab90:s0 -> Node0x52fade0;
+	Node0x52fab90:s1 -> Node0x52f9920;
+	Node0x52f9920 [shape=record, style = filled, fillcolor = blue, label="{land.rhs:                                         \l  %9 = load %struct.jpeg_input_controller*, %struct.jpeg_input_controller**\l... %inputctl, align 8, !tbaa !22\l  %eoi_reached = getelementptr inbounds %struct.jpeg_input_controller,\l... %struct.jpeg_input_controller* %9, i64 0, i32 5\l  %10 = load i32, i32* %eoi_reached, align 4, !tbaa !23\l  %lnot = icmp eq i32 %10, 0\l  br i1 %lnot, label %while.body, label %while.end\l|{<s0>T|<s1>F}}"];
+	Node0x52f9920:s0 -> Node0x52fb8e0;
+	Node0x52f9920:s1 -> Node0x52fade0;
+	Node0x52fb8e0 [shape=record, style = filled, fillcolor = blue, label="{while.body:                                       \l  %11 = bitcast %struct.jpeg_input_controller* %9 to i32\l... (%struct.jpeg_decompress_struct*)**\l  %12 = load i32 (%struct.jpeg_decompress_struct*)*, i32\l... (%struct.jpeg_decompress_struct*)** %11, align 8, !tbaa !25\l  %call = tail call i32 %12(%struct.jpeg_decompress_struct* nonnull %cinfo) #3\l  %cmp15 = icmp eq i32 %call, 0\l  br i1 %cmp15, label %return.loopexit, label %while.cond\l|{<s0>T|<s1>F}}"];
+	Node0x52fb8e0:s0 -> Node0x52fbc40;
+	Node0x52fb8e0:s1 -> Node0x52fab90;
+	Node0x52fade0 [shape=record, style = filled, fillcolor = blue, label="{while.end:                                        \l  store i32 207, i32* %global_state, align 4, !tbaa !2\l  br label %return\l}"];
+	Node0x52fade0 -> Node0x52fbe30;
+	Node0x52fbc40 [shape=record, style = filled, fillcolor = blue, label="{return.loopexit:                                  \l  br label %return\l}"];
+	Node0x52fbc40 -> Node0x52fbe30;
+	Node0x52fbe30 [shape=record, style = filled, fillcolor = blue, label="{return:                                           \l  %retval.0 = phi i32 [ 1, %while.end ], [ 0, %return.loopexit ]\l  ret i32 %retval.0\l}"];
+}

@@ -1,0 +1,5 @@
+digraph "CFG for 'error_exit' function" {
+	label="CFG for 'error_exit' function";
+
+	Node0x53df890 [shape=record,label="{entry:\l  %err = getelementptr inbounds %struct.jpeg_common_struct,\l... %struct.jpeg_common_struct* %cinfo, i64 0, i32 0\l  %0 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8,\l... !tbaa !3\l  %output_message = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %0, i64 0, i32 2\l  %1 = load void (%struct.jpeg_common_struct*)*, void\l... (%struct.jpeg_common_struct*)** %output_message, align 8, !tbaa !9\l  tail call void %1(%struct.jpeg_common_struct* %cinfo) #7\l  tail call void @jpeg_destroy(%struct.jpeg_common_struct* %cinfo) #7\l  tail call void @exit(i32 1) #8\l  unreachable\l}"];
+}

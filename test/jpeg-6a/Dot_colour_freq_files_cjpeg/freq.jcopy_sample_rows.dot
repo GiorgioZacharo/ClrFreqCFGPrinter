@@ -1,0 +1,15 @@
+digraph "CFG for 'jcopy_sample_rows' function" {
+	label="CFG for 'jcopy_sample_rows' function";
+
+	Node0x57ef160 [shape=record, style = filled, fillcolor = cyan, label="{entry:\l  %conv = zext i32 %num_cols to i64\l  %cmp12 = icmp sgt i32 %num_rows, 0\l  br i1 %cmp12, label %for.body.preheader, label %for.end, !prof !3\l|{<s0>T|<s1>F}}"];
+	Node0x57ef160:s0 -> Node0x57ef8e0;
+	Node0x57ef160:s1 -> Node0x57ef9e0;
+	Node0x57ef8e0 [shape=record, style = filled, fillcolor = cyan, label="{for.body.preheader:                               \l  %idx.ext1 = sext i32 %dest_row to i64\l  %add.ptr2 = getelementptr inbounds i8*, i8** %output_array, i64 %idx.ext1\l  %idx.ext = sext i32 %source_row to i64\l  %add.ptr = getelementptr inbounds i8*, i8** %input_array, i64 %idx.ext\l  br label %for.body\l}"];
+	Node0x57ef8e0 -> Node0x57ef530;
+	Node0x57ef530 [shape=record, style = filled, fillcolor = turquoise, label="{for.body:                                         \l  %row.015 = phi i32 [ %dec, %for.body ], [ %num_rows, %for.body.preheader ]\l  %input_array.addr.014 = phi i8** [ %incdec.ptr, %for.body ], [ %add.ptr,\l... %for.body.preheader ]\l  %output_array.addr.013 = phi i8** [ %incdec.ptr4, %for.body ], [ %add.ptr2,\l... %for.body.preheader ]\l  %incdec.ptr = getelementptr inbounds i8*, i8** %input_array.addr.014, i64 1\l  %0 = load i8*, i8** %input_array.addr.014, align 8, !tbaa !4\l  %incdec.ptr4 = getelementptr inbounds i8*, i8** %output_array.addr.013, i64 1\l  %1 = load i8*, i8** %output_array.addr.013, align 8, !tbaa !4\l  tail call void @llvm.memcpy.p0i8.p0i8.i64(i8* %1, i8* %0, i64 %conv, i32 1,\l... i1 false)\l  %dec = add nsw i32 %row.015, -1\l  %cmp = icmp sgt i32 %row.015, 1\l  br i1 %cmp, label %for.body, label %for.end.loopexit, !prof !3\l|{<s0>T|<s1>F}}"];
+	Node0x57ef530:s0 -> Node0x57ef530;
+	Node0x57ef530:s1 -> Node0x57f23b0;
+	Node0x57f23b0 [shape=record, style = filled, fillcolor = cyan, label="{for.end.loopexit:                                 \l  br label %for.end\l}"];
+	Node0x57f23b0 -> Node0x57ef9e0;
+	Node0x57ef9e0 [shape=record, style = filled, fillcolor = cyan, label="{for.end:                                          \l  ret void\l}"];
+}

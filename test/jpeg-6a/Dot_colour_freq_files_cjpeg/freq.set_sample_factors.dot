@@ -1,0 +1,42 @@
+digraph "CFG for 'set_sample_factors' function" {
+	label="CFG for 'set_sample_factors' function";
+
+	Node0x5e56490 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  %val1 = alloca i32, align 4\l  %val2 = alloca i32, align 4\l  %ch1 = alloca i8, align 1\l  %ch2 = alloca i8, align 1\l  %0 = bitcast i32* %val1 to i8*\l  call void @llvm.lifetime.start(i64 4, i8* %0) #5\l  %1 = bitcast i32* %val2 to i8*\l  call void @llvm.lifetime.start(i64 4, i8* %1) #5\l  call void @llvm.lifetime.start(i64 1, i8* nonnull %ch1) #5\l  call void @llvm.lifetime.start(i64 1, i8* nonnull %ch2) #5\l  %comp_info36 = getelementptr inbounds %struct.jpeg_compress_struct,\l... %struct.jpeg_compress_struct* %cinfo, i64 0, i32 14\l  br label %for.body\l}"];
+	Node0x5e56490 -> Node0x5e56ca0;
+	Node0x5e56ca0 [shape=record, style = filled, fillcolor = blue, label="{for.body:                                         \l  %indvars.iv = phi i64 [ 0, %entry ], [ %indvars.iv.next, %for.inc ]\l  %arg.addr.063 = phi i8* [ %arg, %entry ], [ %arg.addr.2, %for.inc ]\l  %2 = load i8, i8* %arg.addr.063, align 1, !tbaa !3\l  %tobool = icmp eq i8 %2, 0\l  br i1 %tobool, label %if.else, label %if.then\l|{<s0>T|<s1>F}}"];
+	Node0x5e56ca0:s0 -> Node0x5e56370;
+	Node0x5e56ca0:s1 -> Node0x5e57440;
+	Node0x5e57440 [shape=record, style = filled, fillcolor = blue, label="{if.then:                                          \l  store i8 44, i8* %ch2, align 1, !tbaa !3\l  %call = call i32 (i8*, i8*, ...) @__isoc99_sscanf(i8* nonnull %arg.addr.063,\l... i8* nonnull getelementptr inbounds ([9 x i8], [9 x i8]* @.str.11, i64 0, i64\l... 0), i32* nonnull %val1, i8* nonnull %ch1, i32* nonnull %val2, i8* nonnull\l... %ch2) #5\l  %cmp1 = icmp slt i32 %call, 3\l  br i1 %cmp1, label %cleanup.loopexit, label %if.end\l|{<s0>T|<s1>F}}"];
+	Node0x5e57440:s0 -> Node0x5e579c0;
+	Node0x5e57440:s1 -> Node0x5e57a60;
+	Node0x5e57a60 [shape=record, style = filled, fillcolor = blue, label="{if.end:                                           \l  %3 = load i8, i8* %ch1, align 1, !tbaa !3\l  switch i8 %3, label %cleanup.loopexit [\l    i8 120, label %lor.lhs.false\l    i8 88, label %lor.lhs.false\l  ]\l|{<s0>def|<s1>120|<s2>88}}"];
+	Node0x5e57a60:s0 -> Node0x5e579c0;
+	Node0x5e57a60:s1 -> Node0x5e58010;
+	Node0x5e57a60:s2 -> Node0x5e58010;
+	Node0x5e58010 [shape=record, style = filled, fillcolor = blue, label="{lor.lhs.false:                                    \l  %4 = load i8, i8* %ch2, align 1, !tbaa !3\l  %cmp9 = icmp eq i8 %4, 44\l  br i1 %cmp9, label %if.end12, label %cleanup.loopexit\l|{<s0>T|<s1>F}}"];
+	Node0x5e58010:s0 -> Node0x5e582f0;
+	Node0x5e58010:s1 -> Node0x5e579c0;
+	Node0x5e582f0 [shape=record, style = filled, fillcolor = blue, label="{if.end12:                                         \l  %5 = load i32, i32* %val1, align 4, !tbaa !6\l  %.off = add i32 %5, -1\l  %6 = load i32, i32* %val2, align 4\l  %.off62 = add i32 %6, -1\l  %7 = or i32 %.off62, %.off\l  %8 = icmp ugt i32 %7, 3\l  br i1 %8, label %if.then24, label %if.end26\l|{<s0>T|<s1>F}}"];
+	Node0x5e582f0:s0 -> Node0x5e58200;
+	Node0x5e582f0:s1 -> Node0x5e57300;
+	Node0x5e58200 [shape=record, style = filled, fillcolor = blue, label="{if.then24:                                        \l  %9 = load %struct._IO_FILE*, %struct._IO_FILE** @stderr, align 8, !tbaa !8\l  %10 = call i64 @fwrite(i8* nonnull getelementptr inbounds ([36 x i8], [36 x\l... i8]* @.str.12, i64 0, i64 0), i64 35, i64 1, %struct._IO_FILE* %9) #6\l  br label %cleanup\l}"];
+	Node0x5e58200 -> Node0x5e58e70;
+	Node0x5e57300 [shape=record, style = filled, fillcolor = blue, label="{if.end26:                                         \l  %11 = load %struct.jpeg_component_info*, %struct.jpeg_component_info**\l... %comp_info36, align 8, !tbaa !10\l  %h_samp_factor = getelementptr inbounds %struct.jpeg_component_info,\l... %struct.jpeg_component_info* %11, i64 %indvars.iv, i32 2\l  store i32 %5, i32* %h_samp_factor, align 8, !tbaa !14\l  %12 = load i32, i32* %val2, align 4, !tbaa !6\l  %v_samp_factor = getelementptr inbounds %struct.jpeg_component_info,\l... %struct.jpeg_component_info* %11, i64 %indvars.iv, i32 3\l  store i32 %12, i32* %v_samp_factor, align 4, !tbaa !16\l  br label %while.cond\l}"];
+	Node0x5e57300 -> Node0x5e594e0;
+	Node0x5e594e0 [shape=record, style = filled, fillcolor = blue, label="{while.cond:                                       \l  %arg.addr.1 = phi i8* [ %arg.addr.063, %if.end26 ], [ %incdec.ptr, %land.rhs\l... ]\l  %13 = load i8, i8* %arg.addr.1, align 1, !tbaa !3\l  %tobool31 = icmp eq i8 %13, 0\l  br i1 %tobool31, label %for.inc.loopexit, label %land.rhs\l|{<s0>T|<s1>F}}"];
+	Node0x5e594e0:s0 -> Node0x5e59990;
+	Node0x5e594e0:s1 -> Node0x5e59690;
+	Node0x5e59690 [shape=record, style = filled, fillcolor = blue, label="{land.rhs:                                         \l  %incdec.ptr = getelementptr inbounds i8, i8* %arg.addr.1, i64 1\l  %cmp33 = icmp eq i8 %13, 44\l  br i1 %cmp33, label %for.inc.loopexit, label %while.cond\l|{<s0>T|<s1>F}}"];
+	Node0x5e59690:s0 -> Node0x5e59990;
+	Node0x5e59690:s1 -> Node0x5e594e0;
+	Node0x5e56370 [shape=record, style = filled, fillcolor = blue, label="{if.else:                                          \l  %14 = load %struct.jpeg_component_info*, %struct.jpeg_component_info**\l... %comp_info36, align 8, !tbaa !10\l  %h_samp_factor38 = getelementptr inbounds %struct.jpeg_component_info,\l... %struct.jpeg_component_info* %14, i64 %indvars.iv, i32 2\l  store i32 1, i32* %h_samp_factor38, align 8, !tbaa !14\l  %v_samp_factor42 = getelementptr inbounds %struct.jpeg_component_info,\l... %struct.jpeg_component_info* %14, i64 %indvars.iv, i32 3\l  store i32 1, i32* %v_samp_factor42, align 4, !tbaa !16\l  br label %for.inc\l}"];
+	Node0x5e56370 -> Node0x5e56e50;
+	Node0x5e59990 [shape=record, style = filled, fillcolor = blue, label="{for.inc.loopexit:                                 \l  %arg.addr.2.ph = phi i8* [ %arg.addr.1, %while.cond ], [ %incdec.ptr,\l... %land.rhs ]\l  br label %for.inc\l}"];
+	Node0x5e59990 -> Node0x5e56e50;
+	Node0x5e56e50 [shape=record, style = filled, fillcolor = blue, label="{for.inc:                                          \l  %arg.addr.2 = phi i8* [ %arg.addr.063, %if.else ], [ %arg.addr.2.ph,\l... %for.inc.loopexit ]\l  %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1\l  %cmp = icmp slt i64 %indvars.iv.next, 10\l  br i1 %cmp, label %for.body, label %cleanup.loopexit\l|{<s0>T|<s1>F}}"];
+	Node0x5e56e50:s0 -> Node0x5e56ca0;
+	Node0x5e56e50:s1 -> Node0x5e579c0;
+	Node0x5e579c0 [shape=record, style = filled, fillcolor = blue, label="{cleanup.loopexit:                                 \l  %retval.0.ph = phi i32 [ 1, %for.inc ], [ 0, %lor.lhs.false ], [ 0, %if.end\l... ], [ 0, %if.then ]\l  br label %cleanup\l}"];
+	Node0x5e579c0 -> Node0x5e58e70;
+	Node0x5e58e70 [shape=record, style = filled, fillcolor = blue, label="{cleanup:                                          \l  %retval.0 = phi i32 [ 0, %if.then24 ], [ %retval.0.ph, %cleanup.loopexit ]\l  call void @llvm.lifetime.end(i64 1, i8* nonnull %ch2) #5\l  call void @llvm.lifetime.end(i64 1, i8* nonnull %ch1) #5\l  call void @llvm.lifetime.end(i64 4, i8* %1) #5\l  call void @llvm.lifetime.end(i64 4, i8* %0) #5\l  ret i32 %retval.0\l}"];
+}

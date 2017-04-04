@@ -1,0 +1,5 @@
+digraph "CFG for 'null_method' function" {
+	label="CFG for 'null_method' function";
+
+	Node0x5949890 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  ret void\l}"];
+}

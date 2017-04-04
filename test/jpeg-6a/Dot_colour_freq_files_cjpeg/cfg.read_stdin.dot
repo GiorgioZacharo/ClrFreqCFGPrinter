@@ -1,0 +1,5 @@
+digraph "CFG for 'read_stdin' function" {
+	label="CFG for 'read_stdin' function";
+
+	Node0x643e390 [shape=record,label="{entry:\l  %0 = load %struct._IO_FILE*, %struct._IO_FILE** @stdin, align 8, !tbaa !3\l  ret %struct._IO_FILE* %0\l}"];
+}

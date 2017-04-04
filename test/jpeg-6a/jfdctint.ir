@@ -1,0 +1,241 @@
+; ModuleID = 'jfdctint.c'
+target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+; Function Attrs: norecurse nounwind uwtable
+define void @jpeg_fdct_islow(i32* nocapture %data) #0 !prof !2 {
+entry:
+  br label %for.body
+
+for.body:                                         ; preds = %entry, %for.body
+  %ctr.0375 = phi i32 [ 7, %entry ], [ %dec, %for.body ]
+  %dataptr.0374 = phi i32* [ %data, %entry ], [ %add.ptr, %for.body ]
+  %0 = load i32, i32* %dataptr.0374, align 4, !tbaa !3
+  %arrayidx1 = getelementptr inbounds i32, i32* %dataptr.0374, i64 7
+  %1 = load i32, i32* %arrayidx1, align 4, !tbaa !3
+  %add = add nsw i32 %1, %0
+  %conv = sext i32 %add to i64
+  %sub = sub nsw i32 %0, %1
+  %conv4 = sext i32 %sub to i64
+  %arrayidx5 = getelementptr inbounds i32, i32* %dataptr.0374, i64 1
+  %2 = load i32, i32* %arrayidx5, align 4, !tbaa !3
+  %arrayidx6 = getelementptr inbounds i32, i32* %dataptr.0374, i64 6
+  %3 = load i32, i32* %arrayidx6, align 4, !tbaa !3
+  %add7 = add nsw i32 %3, %2
+  %conv8 = sext i32 %add7 to i64
+  %sub11 = sub nsw i32 %2, %3
+  %conv12 = sext i32 %sub11 to i64
+  %arrayidx13 = getelementptr inbounds i32, i32* %dataptr.0374, i64 2
+  %4 = load i32, i32* %arrayidx13, align 4, !tbaa !3
+  %arrayidx14 = getelementptr inbounds i32, i32* %dataptr.0374, i64 5
+  %5 = load i32, i32* %arrayidx14, align 4, !tbaa !3
+  %add15 = add nsw i32 %5, %4
+  %conv16 = sext i32 %add15 to i64
+  %sub19 = sub nsw i32 %4, %5
+  %conv20 = sext i32 %sub19 to i64
+  %arrayidx21 = getelementptr inbounds i32, i32* %dataptr.0374, i64 3
+  %6 = load i32, i32* %arrayidx21, align 4, !tbaa !3
+  %arrayidx22 = getelementptr inbounds i32, i32* %dataptr.0374, i64 4
+  %7 = load i32, i32* %arrayidx22, align 4, !tbaa !3
+  %add23 = add nsw i32 %7, %6
+  %conv24 = sext i32 %add23 to i64
+  %sub27 = sub nsw i32 %6, %7
+  %conv28 = sext i32 %sub27 to i64
+  %add29 = add nsw i64 %conv24, %conv
+  %sub30 = sub nsw i64 %conv, %conv24
+  %add31 = add nsw i64 %conv16, %conv8
+  %sub32 = sub nsw i64 %conv8, %conv16
+  %add33 = add nsw i64 %add29, %add31
+  %shl = shl nsw i64 %add33, 2
+  %conv34 = trunc i64 %shl to i32
+  store i32 %conv34, i32* %dataptr.0374, align 4, !tbaa !3
+  %sub36 = sub nsw i64 %add29, %add31
+  %shl37 = shl nsw i64 %sub36, 2
+  %conv38 = trunc i64 %shl37 to i32
+  store i32 %conv38, i32* %arrayidx22, align 4, !tbaa !3
+  %add40 = add nsw i64 %sub30, %sub32
+  %mul = mul nsw i64 %add40, 4433
+  %mul41 = mul nsw i64 %sub30, 6270
+  %add42 = add i64 %mul41, 1024
+  %add43 = add i64 %add42, %mul
+  %shr366 = lshr i64 %add43, 11
+  %conv44 = trunc i64 %shr366 to i32
+  store i32 %conv44, i32* %arrayidx13, align 4, !tbaa !3
+  %mul46 = mul nsw i64 %sub32, -15137
+  %add47 = add i64 %mul46, 1024
+  %add48 = add i64 %add47, %mul
+  %shr49367 = lshr i64 %add48, 11
+  %conv50 = trunc i64 %shr49367 to i32
+  store i32 %conv50, i32* %arrayidx6, align 4, !tbaa !3
+  %add52 = add nsw i64 %conv28, %conv4
+  %add53 = add nsw i64 %conv20, %conv12
+  %add54 = add nsw i64 %conv28, %conv12
+  %add55 = add nsw i64 %conv20, %conv4
+  %add56 = add nsw i64 %add54, %add55
+  %mul57 = mul nsw i64 %add56, 9633
+  %mul58 = mul nsw i64 %conv28, 2446
+  %mul59 = mul nsw i64 %conv20, 16819
+  %mul60 = mul nsw i64 %conv12, 25172
+  %mul61 = mul nsw i64 %conv4, 12299
+  %mul62 = mul nsw i64 %add52, -7373
+  %mul63 = mul nsw i64 %add53, -20995
+  %mul64 = mul nsw i64 %add54, -16069
+  %mul65 = mul nsw i64 %add55, -3196
+  %add66 = add nsw i64 %mul57, %mul64
+  %add67 = add nsw i64 %mul57, %mul65
+  %add68 = add i64 %mul58, 1024
+  %add69 = add i64 %add68, %mul62
+  %add70 = add i64 %add69, %add66
+  %shr71368 = lshr i64 %add70, 11
+  %conv72 = trunc i64 %shr71368 to i32
+  store i32 %conv72, i32* %arrayidx1, align 4, !tbaa !3
+  %add74 = add i64 %mul59, 1024
+  %add75 = add i64 %add74, %mul63
+  %add76 = add i64 %add75, %add67
+  %shr77369 = lshr i64 %add76, 11
+  %conv78 = trunc i64 %shr77369 to i32
+  store i32 %conv78, i32* %arrayidx14, align 4, !tbaa !3
+  %add80 = add i64 %mul60, 1024
+  %add81 = add i64 %add80, %mul63
+  %add82 = add i64 %add81, %add66
+  %shr83370 = lshr i64 %add82, 11
+  %conv84 = trunc i64 %shr83370 to i32
+  store i32 %conv84, i32* %arrayidx21, align 4, !tbaa !3
+  %add86 = add i64 %mul61, 1024
+  %add87 = add i64 %add86, %mul62
+  %add88 = add i64 %add87, %add67
+  %shr89371 = lshr i64 %add88, 11
+  %conv90 = trunc i64 %shr89371 to i32
+  store i32 %conv90, i32* %arrayidx5, align 4, !tbaa !3
+  %add.ptr = getelementptr inbounds i32, i32* %dataptr.0374, i64 8
+  %dec = add nsw i32 %ctr.0375, -1
+  %cmp = icmp sgt i32 %ctr.0375, 0
+  br i1 %cmp, label %for.body, label %for.body95.preheader, !prof !7
+
+for.body95.preheader:                             ; preds = %for.body
+  br label %for.body95
+
+for.body95:                                       ; preds = %for.body95.preheader, %for.body95
+  %ctr.1373 = phi i32 [ %dec197, %for.body95 ], [ 7, %for.body95.preheader ]
+  %dataptr.1372 = phi i32* [ %incdec.ptr, %for.body95 ], [ %data, %for.body95.preheader ]
+  %8 = load i32, i32* %dataptr.1372, align 4, !tbaa !3
+  %arrayidx97 = getelementptr inbounds i32, i32* %dataptr.1372, i64 56
+  %9 = load i32, i32* %arrayidx97, align 4, !tbaa !3
+  %add98 = add nsw i32 %9, %8
+  %conv99 = sext i32 %add98 to i64
+  %sub102 = sub nsw i32 %8, %9
+  %conv103 = sext i32 %sub102 to i64
+  %arrayidx104 = getelementptr inbounds i32, i32* %dataptr.1372, i64 8
+  %10 = load i32, i32* %arrayidx104, align 4, !tbaa !3
+  %arrayidx105 = getelementptr inbounds i32, i32* %dataptr.1372, i64 48
+  %11 = load i32, i32* %arrayidx105, align 4, !tbaa !3
+  %add106 = add nsw i32 %11, %10
+  %conv107 = sext i32 %add106 to i64
+  %sub110 = sub nsw i32 %10, %11
+  %conv111 = sext i32 %sub110 to i64
+  %arrayidx112 = getelementptr inbounds i32, i32* %dataptr.1372, i64 16
+  %12 = load i32, i32* %arrayidx112, align 4, !tbaa !3
+  %arrayidx113 = getelementptr inbounds i32, i32* %dataptr.1372, i64 40
+  %13 = load i32, i32* %arrayidx113, align 4, !tbaa !3
+  %add114 = add nsw i32 %13, %12
+  %conv115 = sext i32 %add114 to i64
+  %sub118 = sub nsw i32 %12, %13
+  %conv119 = sext i32 %sub118 to i64
+  %arrayidx120 = getelementptr inbounds i32, i32* %dataptr.1372, i64 24
+  %14 = load i32, i32* %arrayidx120, align 4, !tbaa !3
+  %arrayidx121 = getelementptr inbounds i32, i32* %dataptr.1372, i64 32
+  %15 = load i32, i32* %arrayidx121, align 4, !tbaa !3
+  %add122 = add nsw i32 %15, %14
+  %conv123 = sext i32 %add122 to i64
+  %sub126 = sub nsw i32 %14, %15
+  %conv127 = sext i32 %sub126 to i64
+  %add128 = add nsw i64 %conv123, %conv99
+  %sub129 = sub nsw i64 %conv99, %conv123
+  %add130 = add nsw i64 %conv115, %conv107
+  %sub131 = sub nsw i64 %conv107, %conv115
+  %add132 = add nsw i64 %add130, 2
+  %add133 = add nsw i64 %add132, %add128
+  %shr134358 = lshr i64 %add133, 2
+  %conv135 = trunc i64 %shr134358 to i32
+  store i32 %conv135, i32* %dataptr.1372, align 4, !tbaa !3
+  %sub137 = sub nsw i64 2, %add130
+  %add138 = add nsw i64 %sub137, %add128
+  %shr139359 = lshr i64 %add138, 2
+  %conv140 = trunc i64 %shr139359 to i32
+  store i32 %conv140, i32* %arrayidx121, align 4, !tbaa !3
+  %add142 = add nsw i64 %sub129, %sub131
+  %mul143 = mul nsw i64 %add142, 4433
+  %mul144 = mul nsw i64 %sub129, 6270
+  %add145 = add i64 %mul144, 16384
+  %add146 = add i64 %add145, %mul143
+  %shr147360 = lshr i64 %add146, 15
+  %conv148 = trunc i64 %shr147360 to i32
+  store i32 %conv148, i32* %arrayidx112, align 4, !tbaa !3
+  %mul150 = mul nsw i64 %sub131, -15137
+  %add151 = add i64 %mul150, 16384
+  %add152 = add i64 %add151, %mul143
+  %shr153361 = lshr i64 %add152, 15
+  %conv154 = trunc i64 %shr153361 to i32
+  store i32 %conv154, i32* %arrayidx105, align 4, !tbaa !3
+  %add156 = add nsw i64 %conv127, %conv103
+  %add157 = add nsw i64 %conv119, %conv111
+  %add158 = add nsw i64 %conv127, %conv111
+  %add159 = add nsw i64 %conv119, %conv103
+  %add160 = add nsw i64 %add158, %add159
+  %mul161 = mul nsw i64 %add160, 9633
+  %mul162 = mul nsw i64 %conv127, 2446
+  %mul163 = mul nsw i64 %conv119, 16819
+  %mul164 = mul nsw i64 %conv111, 25172
+  %mul165 = mul nsw i64 %conv103, 12299
+  %mul166 = mul nsw i64 %add156, -7373
+  %mul167 = mul nsw i64 %add157, -20995
+  %mul168 = mul nsw i64 %add158, -16069
+  %mul169 = mul nsw i64 %add159, -3196
+  %add170 = add nsw i64 %mul161, %mul168
+  %add171 = add nsw i64 %mul161, %mul169
+  %add172 = add i64 %mul162, 16384
+  %add173 = add i64 %add172, %mul166
+  %add174 = add i64 %add173, %add170
+  %shr175362 = lshr i64 %add174, 15
+  %conv176 = trunc i64 %shr175362 to i32
+  store i32 %conv176, i32* %arrayidx97, align 4, !tbaa !3
+  %add178 = add i64 %mul163, 16384
+  %add179 = add i64 %add178, %mul167
+  %add180 = add i64 %add179, %add171
+  %shr181363 = lshr i64 %add180, 15
+  %conv182 = trunc i64 %shr181363 to i32
+  store i32 %conv182, i32* %arrayidx113, align 4, !tbaa !3
+  %add184 = add i64 %mul164, 16384
+  %add185 = add i64 %add184, %mul167
+  %add186 = add i64 %add185, %add170
+  %shr187364 = lshr i64 %add186, 15
+  %conv188 = trunc i64 %shr187364 to i32
+  store i32 %conv188, i32* %arrayidx120, align 4, !tbaa !3
+  %add190 = add i64 %mul165, 16384
+  %add191 = add i64 %add190, %mul166
+  %add192 = add i64 %add191, %add171
+  %shr193365 = lshr i64 %add192, 15
+  %conv194 = trunc i64 %shr193365 to i32
+  store i32 %conv194, i32* %arrayidx104, align 4, !tbaa !3
+  %incdec.ptr = getelementptr inbounds i32, i32* %dataptr.1372, i64 1
+  %dec197 = add nsw i32 %ctr.1373, -1
+  %cmp93 = icmp sgt i32 %ctr.1373, 0
+  br i1 %cmp93, label %for.body95, label %for.end198, !prof !7
+
+for.end198:                                       ; preds = %for.body95
+  ret void
+}
+
+attributes #0 = { norecurse nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+
+!llvm.module.flags = !{!0}
+!llvm.ident = !{!1}
+
+!0 = !{i32 1, !"MaxFunctionCount", i32 150581}
+!1 = !{!"clang version 3.8.0 (trunk 257473)"}
+!2 = !{!"function_entry_count", i64 6144}
+!3 = !{!4, !4, i64 0}
+!4 = !{!"int", !5, i64 0}
+!5 = !{!"omnipotent char", !6, i64 0}
+!6 = !{!"Simple C/C++ TBAA"}
+!7 = !{!"branch_weights", i32 49153, i32 6145}

@@ -1,0 +1,5 @@
+digraph "CFG for 'start_output_bmp' function" {
+	label="CFG for 'start_output_bmp' function";
+
+	Node0x4f8ce00 [shape=record,label="{entry:\l  ret void\l}"];
+}

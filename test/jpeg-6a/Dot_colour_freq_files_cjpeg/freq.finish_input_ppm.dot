@@ -1,0 +1,5 @@
+digraph "CFG for 'finish_input_ppm' function" {
+	label="CFG for 'finish_input_ppm' function";
+
+	Node0x580b3f0 [shape=record, style = filled, fillcolor = skyblue, label="{entry:\l  ret void\l}"];
+}

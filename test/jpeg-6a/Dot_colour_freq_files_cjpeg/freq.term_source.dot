@@ -1,0 +1,5 @@
+digraph "CFG for 'term_source' function" {
+	label="CFG for 'term_source' function";
+
+	Node0x4e2bad0 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  ret void\l}"];
+}

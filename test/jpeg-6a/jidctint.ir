@@ -1,0 +1,429 @@
+; ModuleID = 'jidctint.c'
+target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+%struct.jpeg_decompress_struct = type { %struct.jpeg_error_mgr*, %struct.jpeg_memory_mgr*, %struct.jpeg_progress_mgr*, i32, i32, %struct.jpeg_source_mgr*, i32, i32, i32, i32, i32, i32, i32, double, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i8**, i32, i32, i32, i32, i32, [64 x i32]*, [4 x %struct.JQUANT_TBL*], [4 x %struct.JHUFF_TBL*], [4 x %struct.JHUFF_TBL*], i32, %struct.jpeg_component_info*, i32, i32, [16 x i8], [16 x i8], [16 x i8], i32, i32, i8, i16, i16, i32, i8, i32, i32, i32, i32, i32, i8*, i32, [4 x %struct.jpeg_component_info*], i32, i32, i32, [10 x i32], i32, i32, i32, i32, i32, %struct.jpeg_decomp_master*, %struct.jpeg_d_main_controller*, %struct.jpeg_d_coef_controller*, %struct.jpeg_d_post_controller*, %struct.jpeg_input_controller*, %struct.jpeg_marker_reader*, %struct.jpeg_entropy_decoder*, %struct.jpeg_inverse_dct*, %struct.jpeg_upsampler*, %struct.jpeg_color_deconverter*, %struct.jpeg_color_quantizer* }
+%struct.jpeg_error_mgr = type { void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*, i32)*, void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*, i8*)*, void (%struct.jpeg_common_struct*)*, i32, %union.anon, i32, i64, i8**, i32, i8**, i32, i32 }
+%struct.jpeg_common_struct = type { %struct.jpeg_error_mgr*, %struct.jpeg_memory_mgr*, %struct.jpeg_progress_mgr*, i32, i32 }
+%union.anon = type { [8 x i32], [48 x i8] }
+%struct.jpeg_memory_mgr = type { i8* (%struct.jpeg_common_struct*, i32, i64)*, i8* (%struct.jpeg_common_struct*, i32, i64)*, i8** (%struct.jpeg_common_struct*, i32, i32, i32)*, [64 x i16]** (%struct.jpeg_common_struct*, i32, i32, i32)*, %struct.jvirt_sarray_control* (%struct.jpeg_common_struct*, i32, i32, i32, i32, i32)*, %struct.jvirt_barray_control* (%struct.jpeg_common_struct*, i32, i32, i32, i32, i32)*, {}*, i8** (%struct.jpeg_common_struct*, %struct.jvirt_sarray_control*, i32, i32, i32)*, [64 x i16]** (%struct.jpeg_common_struct*, %struct.jvirt_barray_control*, i32, i32, i32)*, void (%struct.jpeg_common_struct*, i32)*, {}*, i64 }
+%struct.jvirt_sarray_control = type opaque
+%struct.jvirt_barray_control = type opaque
+%struct.jpeg_progress_mgr = type { {}*, i64, i64, i32, i32 }
+%struct.jpeg_source_mgr = type { i8*, i64, void (%struct.jpeg_decompress_struct*)*, i32 (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*, i64)*, i32 (%struct.jpeg_decompress_struct*, i32)*, void (%struct.jpeg_decompress_struct*)* }
+%struct.JQUANT_TBL = type { [64 x i16], i32 }
+%struct.JHUFF_TBL = type { [17 x i8], [256 x i8], i32 }
+%struct.jpeg_decomp_master = type { void (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*)*, i32 }
+%struct.jpeg_d_main_controller = type { void (%struct.jpeg_decompress_struct*, i32)*, void (%struct.jpeg_decompress_struct*, i8**, i32*, i32)* }
+%struct.jpeg_d_coef_controller = type { void (%struct.jpeg_decompress_struct*)*, i32 (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*)*, i32 (%struct.jpeg_decompress_struct*, i8***)*, %struct.jvirt_barray_control** }
+%struct.jpeg_d_post_controller = type { void (%struct.jpeg_decompress_struct*, i32)*, void (%struct.jpeg_decompress_struct*, i8***, i32*, i32, i8**, i32*, i32)* }
+%struct.jpeg_input_controller = type { i32 (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*)*, i32, i32 }
+%struct.jpeg_marker_reader = type { void (%struct.jpeg_decompress_struct*)*, i32 (%struct.jpeg_decompress_struct*)*, i32 (%struct.jpeg_decompress_struct*)*, i32 (%struct.jpeg_decompress_struct*)*, [16 x i32 (%struct.jpeg_decompress_struct*)*], i32, i32, i32, i32 }
+%struct.jpeg_entropy_decoder = type { void (%struct.jpeg_decompress_struct*)*, i32 (%struct.jpeg_decompress_struct*, [64 x i16]**)* }
+%struct.jpeg_inverse_dct = type { void (%struct.jpeg_decompress_struct*)*, [10 x {}*] }
+%struct.jpeg_upsampler = type { void (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*, i8***, i32*, i32, i8**, i32*, i32)*, i32 }
+%struct.jpeg_color_deconverter = type { void (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*, i8***, i32, i8**, i32)* }
+%struct.jpeg_color_quantizer = type { void (%struct.jpeg_decompress_struct*, i32)*, void (%struct.jpeg_decompress_struct*, i8**, i8**, i32)*, void (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*)* }
+%struct.jpeg_component_info = type { i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, %struct.JQUANT_TBL*, i8* }
+
+; Function Attrs: norecurse nounwind uwtable
+define void @jpeg_idct_islow(%struct.jpeg_decompress_struct* nocapture readonly %cinfo, %struct.jpeg_component_info* nocapture readonly %compptr, i16* nocapture readonly %coef_block, i8** nocapture readonly %output_buf, i32 %output_col) #0 {
+entry:
+  %workspace = alloca [64 x i32], align 16
+  %sample_range_limit = getelementptr inbounds %struct.jpeg_decompress_struct, %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 61
+  %0 = load i8*, i8** %sample_range_limit, align 8, !tbaa !2
+  %1 = bitcast [64 x i32]* %workspace to i8*
+  call void @llvm.lifetime.start(i64 256, i8* %1) #2
+  %dct_table = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %compptr, i64 0, i32 20
+  %2 = bitcast i8** %dct_table to i32**
+  %3 = load i32*, i32** %2, align 8, !tbaa !10
+  %arraydecay = getelementptr inbounds [64 x i32], [64 x i32]* %workspace, i64 0, i64 0
+  br label %for.body
+
+for.cond152.preheader:                            ; preds = %for.inc
+  %add.ptr = getelementptr inbounds i8, i8* %0, i64 128
+  %idx.ext = zext i32 %output_col to i64
+  br label %for.body155
+
+for.body:                                         ; preds = %entry, %for.inc
+  %ctr.0599 = phi i32 [ 8, %entry ], [ %dec, %for.inc ]
+  %wsptr.0598 = phi i32* [ %arraydecay, %entry ], [ %wsptr.1, %for.inc ]
+  %quantptr.0597 = phi i32* [ %3, %entry ], [ %quantptr.1, %for.inc ]
+  %inptr.0596 = phi i16* [ %coef_block, %entry ], [ %inptr.1, %for.inc ]
+  %arrayidx = getelementptr inbounds i16, i16* %inptr.0596, i64 8
+  %4 = load i16, i16* %arrayidx, align 2, !tbaa !12
+  %arrayidx1 = getelementptr inbounds i16, i16* %inptr.0596, i64 16
+  %5 = load i16, i16* %arrayidx1, align 2, !tbaa !12
+  %or579 = or i16 %5, %4
+  %arrayidx3 = getelementptr inbounds i16, i16* %inptr.0596, i64 24
+  %6 = load i16, i16* %arrayidx3, align 2, !tbaa !12
+  %or5580 = or i16 %or579, %6
+  %arrayidx6 = getelementptr inbounds i16, i16* %inptr.0596, i64 32
+  %7 = load i16, i16* %arrayidx6, align 2, !tbaa !12
+  %or8581 = or i16 %or5580, %7
+  %arrayidx9 = getelementptr inbounds i16, i16* %inptr.0596, i64 40
+  %8 = load i16, i16* %arrayidx9, align 2, !tbaa !12
+  %or11582 = or i16 %or8581, %8
+  %arrayidx12 = getelementptr inbounds i16, i16* %inptr.0596, i64 48
+  %9 = load i16, i16* %arrayidx12, align 2, !tbaa !12
+  %or14583 = or i16 %or11582, %9
+  %arrayidx15 = getelementptr inbounds i16, i16* %inptr.0596, i64 56
+  %10 = load i16, i16* %arrayidx15, align 2, !tbaa !12
+  %or17584 = or i16 %or14583, %10
+  %cmp18 = icmp eq i16 %or17584, 0
+  br i1 %cmp18, label %if.then, label %if.end
+
+if.then:                                          ; preds = %for.body
+  %11 = load i16, i16* %inptr.0596, align 2, !tbaa !12
+  %conv21 = sext i16 %11 to i32
+  %12 = load i32, i32* %quantptr.0597, align 4, !tbaa !13
+  %mul = shl i32 %12, 2
+  %shl = mul i32 %mul, %conv21
+  store i32 %shl, i32* %wsptr.0598, align 4, !tbaa !13
+  br label %for.inc
+
+if.end:                                           ; preds = %for.body
+  %conv16 = sext i16 %10 to i32
+  %conv13 = sext i16 %9 to i32
+  %conv10 = sext i16 %8 to i32
+  %conv7 = sext i16 %7 to i32
+  %conv4 = sext i16 %6 to i32
+  %conv = sext i16 %4 to i32
+  %conv2 = sext i16 %5 to i32
+  %arrayidx35 = getelementptr inbounds i32, i32* %quantptr.0597, i64 16
+  %13 = load i32, i32* %arrayidx35, align 4, !tbaa !13
+  %mul36 = mul nsw i32 %13, %conv2
+  %conv37 = sext i32 %mul36 to i64
+  %arrayidx40 = getelementptr inbounds i32, i32* %quantptr.0597, i64 48
+  %14 = load i32, i32* %arrayidx40, align 4, !tbaa !13
+  %mul41 = mul nsw i32 %14, %conv13
+  %conv42 = sext i32 %mul41 to i64
+  %add = add nsw i64 %conv42, %conv37
+  %mul43 = mul nsw i64 %add, 4433
+  %mul44 = mul nsw i64 %conv42, -15137
+  %add45 = add nsw i64 %mul43, %mul44
+  %mul46 = mul nsw i64 %conv37, 6270
+  %add47 = add nsw i64 %mul43, %mul46
+  %15 = load i16, i16* %inptr.0596, align 2, !tbaa !12
+  %conv49 = sext i16 %15 to i32
+  %16 = load i32, i32* %quantptr.0597, align 4, !tbaa !13
+  %mul51 = mul nsw i32 %conv49, %16
+  %conv52 = sext i32 %mul51 to i64
+  %arrayidx55 = getelementptr inbounds i32, i32* %quantptr.0597, i64 32
+  %17 = load i32, i32* %arrayidx55, align 4, !tbaa !13
+  %mul56 = mul nsw i32 %17, %conv7
+  %conv57 = sext i32 %mul56 to i64
+  %add58 = add nsw i64 %conv57, %conv52
+  %shl59 = shl nsw i64 %add58, 13
+  %sub = sub nsw i64 %conv52, %conv57
+  %shl60 = shl nsw i64 %sub, 13
+  %add61 = add nsw i64 %shl59, %add47
+  %sub62 = sub nsw i64 %shl59, %add47
+  %add63 = add nsw i64 %shl60, %add45
+  %sub64 = sub nsw i64 %shl60, %add45
+  %arrayidx67 = getelementptr inbounds i32, i32* %quantptr.0597, i64 56
+  %18 = load i32, i32* %arrayidx67, align 4, !tbaa !13
+  %mul68 = mul nsw i32 %18, %conv16
+  %conv69 = sext i32 %mul68 to i64
+  %arrayidx72 = getelementptr inbounds i32, i32* %quantptr.0597, i64 40
+  %19 = load i32, i32* %arrayidx72, align 4, !tbaa !13
+  %mul73 = mul nsw i32 %19, %conv10
+  %conv74 = sext i32 %mul73 to i64
+  %arrayidx77 = getelementptr inbounds i32, i32* %quantptr.0597, i64 24
+  %20 = load i32, i32* %arrayidx77, align 4, !tbaa !13
+  %mul78 = mul nsw i32 %20, %conv4
+  %conv79 = sext i32 %mul78 to i64
+  %arrayidx82 = getelementptr inbounds i32, i32* %quantptr.0597, i64 8
+  %21 = load i32, i32* %arrayidx82, align 4, !tbaa !13
+  %mul83 = mul nsw i32 %21, %conv
+  %conv84 = sext i32 %mul83 to i64
+  %add85 = add nsw i64 %conv84, %conv69
+  %add86 = add nsw i64 %conv79, %conv74
+  %add87 = add nsw i64 %conv79, %conv69
+  %add88 = add nsw i64 %conv84, %conv74
+  %add89 = add nsw i64 %add88, %add87
+  %mul90 = mul nsw i64 %add89, 9633
+  %mul91 = mul nsw i64 %conv69, 2446
+  %mul92 = mul nsw i64 %conv74, 16819
+  %mul93 = mul nsw i64 %conv79, 25172
+  %mul94 = mul nsw i64 %conv84, 12299
+  %mul95 = mul nsw i64 %add85, -7373
+  %mul96 = mul nsw i64 %add86, -20995
+  %mul97 = mul nsw i64 %add87, -16069
+  %mul98 = mul nsw i64 %add88, -3196
+  %add99 = add nsw i64 %mul90, %mul97
+  %add100 = add nsw i64 %mul90, %mul98
+  %add101 = add i64 %mul95, %mul91
+  %add102 = add i64 %add101, %add99
+  %add103 = add i64 %mul96, %mul92
+  %add104 = add i64 %add103, %add100
+  %add105 = add i64 %mul96, %mul93
+  %add106 = add i64 %add105, %add99
+  %add107 = add i64 %mul95, %mul94
+  %add108 = add i64 %add107, %add100
+  %add109 = add i64 %add61, 1024
+  %add110 = add i64 %add109, %add108
+  %shr585 = lshr i64 %add110, 11
+  %conv111 = trunc i64 %shr585 to i32
+  store i32 %conv111, i32* %wsptr.0598, align 4, !tbaa !13
+  %add114 = sub i64 %add109, %add108
+  %shr115586 = lshr i64 %add114, 11
+  %conv116 = trunc i64 %shr115586 to i32
+  %add118 = add i64 %add63, 1024
+  %add119 = add i64 %add118, %add106
+  %shr120587 = lshr i64 %add119, 11
+  %conv121 = trunc i64 %shr120587 to i32
+  %add124 = sub i64 %add118, %add106
+  %shr125588 = lshr i64 %add124, 11
+  %conv126 = trunc i64 %shr125588 to i32
+  %add128 = add i64 %sub64, 1024
+  %add129 = add i64 %add128, %add104
+  %shr130589 = lshr i64 %add129, 11
+  %conv131 = trunc i64 %shr130589 to i32
+  %add134 = sub i64 %add128, %add104
+  %shr135590 = lshr i64 %add134, 11
+  %conv136 = trunc i64 %shr135590 to i32
+  %add138 = add i64 %sub62, 1024
+  %add139 = add i64 %add138, %add102
+  %shr140591 = lshr i64 %add139, 11
+  %conv141 = trunc i64 %shr140591 to i32
+  %add144 = sub i64 %add138, %add102
+  %shr145592 = lshr i64 %add144, 11
+  %conv146 = trunc i64 %shr145592 to i32
+  br label %for.inc
+
+for.inc:                                          ; preds = %if.end, %if.then
+  %shl.sink605 = phi i32 [ %conv116, %if.end ], [ %shl, %if.then ]
+  %shl.sink604 = phi i32 [ %conv121, %if.end ], [ %shl, %if.then ]
+  %shl.sink603 = phi i32 [ %conv126, %if.end ], [ %shl, %if.then ]
+  %shl.sink602 = phi i32 [ %conv131, %if.end ], [ %shl, %if.then ]
+  %shl.sink601 = phi i32 [ %conv136, %if.end ], [ %shl, %if.then ]
+  %shl.sink600 = phi i32 [ %conv141, %if.end ], [ %shl, %if.then ]
+  %shl.sink = phi i32 [ %conv146, %if.end ], [ %shl, %if.then ]
+  %22 = getelementptr inbounds i32, i32* %wsptr.0598, i64 56
+  store i32 %shl.sink605, i32* %22, align 4
+  %23 = getelementptr inbounds i32, i32* %wsptr.0598, i64 8
+  store i32 %shl.sink604, i32* %23, align 4
+  %24 = getelementptr inbounds i32, i32* %wsptr.0598, i64 48
+  store i32 %shl.sink603, i32* %24, align 4
+  %25 = getelementptr inbounds i32, i32* %wsptr.0598, i64 16
+  store i32 %shl.sink602, i32* %25, align 4
+  %26 = getelementptr inbounds i32, i32* %wsptr.0598, i64 40
+  store i32 %shl.sink601, i32* %26, align 4
+  %27 = getelementptr inbounds i32, i32* %wsptr.0598, i64 24
+  store i32 %shl.sink600, i32* %27, align 4
+  %28 = getelementptr inbounds i32, i32* %wsptr.0598, i64 32
+  store i32 %shl.sink, i32* %28, align 4
+  %wsptr.1 = getelementptr inbounds i32, i32* %wsptr.0598, i64 1
+  %quantptr.1 = getelementptr inbounds i32, i32* %quantptr.0597, i64 1
+  %inptr.1 = getelementptr inbounds i16, i16* %inptr.0596, i64 1
+  %dec = add nsw i32 %ctr.0599, -1
+  %cmp = icmp sgt i32 %ctr.0599, 1
+  br i1 %cmp, label %for.body, label %for.cond152.preheader
+
+for.body155:                                      ; preds = %for.inc315, %for.cond152.preheader
+  %indvars.iv = phi i64 [ 0, %for.cond152.preheader ], [ %indvars.iv.next, %for.inc315 ]
+  %wsptr.2594 = phi i32* [ %arraydecay, %for.cond152.preheader ], [ %wsptr.3, %for.inc315 ]
+  %arrayidx156 = getelementptr inbounds i8*, i8** %output_buf, i64 %indvars.iv
+  %29 = load i8*, i8** %arrayidx156, align 8, !tbaa !14
+  %add.ptr157 = getelementptr inbounds i8, i8* %29, i64 %idx.ext
+  %arrayidx158 = getelementptr inbounds i32, i32* %wsptr.2594, i64 1
+  %30 = load i32, i32* %arrayidx158, align 4, !tbaa !13
+  %arrayidx159 = getelementptr inbounds i32, i32* %wsptr.2594, i64 2
+  %31 = load i32, i32* %arrayidx159, align 4, !tbaa !13
+  %or160 = or i32 %31, %30
+  %arrayidx161 = getelementptr inbounds i32, i32* %wsptr.2594, i64 3
+  %32 = load i32, i32* %arrayidx161, align 4, !tbaa !13
+  %or162 = or i32 %or160, %32
+  %arrayidx163 = getelementptr inbounds i32, i32* %wsptr.2594, i64 4
+  %33 = load i32, i32* %arrayidx163, align 4, !tbaa !13
+  %or164 = or i32 %or162, %33
+  %arrayidx165 = getelementptr inbounds i32, i32* %wsptr.2594, i64 5
+  %34 = load i32, i32* %arrayidx165, align 4, !tbaa !13
+  %or166 = or i32 %or164, %34
+  %arrayidx167 = getelementptr inbounds i32, i32* %wsptr.2594, i64 6
+  %35 = load i32, i32* %arrayidx167, align 4, !tbaa !13
+  %or168 = or i32 %or166, %35
+  %arrayidx169 = getelementptr inbounds i32, i32* %wsptr.2594, i64 7
+  %36 = load i32, i32* %arrayidx169, align 4, !tbaa !13
+  %or170 = or i32 %or168, %36
+  %cmp171 = icmp eq i32 %or170, 0
+  br i1 %cmp171, label %if.then173, label %if.end191
+
+if.then173:                                       ; preds = %for.body155
+  %37 = load i32, i32* %wsptr.2594, align 4, !tbaa !13
+  %conv176593 = zext i32 %37 to i64
+  %add177 = add nuw nsw i64 %conv176593, 16
+  %shr178577 = lshr i64 %add177, 5
+  %and = and i64 %shr178577, 1023
+  %arrayidx181 = getelementptr inbounds i8, i8* %add.ptr, i64 %and
+  %38 = load i8, i8* %arrayidx181, align 1, !tbaa !15
+  store i8 %38, i8* %add.ptr157, align 1, !tbaa !15
+  %arrayidx183 = getelementptr inbounds i8, i8* %add.ptr157, i64 1
+  store i8 %38, i8* %arrayidx183, align 1, !tbaa !15
+  %arrayidx184 = getelementptr inbounds i8, i8* %add.ptr157, i64 2
+  store i8 %38, i8* %arrayidx184, align 1, !tbaa !15
+  %arrayidx185 = getelementptr inbounds i8, i8* %add.ptr157, i64 3
+  store i8 %38, i8* %arrayidx185, align 1, !tbaa !15
+  %arrayidx187 = getelementptr inbounds i8, i8* %add.ptr157, i64 5
+  store i8 %38, i8* %arrayidx187, align 1, !tbaa !15
+  %arrayidx188 = getelementptr inbounds i8, i8* %add.ptr157, i64 6
+  store i8 %38, i8* %arrayidx188, align 1, !tbaa !15
+  %arrayidx189 = getelementptr inbounds i8, i8* %add.ptr157, i64 7
+  store i8 %38, i8* %arrayidx189, align 1, !tbaa !15
+  br label %for.inc315
+
+if.end191:                                        ; preds = %for.body155
+  %conv193 = sext i32 %31 to i64
+  %conv195 = sext i32 %35 to i64
+  %add196 = add nsw i64 %conv195, %conv193
+  %mul197 = mul nsw i64 %add196, 4433
+  %mul198 = mul nsw i64 %conv195, -15137
+  %add199 = add nsw i64 %mul197, %mul198
+  %mul200 = mul nsw i64 %conv193, 6270
+  %add201 = add nsw i64 %mul197, %mul200
+  %39 = load i32, i32* %wsptr.2594, align 4, !tbaa !13
+  %conv203 = sext i32 %39 to i64
+  %conv205 = sext i32 %33 to i64
+  %add206 = add nsw i64 %conv203, %conv205
+  %shl207 = shl nsw i64 %add206, 13
+  %sub212 = sub nsw i64 %conv203, %conv205
+  %shl213 = shl nsw i64 %sub212, 13
+  %add214 = add nsw i64 %shl207, %add201
+  %sub215 = sub nsw i64 %shl207, %add201
+  %add216 = add nsw i64 %shl213, %add199
+  %sub217 = sub nsw i64 %shl213, %add199
+  %conv219 = sext i32 %36 to i64
+  %conv221 = sext i32 %34 to i64
+  %conv223 = sext i32 %32 to i64
+  %conv225 = sext i32 %30 to i64
+  %add226 = add nsw i64 %conv219, %conv225
+  %add227 = add nsw i64 %conv221, %conv223
+  %add228 = add nsw i64 %conv219, %conv223
+  %add229 = add nsw i64 %conv221, %conv225
+  %add230 = add nsw i64 %add228, %add229
+  %mul231 = mul nsw i64 %add230, 9633
+  %mul232 = mul nsw i64 %conv219, 2446
+  %mul233 = mul nsw i64 %conv221, 16819
+  %mul234 = mul nsw i64 %conv223, 25172
+  %mul235 = mul nsw i64 %conv225, 12299
+  %mul236 = mul nsw i64 %add226, -7373
+  %mul237 = mul nsw i64 %add227, -20995
+  %mul238 = mul nsw i64 %add228, -16069
+  %mul239 = mul nsw i64 %add229, -3196
+  %add240 = add nsw i64 %mul231, %mul238
+  %add241 = add nsw i64 %mul231, %mul239
+  %add242 = add i64 %mul236, %mul232
+  %add243 = add i64 %add242, %add240
+  %add244 = add i64 %mul237, %mul233
+  %add245 = add i64 %add244, %add241
+  %add246 = add i64 %mul237, %mul234
+  %add247 = add i64 %add246, %add240
+  %add248 = add i64 %mul236, %mul235
+  %add249 = add i64 %add248, %add241
+  %add250 = add i64 %add249, 131072
+  %add251 = add i64 %add250, %add214
+  %shr252561 = lshr i64 %add251, 18
+  %and254 = and i64 %shr252561, 1023
+  %arrayidx256 = getelementptr inbounds i8, i8* %add.ptr, i64 %and254
+  %40 = load i8, i8* %arrayidx256, align 1, !tbaa !15
+  store i8 %40, i8* %add.ptr157, align 1, !tbaa !15
+  %sub258 = sub i64 131072, %add249
+  %add259 = add i64 %sub258, %add214
+  %shr260563 = lshr i64 %add259, 18
+  %and262 = and i64 %shr260563, 1023
+  %arrayidx264 = getelementptr inbounds i8, i8* %add.ptr, i64 %and262
+  %41 = load i8, i8* %arrayidx264, align 1, !tbaa !15
+  %arrayidx265 = getelementptr inbounds i8, i8* %add.ptr157, i64 7
+  store i8 %41, i8* %arrayidx265, align 1, !tbaa !15
+  %add266 = add i64 %add247, 131072
+  %add267 = add i64 %add266, %add216
+  %shr268565 = lshr i64 %add267, 18
+  %and270 = and i64 %shr268565, 1023
+  %arrayidx272 = getelementptr inbounds i8, i8* %add.ptr, i64 %and270
+  %42 = load i8, i8* %arrayidx272, align 1, !tbaa !15
+  %arrayidx273 = getelementptr inbounds i8, i8* %add.ptr157, i64 1
+  store i8 %42, i8* %arrayidx273, align 1, !tbaa !15
+  %sub274 = sub i64 131072, %add247
+  %add275 = add i64 %sub274, %add216
+  %shr276567 = lshr i64 %add275, 18
+  %and278 = and i64 %shr276567, 1023
+  %arrayidx280 = getelementptr inbounds i8, i8* %add.ptr, i64 %and278
+  %43 = load i8, i8* %arrayidx280, align 1, !tbaa !15
+  %arrayidx281 = getelementptr inbounds i8, i8* %add.ptr157, i64 6
+  store i8 %43, i8* %arrayidx281, align 1, !tbaa !15
+  %add282 = add i64 %add245, 131072
+  %add283 = add i64 %add282, %sub217
+  %shr284569 = lshr i64 %add283, 18
+  %and286 = and i64 %shr284569, 1023
+  %arrayidx288 = getelementptr inbounds i8, i8* %add.ptr, i64 %and286
+  %44 = load i8, i8* %arrayidx288, align 1, !tbaa !15
+  %arrayidx289 = getelementptr inbounds i8, i8* %add.ptr157, i64 2
+  store i8 %44, i8* %arrayidx289, align 1, !tbaa !15
+  %sub290 = sub i64 131072, %add245
+  %add291 = add i64 %sub290, %sub217
+  %shr292571 = lshr i64 %add291, 18
+  %and294 = and i64 %shr292571, 1023
+  %arrayidx296 = getelementptr inbounds i8, i8* %add.ptr, i64 %and294
+  %45 = load i8, i8* %arrayidx296, align 1, !tbaa !15
+  %arrayidx297 = getelementptr inbounds i8, i8* %add.ptr157, i64 5
+  store i8 %45, i8* %arrayidx297, align 1, !tbaa !15
+  %add298 = add i64 %add243, 131072
+  %add299 = add i64 %add298, %sub215
+  %shr300573 = lshr i64 %add299, 18
+  %and302 = and i64 %shr300573, 1023
+  %arrayidx304 = getelementptr inbounds i8, i8* %add.ptr, i64 %and302
+  %46 = load i8, i8* %arrayidx304, align 1, !tbaa !15
+  %arrayidx305 = getelementptr inbounds i8, i8* %add.ptr157, i64 3
+  store i8 %46, i8* %arrayidx305, align 1, !tbaa !15
+  %sub306 = sub i64 131072, %add243
+  %add307 = add i64 %sub306, %sub215
+  %shr308575 = lshr i64 %add307, 18
+  %and310 = and i64 %shr308575, 1023
+  %arrayidx312 = getelementptr inbounds i8, i8* %add.ptr, i64 %and310
+  %47 = load i8, i8* %arrayidx312, align 1, !tbaa !15
+  br label %for.inc315
+
+for.inc315:                                       ; preds = %if.end191, %if.then173
+  %.sink = phi i8 [ %47, %if.end191 ], [ %38, %if.then173 ]
+  %48 = getelementptr inbounds i8, i8* %add.ptr157, i64 4
+  store i8 %.sink, i8* %48, align 1
+  %wsptr.3 = getelementptr inbounds i32, i32* %wsptr.2594, i64 8
+  %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+  %exitcond = icmp eq i64 %indvars.iv.next, 8
+  br i1 %exitcond, label %for.end316, label %for.body155
+
+for.end316:                                       ; preds = %for.inc315
+  call void @llvm.lifetime.end(i64 256, i8* %1) #2
+  ret void
+}
+
+; Function Attrs: argmemonly nounwind
+declare void @llvm.lifetime.start(i64, i8* nocapture) #1
+
+; Function Attrs: argmemonly nounwind
+declare void @llvm.lifetime.end(i64, i8* nocapture) #1
+
+attributes #0 = { norecurse nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #1 = { argmemonly nounwind }
+attributes #2 = { nounwind }
+
+!llvm.module.flags = !{!0}
+!llvm.ident = !{!1}
+
+!0 = !{i32 1, !"MaxFunctionCount", i32 150581}
+!1 = !{!"clang version 3.8.0 (trunk 257473)"}
+!2 = !{!3, !4, i64 408}
+!3 = !{!"jpeg_decompress_struct", !4, i64 0, !4, i64 8, !4, i64 16, !7, i64 24, !7, i64 28, !4, i64 32, !7, i64 40, !7, i64 44, !7, i64 48, !5, i64 52, !5, i64 56, !7, i64 60, !7, i64 64, !8, i64 72, !7, i64 80, !7, i64 84, !5, i64 88, !7, i64 92, !7, i64 96, !7, i64 100, !5, i64 104, !7, i64 108, !7, i64 112, !7, i64 116, !7, i64 120, !7, i64 124, !7, i64 128, !7, i64 132, !7, i64 136, !7, i64 140, !7, i64 144, !7, i64 148, !4, i64 152, !7, i64 160, !7, i64 164, !7, i64 168, !7, i64 172, !7, i64 176, !4, i64 184, !5, i64 192, !5, i64 224, !5, i64 256, !7, i64 288, !4, i64 296, !7, i64 304, !7, i64 308, !5, i64 312, !5, i64 328, !5, i64 344, !7, i64 360, !7, i64 364, !5, i64 368, !9, i64 370, !9, i64 372, !7, i64 376, !5, i64 380, !7, i64 384, !7, i64 388, !7, i64 392, !7, i64 396, !7, i64 400, !4, i64 408, !7, i64 416, !5, i64 424, !7, i64 456, !7, i64 460, !7, i64 464, !5, i64 468, !7, i64 508, !7, i64 512, !7, i64 516, !7, i64 520, !7, i64 524, !4, i64 528, !4, i64 536, !4, i64 544, !4, i64 552, !4, i64 560, !4, i64 568, !4, i64 576, !4, i64 584, !4, i64 592, !4, i64 600, !4, i64 608}
+!4 = !{!"any pointer", !5, i64 0}
+!5 = !{!"omnipotent char", !6, i64 0}
+!6 = !{!"Simple C/C++ TBAA"}
+!7 = !{!"int", !5, i64 0}
+!8 = !{!"double", !5, i64 0}
+!9 = !{!"short", !5, i64 0}
+!10 = !{!11, !4, i64 88}
+!11 = !{!"", !7, i64 0, !7, i64 4, !7, i64 8, !7, i64 12, !7, i64 16, !7, i64 20, !7, i64 24, !7, i64 28, !7, i64 32, !7, i64 36, !7, i64 40, !7, i64 44, !7, i64 48, !7, i64 52, !7, i64 56, !7, i64 60, !7, i64 64, !7, i64 68, !7, i64 72, !4, i64 80, !4, i64 88}
+!12 = !{!9, !9, i64 0}
+!13 = !{!7, !7, i64 0}
+!14 = !{!4, !4, i64 0}
+!15 = !{!5, !5, i64 0}

@@ -1,0 +1,522 @@
+; ModuleID = 'jddctmgr.c'
+target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+%struct.jpeg_decompress_struct = type { %struct.jpeg_error_mgr*, %struct.jpeg_memory_mgr*, %struct.jpeg_progress_mgr*, i32, i32, %struct.jpeg_source_mgr*, i32, i32, i32, i32, i32, i32, i32, double, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i8**, i32, i32, i32, i32, i32, [64 x i32]*, [4 x %struct.JQUANT_TBL*], [4 x %struct.JHUFF_TBL*], [4 x %struct.JHUFF_TBL*], i32, %struct.jpeg_component_info*, i32, i32, [16 x i8], [16 x i8], [16 x i8], i32, i32, i8, i16, i16, i32, i8, i32, i32, i32, i32, i32, i8*, i32, [4 x %struct.jpeg_component_info*], i32, i32, i32, [10 x i32], i32, i32, i32, i32, i32, %struct.jpeg_decomp_master*, %struct.jpeg_d_main_controller*, %struct.jpeg_d_coef_controller*, %struct.jpeg_d_post_controller*, %struct.jpeg_input_controller*, %struct.jpeg_marker_reader*, %struct.jpeg_entropy_decoder*, %struct.jpeg_inverse_dct*, %struct.jpeg_upsampler*, %struct.jpeg_color_deconverter*, %struct.jpeg_color_quantizer* }
+%struct.jpeg_error_mgr = type { void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*, i32)*, void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*, i8*)*, void (%struct.jpeg_common_struct*)*, i32, %union.anon, i32, i64, i8**, i32, i8**, i32, i32 }
+%struct.jpeg_common_struct = type { %struct.jpeg_error_mgr*, %struct.jpeg_memory_mgr*, %struct.jpeg_progress_mgr*, i32, i32 }
+%union.anon = type { [8 x i32], [48 x i8] }
+%struct.jpeg_memory_mgr = type { i8* (%struct.jpeg_common_struct*, i32, i64)*, i8* (%struct.jpeg_common_struct*, i32, i64)*, i8** (%struct.jpeg_common_struct*, i32, i32, i32)*, [64 x i16]** (%struct.jpeg_common_struct*, i32, i32, i32)*, %struct.jvirt_sarray_control* (%struct.jpeg_common_struct*, i32, i32, i32, i32, i32)*, %struct.jvirt_barray_control* (%struct.jpeg_common_struct*, i32, i32, i32, i32, i32)*, {}*, i8** (%struct.jpeg_common_struct*, %struct.jvirt_sarray_control*, i32, i32, i32)*, [64 x i16]** (%struct.jpeg_common_struct*, %struct.jvirt_barray_control*, i32, i32, i32)*, void (%struct.jpeg_common_struct*, i32)*, {}*, i64 }
+%struct.jvirt_sarray_control = type opaque
+%struct.jvirt_barray_control = type opaque
+%struct.jpeg_progress_mgr = type { {}*, i64, i64, i32, i32 }
+%struct.jpeg_source_mgr = type { i8*, i64, {}*, i32 (%struct.jpeg_decompress_struct*)*, void (%struct.jpeg_decompress_struct*, i64)*, i32 (%struct.jpeg_decompress_struct*, i32)*, {}* }
+%struct.JQUANT_TBL = type { [64 x i16], i32 }
+%struct.JHUFF_TBL = type { [17 x i8], [256 x i8], i32 }
+%struct.jpeg_decomp_master = type { {}*, {}*, i32 }
+%struct.jpeg_d_main_controller = type { void (%struct.jpeg_decompress_struct*, i32)*, void (%struct.jpeg_decompress_struct*, i8**, i32*, i32)* }
+%struct.jpeg_d_coef_controller = type { {}*, i32 (%struct.jpeg_decompress_struct*)*, {}*, i32 (%struct.jpeg_decompress_struct*, i8***)*, %struct.jvirt_barray_control** }
+%struct.jpeg_d_post_controller = type { void (%struct.jpeg_decompress_struct*, i32)*, void (%struct.jpeg_decompress_struct*, i8***, i32*, i32, i8**, i32*, i32)* }
+%struct.jpeg_input_controller = type { i32 (%struct.jpeg_decompress_struct*)*, {}*, {}*, {}*, i32, i32 }
+%struct.jpeg_marker_reader = type { {}*, i32 (%struct.jpeg_decompress_struct*)*, i32 (%struct.jpeg_decompress_struct*)*, i32 (%struct.jpeg_decompress_struct*)*, [16 x i32 (%struct.jpeg_decompress_struct*)*], i32, i32, i32, i32 }
+%struct.jpeg_entropy_decoder = type { {}*, i32 (%struct.jpeg_decompress_struct*, [64 x i16]**)* }
+%struct.jpeg_inverse_dct = type { {}*, [10 x void (%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32)*] }
+%struct.jpeg_upsampler = type { {}*, void (%struct.jpeg_decompress_struct*, i8***, i32*, i32, i8**, i32*, i32)*, i32 }
+%struct.jpeg_color_deconverter = type { {}*, void (%struct.jpeg_decompress_struct*, i8***, i32, i8**, i32)* }
+%struct.jpeg_color_quantizer = type { void (%struct.jpeg_decompress_struct*, i32)*, void (%struct.jpeg_decompress_struct*, i8**, i8**, i32)*, {}*, {}* }
+%struct.jpeg_component_info = type { i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, %struct.JQUANT_TBL*, i8* }
+%struct.my_idct_controller = type { %struct.jpeg_inverse_dct, [10 x i32] }
+
+@start_pass.aanscales = internal unnamed_addr constant [64 x i16] [i16 16384, i16 22725, i16 21407, i16 19266, i16 16384, i16 12873, i16 8867, i16 4520, i16 22725, i16 31521, i16 29692, i16 26722, i16 22725, i16 17855, i16 12299, i16 6270, i16 21407, i16 29692, i16 27969, i16 25172, i16 21407, i16 16819, i16 11585, i16 5906, i16 19266, i16 26722, i16 25172, i16 22654, i16 19266, i16 15137, i16 10426, i16 5315, i16 16384, i16 22725, i16 21407, i16 19266, i16 16384, i16 12873, i16 8867, i16 4520, i16 12873, i16 17855, i16 16819, i16 15137, i16 12873, i16 10114, i16 6967, i16 3552, i16 8867, i16 12299, i16 11585, i16 10426, i16 8867, i16 6967, i16 4799, i16 2446, i16 4520, i16 6270, i16 5906, i16 5315, i16 4520, i16 3552, i16 2446, i16 1247], align 16
+@start_pass.aanscalefactor = internal unnamed_addr constant [8 x double] [double 1.000000e+00, double 0x3FF63150B14861EF, double 0x3FF4E7AE914D6FCA, double 0x3FF2D062EF6C11AA, double 1.000000e+00, double 0x3FE92469C0A7BF3B, double 5.411961e-01, double 0x3FD1A855DE72AB5D], align 16
+@switch.table = private unnamed_addr constant [3 x void (%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32)*] [void (%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32)* @jpeg_idct_islow, void (%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32)* @jpeg_idct_ifast, void (%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32)* @jpeg_idct_float]
+
+; Function Attrs: nounwind uwtable
+define void @jinit_inverse_dct(%struct.jpeg_decompress_struct* %cinfo) #0 {
+entry:
+  %mem = getelementptr inbounds %struct.jpeg_decompress_struct, %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 1
+  %0 = load %struct.jpeg_memory_mgr*, %struct.jpeg_memory_mgr** %mem, align 8, !tbaa !2
+  %alloc_small = getelementptr inbounds %struct.jpeg_memory_mgr, %struct.jpeg_memory_mgr* %0, i64 0, i32 0
+  %1 = load i8* (%struct.jpeg_common_struct*, i32, i64)*, i8* (%struct.jpeg_common_struct*, i32, i64)** %alloc_small, align 8, !tbaa !10
+  %2 = bitcast %struct.jpeg_decompress_struct* %cinfo to %struct.jpeg_common_struct*
+  %call = tail call i8* %1(%struct.jpeg_common_struct* %2, i32 1, i64 128) #3
+  %idct1 = getelementptr inbounds %struct.jpeg_decompress_struct, %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 80
+  %3 = bitcast %struct.jpeg_inverse_dct** %idct1 to i8**
+  store i8* %call, i8** %3, align 8, !tbaa !13
+  %start_pass2 = bitcast i8* %call to void (%struct.jpeg_decompress_struct*)**
+  store void (%struct.jpeg_decompress_struct*)* @start_pass, void (%struct.jpeg_decompress_struct*)** %start_pass2, align 8, !tbaa !14
+  %num_components = getelementptr inbounds %struct.jpeg_decompress_struct, %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 8
+  %4 = load i32, i32* %num_components, align 8, !tbaa !17
+  %cmp22 = icmp sgt i32 %4, 0
+  br i1 %cmp22, label %for.body.lr.ph, label %for.end
+
+for.body.lr.ph:                                   ; preds = %entry
+  %comp_info = getelementptr inbounds %struct.jpeg_decompress_struct, %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 43
+  %5 = load %struct.jpeg_component_info*, %struct.jpeg_component_info** %comp_info, align 8, !tbaa !18
+  %cur_method = getelementptr inbounds i8, i8* %call, i64 88
+  %6 = bitcast i8* %cur_method to [10 x i32]*
+  br label %for.body
+
+for.body:                                         ; preds = %for.body.lr.ph, %for.body
+  %indvars.iv = phi i64 [ 0, %for.body.lr.ph ], [ %indvars.iv.next, %for.body ]
+  %compptr.024 = phi %struct.jpeg_component_info* [ %5, %for.body.lr.ph ], [ %incdec.ptr, %for.body ]
+  %7 = load %struct.jpeg_memory_mgr*, %struct.jpeg_memory_mgr** %mem, align 8, !tbaa !2
+  %alloc_small4 = getelementptr inbounds %struct.jpeg_memory_mgr, %struct.jpeg_memory_mgr* %7, i64 0, i32 0
+  %8 = load i8* (%struct.jpeg_common_struct*, i32, i64)*, i8* (%struct.jpeg_common_struct*, i32, i64)** %alloc_small4, align 8, !tbaa !10
+  %call5 = tail call i8* %8(%struct.jpeg_common_struct* nonnull %2, i32 1, i64 256) #3
+  %dct_table = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %compptr.024, i64 0, i32 20
+  store i8* %call5, i8** %dct_table, align 8, !tbaa !19
+  tail call void @llvm.memset.p0i8.i64(i8* %call5, i8 0, i64 256, i32 1, i1 false)
+  %arrayidx = getelementptr inbounds [10 x i32], [10 x i32]* %6, i64 0, i64 %indvars.iv
+  store i32 -1, i32* %arrayidx, align 4, !tbaa !21
+  %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+  %incdec.ptr = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %compptr.024, i64 1
+  %9 = load i32, i32* %num_components, align 8, !tbaa !17
+  %10 = sext i32 %9 to i64
+  %cmp = icmp slt i64 %indvars.iv.next, %10
+  br i1 %cmp, label %for.body, label %for.end.loopexit
+
+for.end.loopexit:                                 ; preds = %for.body
+  br label %for.end
+
+for.end:                                          ; preds = %for.end.loopexit, %entry
+  ret void
+}
+
+; Function Attrs: nounwind uwtable
+define internal void @start_pass(%struct.jpeg_decompress_struct* %cinfo) #0 {
+entry:
+  %idct1 = getelementptr inbounds %struct.jpeg_decompress_struct, %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 80
+  %0 = bitcast %struct.jpeg_inverse_dct** %idct1 to %struct.my_idct_controller**
+  %1 = load %struct.my_idct_controller*, %struct.my_idct_controller** %0, align 8, !tbaa !13
+  %num_components = getelementptr inbounds %struct.jpeg_decompress_struct, %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 8
+  %2 = load i32, i32* %num_components, align 8, !tbaa !17
+  %cmp161 = icmp sgt i32 %2, 0
+  br i1 %cmp161, label %for.body.lr.ph, label %for.end93
+
+for.body.lr.ph:                                   ; preds = %entry
+  %comp_info = getelementptr inbounds %struct.jpeg_decompress_struct, %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 43
+  %3 = load %struct.jpeg_component_info*, %struct.jpeg_component_info** %comp_info, align 8, !tbaa !18
+  %err10 = getelementptr inbounds %struct.jpeg_decompress_struct, %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 0
+  %4 = bitcast %struct.jpeg_decompress_struct* %cinfo to %struct.jpeg_common_struct*
+  %dct_method = getelementptr inbounds %struct.jpeg_decompress_struct, %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 16
+  br label %for.body
+
+for.body:                                         ; preds = %for.body.lr.ph, %for.inc91
+  %indvars.iv181 = phi i64 [ 0, %for.body.lr.ph ], [ %indvars.iv.next182, %for.inc91 ]
+  %compptr.0164 = phi %struct.jpeg_component_info* [ %3, %for.body.lr.ph ], [ %incdec.ptr, %for.inc91 ]
+  %method.0163 = phi i32 [ 0, %for.body.lr.ph ], [ %method.1, %for.inc91 ]
+  %method_ptr.0162 = phi void (%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32)* [ null, %for.body.lr.ph ], [ %method_ptr.1, %for.inc91 ]
+  %DCT_scaled_size = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %compptr.0164, i64 0, i32 9
+  %5 = load i32, i32* %DCT_scaled_size, align 4, !tbaa !22
+  switch i32 %5, label %sw.default9 [
+    i32 1, label %sw.epilog17
+    i32 2, label %sw.bb2
+    i32 4, label %sw.bb3
+    i32 8, label %sw.bb4
+  ]
+
+sw.bb2:                                           ; preds = %for.body
+  br label %sw.epilog17
+
+sw.bb3:                                           ; preds = %for.body
+  br label %sw.epilog17
+
+sw.bb4:                                           ; preds = %for.body
+  %6 = load i32, i32* %dct_method, align 8, !tbaa !23
+  %7 = icmp ult i32 %6, 3
+  br i1 %7, label %switch.lookup, label %sw.default
+
+sw.default:                                       ; preds = %sw.bb4
+  %8 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err10, align 8, !tbaa !24
+  %msg_code = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %8, i64 0, i32 5
+  store i32 47, i32* %msg_code, align 8, !tbaa !25
+  %error_exit = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %8, i64 0, i32 0
+  %9 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit, align 8, !tbaa !27
+  tail call void %9(%struct.jpeg_common_struct* nonnull %4) #3
+  br label %sw.epilog17
+
+sw.default9:                                      ; preds = %for.body
+  %10 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err10, align 8, !tbaa !24
+  %msg_code11 = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %10, i64 0, i32 5
+  store i32 6, i32* %msg_code11, align 8, !tbaa !25
+  %arrayidx = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %10, i64 0, i32 6, i32 0, i64 0
+  store i32 %5, i32* %arrayidx, align 4, !tbaa !21
+  %error_exit16 = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %10, i64 0, i32 0
+  %11 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit16, align 8, !tbaa !27
+  tail call void %11(%struct.jpeg_common_struct* %4) #3
+  br label %sw.epilog17
+
+switch.lookup:                                    ; preds = %sw.bb4
+  %12 = sext i32 %6 to i64
+  %switch.gep = getelementptr inbounds [3 x void (%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32)*], [3 x void (%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32)*]* @switch.table, i64 0, i64 %12
+  %switch.load = load void (%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32)*, void (%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32)** %switch.gep, align 8
+  br label %sw.epilog17
+
+sw.epilog17:                                      ; preds = %switch.lookup, %for.body, %sw.default, %sw.default9, %sw.bb3, %sw.bb2
+  %method_ptr.1 = phi void (%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32)* [ %method_ptr.0162, %sw.default9 ], [ %method_ptr.0162, %sw.default ], [ @jpeg_idct_4x4, %sw.bb3 ], [ @jpeg_idct_2x2, %sw.bb2 ], [ @jpeg_idct_1x1, %for.body ], [ %switch.load, %switch.lookup ]
+  %method.1 = phi i32 [ %method.0163, %sw.default9 ], [ %method.0163, %sw.default ], [ 0, %sw.bb3 ], [ 0, %sw.bb2 ], [ 0, %for.body ], [ %6, %switch.lookup ]
+  %arrayidx18 = getelementptr inbounds %struct.my_idct_controller, %struct.my_idct_controller* %1, i64 0, i32 0, i32 1, i64 %indvars.iv181
+  store void (%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32)* %method_ptr.1, void (%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32)** %arrayidx18, align 8, !tbaa !28
+  %component_needed = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %compptr.0164, i64 0, i32 12
+  %13 = load i32, i32* %component_needed, align 8, !tbaa !29
+  %tobool = icmp eq i32 %13, 0
+  br i1 %tobool, label %for.inc91, label %lor.lhs.false
+
+lor.lhs.false:                                    ; preds = %sw.epilog17
+  %arrayidx20 = getelementptr inbounds %struct.my_idct_controller, %struct.my_idct_controller* %1, i64 0, i32 1, i64 %indvars.iv181
+  %14 = load i32, i32* %arrayidx20, align 4, !tbaa !21
+  %cmp21 = icmp eq i32 %14, %method.1
+  br i1 %cmp21, label %for.inc91, label %if.end
+
+if.end:                                           ; preds = %lor.lhs.false
+  %quant_table = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %compptr.0164, i64 0, i32 19
+  %15 = load %struct.JQUANT_TBL*, %struct.JQUANT_TBL** %quant_table, align 8, !tbaa !30
+  %cmp22 = icmp eq %struct.JQUANT_TBL* %15, null
+  br i1 %cmp22, label %for.inc91, label %if.end24
+
+if.end24:                                         ; preds = %if.end
+  store i32 %method.1, i32* %arrayidx20, align 4, !tbaa !21
+  switch i32 %method.1, label %sw.default85 [
+    i32 0, label %sw.bb28
+    i32 1, label %sw.bb36
+    i32 2, label %sw.bb55
+  ]
+
+sw.bb28:                                          ; preds = %if.end24
+  %dct_table = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %compptr.0164, i64 0, i32 20
+  %16 = bitcast i8** %dct_table to i32**
+  %17 = load i32*, i32** %16, align 8, !tbaa !19
+  br label %vector.body
+
+vector.body:                                      ; preds = %sw.bb28
+  %18 = bitcast %struct.JQUANT_TBL* %15 to <4 x i16>*
+  %wide.load = load <4 x i16>, <4 x i16>* %18, align 2, !tbaa !31
+  %19 = zext <4 x i16> %wide.load to <4 x i32>
+  %20 = bitcast i32* %17 to <4 x i32>*
+  store <4 x i32> %19, <4 x i32>* %20, align 4, !tbaa !21
+  %21 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 4
+  %22 = bitcast i16* %21 to <4 x i16>*
+  %wide.load.1 = load <4 x i16>, <4 x i16>* %22, align 2, !tbaa !31
+  %23 = zext <4 x i16> %wide.load.1 to <4 x i32>
+  %24 = getelementptr inbounds i32, i32* %17, i64 4
+  %25 = bitcast i32* %24 to <4 x i32>*
+  store <4 x i32> %23, <4 x i32>* %25, align 4, !tbaa !21
+  %26 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 8
+  %27 = bitcast i16* %26 to <4 x i16>*
+  %wide.load.2 = load <4 x i16>, <4 x i16>* %27, align 2, !tbaa !31
+  %28 = zext <4 x i16> %wide.load.2 to <4 x i32>
+  %29 = getelementptr inbounds i32, i32* %17, i64 8
+  %30 = bitcast i32* %29 to <4 x i32>*
+  store <4 x i32> %28, <4 x i32>* %30, align 4, !tbaa !21
+  %31 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 12
+  %32 = bitcast i16* %31 to <4 x i16>*
+  %wide.load.3 = load <4 x i16>, <4 x i16>* %32, align 2, !tbaa !31
+  %33 = zext <4 x i16> %wide.load.3 to <4 x i32>
+  %34 = getelementptr inbounds i32, i32* %17, i64 12
+  %35 = bitcast i32* %34 to <4 x i32>*
+  store <4 x i32> %33, <4 x i32>* %35, align 4, !tbaa !21
+  %36 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 16
+  %37 = bitcast i16* %36 to <4 x i16>*
+  %wide.load.4 = load <4 x i16>, <4 x i16>* %37, align 2, !tbaa !31
+  %38 = zext <4 x i16> %wide.load.4 to <4 x i32>
+  %39 = getelementptr inbounds i32, i32* %17, i64 16
+  %40 = bitcast i32* %39 to <4 x i32>*
+  store <4 x i32> %38, <4 x i32>* %40, align 4, !tbaa !21
+  %41 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 20
+  %42 = bitcast i16* %41 to <4 x i16>*
+  %wide.load.5 = load <4 x i16>, <4 x i16>* %42, align 2, !tbaa !31
+  %43 = zext <4 x i16> %wide.load.5 to <4 x i32>
+  %44 = getelementptr inbounds i32, i32* %17, i64 20
+  %45 = bitcast i32* %44 to <4 x i32>*
+  store <4 x i32> %43, <4 x i32>* %45, align 4, !tbaa !21
+  %46 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 24
+  %47 = bitcast i16* %46 to <4 x i16>*
+  %wide.load.6 = load <4 x i16>, <4 x i16>* %47, align 2, !tbaa !31
+  %48 = zext <4 x i16> %wide.load.6 to <4 x i32>
+  %49 = getelementptr inbounds i32, i32* %17, i64 24
+  %50 = bitcast i32* %49 to <4 x i32>*
+  store <4 x i32> %48, <4 x i32>* %50, align 4, !tbaa !21
+  %51 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 28
+  %52 = bitcast i16* %51 to <4 x i16>*
+  %wide.load.7 = load <4 x i16>, <4 x i16>* %52, align 2, !tbaa !31
+  %53 = zext <4 x i16> %wide.load.7 to <4 x i32>
+  %54 = getelementptr inbounds i32, i32* %17, i64 28
+  %55 = bitcast i32* %54 to <4 x i32>*
+  store <4 x i32> %53, <4 x i32>* %55, align 4, !tbaa !21
+  %56 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 32
+  %57 = bitcast i16* %56 to <4 x i16>*
+  %wide.load.8 = load <4 x i16>, <4 x i16>* %57, align 2, !tbaa !31
+  %58 = zext <4 x i16> %wide.load.8 to <4 x i32>
+  %59 = getelementptr inbounds i32, i32* %17, i64 32
+  %60 = bitcast i32* %59 to <4 x i32>*
+  store <4 x i32> %58, <4 x i32>* %60, align 4, !tbaa !21
+  %61 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 36
+  %62 = bitcast i16* %61 to <4 x i16>*
+  %wide.load.9 = load <4 x i16>, <4 x i16>* %62, align 2, !tbaa !31
+  %63 = zext <4 x i16> %wide.load.9 to <4 x i32>
+  %64 = getelementptr inbounds i32, i32* %17, i64 36
+  %65 = bitcast i32* %64 to <4 x i32>*
+  store <4 x i32> %63, <4 x i32>* %65, align 4, !tbaa !21
+  %66 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 40
+  %67 = bitcast i16* %66 to <4 x i16>*
+  %wide.load.10 = load <4 x i16>, <4 x i16>* %67, align 2, !tbaa !31
+  %68 = zext <4 x i16> %wide.load.10 to <4 x i32>
+  %69 = getelementptr inbounds i32, i32* %17, i64 40
+  %70 = bitcast i32* %69 to <4 x i32>*
+  store <4 x i32> %68, <4 x i32>* %70, align 4, !tbaa !21
+  %71 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 44
+  %72 = bitcast i16* %71 to <4 x i16>*
+  %wide.load.11 = load <4 x i16>, <4 x i16>* %72, align 2, !tbaa !31
+  %73 = zext <4 x i16> %wide.load.11 to <4 x i32>
+  %74 = getelementptr inbounds i32, i32* %17, i64 44
+  %75 = bitcast i32* %74 to <4 x i32>*
+  store <4 x i32> %73, <4 x i32>* %75, align 4, !tbaa !21
+  %76 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 48
+  %77 = bitcast i16* %76 to <4 x i16>*
+  %wide.load.12 = load <4 x i16>, <4 x i16>* %77, align 2, !tbaa !31
+  %78 = zext <4 x i16> %wide.load.12 to <4 x i32>
+  %79 = getelementptr inbounds i32, i32* %17, i64 48
+  %80 = bitcast i32* %79 to <4 x i32>*
+  store <4 x i32> %78, <4 x i32>* %80, align 4, !tbaa !21
+  %81 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 52
+  %82 = bitcast i16* %81 to <4 x i16>*
+  %wide.load.13 = load <4 x i16>, <4 x i16>* %82, align 2, !tbaa !31
+  %83 = zext <4 x i16> %wide.load.13 to <4 x i32>
+  %84 = getelementptr inbounds i32, i32* %17, i64 52
+  %85 = bitcast i32* %84 to <4 x i32>*
+  store <4 x i32> %83, <4 x i32>* %85, align 4, !tbaa !21
+  %86 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 56
+  %87 = bitcast i16* %86 to <4 x i16>*
+  %wide.load.14 = load <4 x i16>, <4 x i16>* %87, align 2, !tbaa !31
+  %88 = zext <4 x i16> %wide.load.14 to <4 x i32>
+  %89 = getelementptr inbounds i32, i32* %17, i64 56
+  %90 = bitcast i32* %89 to <4 x i32>*
+  store <4 x i32> %88, <4 x i32>* %90, align 4, !tbaa !21
+  %91 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 60
+  %92 = bitcast i16* %91 to <4 x i16>*
+  %wide.load.15 = load <4 x i16>, <4 x i16>* %92, align 2, !tbaa !31
+  %93 = zext <4 x i16> %wide.load.15 to <4 x i32>
+  %94 = getelementptr inbounds i32, i32* %17, i64 60
+  %95 = bitcast i32* %94 to <4 x i32>*
+  store <4 x i32> %93, <4 x i32>* %95, align 4, !tbaa !21
+  br label %for.inc91
+
+sw.bb36:                                          ; preds = %if.end24
+  %dct_table37 = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %compptr.0164, i64 0, i32 20
+  %96 = bitcast i8** %dct_table37 to i32**
+  %97 = load i32*, i32** %96, align 8, !tbaa !19
+  br label %vector.body187
+
+vector.body187:                                   ; preds = %vector.body187, %sw.bb36
+  %index192 = phi i64 [ 0, %sw.bb36 ], [ %index.next193.1, %vector.body187 ]
+  %98 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 %index192
+  %99 = bitcast i16* %98 to <2 x i16>*
+  %wide.load199 = load <2 x i16>, <2 x i16>* %99, align 2, !tbaa !31
+  %100 = zext <2 x i16> %wide.load199 to <2 x i64>
+  %101 = getelementptr inbounds [64 x i16], [64 x i16]* @start_pass.aanscales, i64 0, i64 %index192
+  %102 = bitcast i16* %101 to <2 x i16>*
+  %wide.load200 = load <2 x i16>, <2 x i16>* %102, align 8, !tbaa !31
+  %103 = sext <2 x i16> %wide.load200 to <2 x i64>
+  %104 = mul nsw <2 x i64> %103, %100
+  %105 = add nsw <2 x i64> %104, <i64 2048, i64 2048>
+  %106 = lshr <2 x i64> %105, <i64 12, i64 12>
+  %107 = trunc <2 x i64> %106 to <2 x i32>
+  %108 = getelementptr inbounds i32, i32* %97, i64 %index192
+  %109 = bitcast i32* %108 to <2 x i32>*
+  store <2 x i32> %107, <2 x i32>* %109, align 4, !tbaa !21
+  %index.next193 = or i64 %index192, 2
+  %110 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 %index.next193
+  %111 = bitcast i16* %110 to <2 x i16>*
+  %wide.load199.1 = load <2 x i16>, <2 x i16>* %111, align 2, !tbaa !31
+  %112 = zext <2 x i16> %wide.load199.1 to <2 x i64>
+  %113 = getelementptr inbounds [64 x i16], [64 x i16]* @start_pass.aanscales, i64 0, i64 %index.next193
+  %114 = bitcast i16* %113 to <2 x i16>*
+  %wide.load200.1 = load <2 x i16>, <2 x i16>* %114, align 4, !tbaa !31
+  %115 = sext <2 x i16> %wide.load200.1 to <2 x i64>
+  %116 = mul nsw <2 x i64> %115, %112
+  %117 = add nsw <2 x i64> %116, <i64 2048, i64 2048>
+  %118 = lshr <2 x i64> %117, <i64 12, i64 12>
+  %119 = trunc <2 x i64> %118 to <2 x i32>
+  %120 = getelementptr inbounds i32, i32* %97, i64 %index.next193
+  %121 = bitcast i32* %120 to <2 x i32>*
+  store <2 x i32> %119, <2 x i32>* %121, align 4, !tbaa !21
+  %index.next193.1 = add nsw i64 %index192, 4
+  %122 = icmp eq i64 %index.next193.1, 64
+  br i1 %122, label %for.inc91.loopexit201, label %vector.body187, !llvm.loop !32
+
+sw.bb55:                                          ; preds = %if.end24
+  %dct_table56 = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %compptr.0164, i64 0, i32 20
+  %123 = bitcast i8** %dct_table56 to float**
+  %124 = load float*, float** %123, align 8, !tbaa !19
+  br label %for.cond61.preheader
+
+for.cond61.preheader:                             ; preds = %for.cond61.preheader, %sw.bb55
+  %indvars.iv172 = phi i64 [ 0, %sw.bb55 ], [ %indvars.iv.next173, %for.cond61.preheader ]
+  %indvars.iv170 = phi i64 [ 0, %sw.bb55 ], [ %indvars.iv.next171, %for.cond61.preheader ]
+  %arrayidx70 = getelementptr inbounds [8 x double], [8 x double]* @start_pass.aanscalefactor, i64 0, i64 %indvars.iv170
+  %125 = load double, double* %arrayidx70, align 8
+  %arrayidx67 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 %indvars.iv172
+  %126 = load i16, i16* %arrayidx67, align 2, !tbaa !31
+  %conv68 = uitofp i16 %126 to double
+  %mul71 = fmul double %conv68, %125
+  %conv75 = fptrunc double %mul71 to float
+  %arrayidx77 = getelementptr inbounds float, float* %124, i64 %indvars.iv172
+  store float %conv75, float* %arrayidx77, align 4, !tbaa !35
+  %indvars.iv.next169 = or i64 %indvars.iv172, 1
+  %arrayidx67.1 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 %indvars.iv.next169
+  %127 = load i16, i16* %arrayidx67.1, align 2, !tbaa !31
+  %conv68.1 = uitofp i16 %127 to double
+  %mul71.1 = fmul double %conv68.1, %125
+  %mul74.1 = fmul double %mul71.1, 0x3FF63150B14861EF
+  %conv75.1 = fptrunc double %mul74.1 to float
+  %arrayidx77.1 = getelementptr inbounds float, float* %124, i64 %indvars.iv.next169
+  store float %conv75.1, float* %arrayidx77.1, align 4, !tbaa !35
+  %indvars.iv.next169.1 = add nsw i64 %indvars.iv.next169, 1
+  %arrayidx67.2 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 %indvars.iv.next169.1
+  %128 = load i16, i16* %arrayidx67.2, align 2, !tbaa !31
+  %conv68.2 = uitofp i16 %128 to double
+  %mul71.2 = fmul double %conv68.2, %125
+  %mul74.2 = fmul double %mul71.2, 0x3FF4E7AE914D6FCA
+  %conv75.2 = fptrunc double %mul74.2 to float
+  %arrayidx77.2 = getelementptr inbounds float, float* %124, i64 %indvars.iv.next169.1
+  store float %conv75.2, float* %arrayidx77.2, align 4, !tbaa !35
+  %indvars.iv.next169.2 = or i64 %indvars.iv172, 3
+  %arrayidx67.3 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 %indvars.iv.next169.2
+  %129 = load i16, i16* %arrayidx67.3, align 2, !tbaa !31
+  %conv68.3 = uitofp i16 %129 to double
+  %mul71.3 = fmul double %conv68.3, %125
+  %mul74.3 = fmul double %mul71.3, 0x3FF2D062EF6C11AA
+  %conv75.3 = fptrunc double %mul74.3 to float
+  %arrayidx77.3 = getelementptr inbounds float, float* %124, i64 %indvars.iv.next169.2
+  store float %conv75.3, float* %arrayidx77.3, align 4, !tbaa !35
+  %indvars.iv.next169.3 = add nsw i64 %indvars.iv.next169.2, 1
+  %arrayidx67.4 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 %indvars.iv.next169.3
+  %130 = load i16, i16* %arrayidx67.4, align 2, !tbaa !31
+  %conv68.4 = uitofp i16 %130 to double
+  %mul71.4 = fmul double %conv68.4, %125
+  %conv75.4 = fptrunc double %mul71.4 to float
+  %arrayidx77.4 = getelementptr inbounds float, float* %124, i64 %indvars.iv.next169.3
+  store float %conv75.4, float* %arrayidx77.4, align 4, !tbaa !35
+  %indvars.iv.next169.4 = add nsw i64 %indvars.iv.next169.2, 2
+  %arrayidx67.5 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 %indvars.iv.next169.4
+  %131 = load i16, i16* %arrayidx67.5, align 2, !tbaa !31
+  %conv68.5 = uitofp i16 %131 to double
+  %mul71.5 = fmul double %conv68.5, %125
+  %mul74.5 = fmul double %mul71.5, 0x3FE92469C0A7BF3B
+  %conv75.5 = fptrunc double %mul74.5 to float
+  %arrayidx77.5 = getelementptr inbounds float, float* %124, i64 %indvars.iv.next169.4
+  store float %conv75.5, float* %arrayidx77.5, align 4, !tbaa !35
+  %indvars.iv.next169.5 = add nsw i64 %indvars.iv.next169.2, 3
+  %arrayidx67.6 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 %indvars.iv.next169.5
+  %132 = load i16, i16* %arrayidx67.6, align 2, !tbaa !31
+  %conv68.6 = uitofp i16 %132 to double
+  %mul71.6 = fmul double %conv68.6, %125
+  %mul74.6 = fmul double %mul71.6, 5.411961e-01
+  %conv75.6 = fptrunc double %mul74.6 to float
+  %arrayidx77.6 = getelementptr inbounds float, float* %124, i64 %indvars.iv.next169.5
+  store float %conv75.6, float* %arrayidx77.6, align 4, !tbaa !35
+  %indvars.iv.next169.6 = or i64 %indvars.iv172, 7
+  %arrayidx67.7 = getelementptr inbounds %struct.JQUANT_TBL, %struct.JQUANT_TBL* %15, i64 0, i32 0, i64 %indvars.iv.next169.6
+  %133 = load i16, i16* %arrayidx67.7, align 2, !tbaa !31
+  %conv68.7 = uitofp i16 %133 to double
+  %mul71.7 = fmul double %conv68.7, %125
+  %mul74.7 = fmul double %mul71.7, 0x3FD1A855DE72AB5D
+  %conv75.7 = fptrunc double %mul74.7 to float
+  %arrayidx77.7 = getelementptr inbounds float, float* %124, i64 %indvars.iv.next169.6
+  store float %conv75.7, float* %arrayidx77.7, align 4, !tbaa !35
+  %indvars.iv.next171 = add nuw nsw i64 %indvars.iv170, 1
+  %indvars.iv.next173 = add nuw nsw i64 %indvars.iv172, 8
+  %exitcond174 = icmp eq i64 %indvars.iv.next171, 8
+  br i1 %exitcond174, label %for.inc91.loopexit202, label %for.cond61.preheader
+
+sw.default85:                                     ; preds = %if.end24
+  %134 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err10, align 8, !tbaa !24
+  %msg_code87 = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %134, i64 0, i32 5
+  store i32 47, i32* %msg_code87, align 8, !tbaa !25
+  %error_exit89 = getelementptr inbounds %struct.jpeg_error_mgr, %struct.jpeg_error_mgr* %134, i64 0, i32 0
+  %135 = load void (%struct.jpeg_common_struct*)*, void (%struct.jpeg_common_struct*)** %error_exit89, align 8, !tbaa !27
+  tail call void %135(%struct.jpeg_common_struct* %4) #3
+  br label %for.inc91
+
+for.inc91.loopexit201:                            ; preds = %vector.body187
+  br label %for.inc91
+
+for.inc91.loopexit202:                            ; preds = %for.cond61.preheader
+  br label %for.inc91
+
+for.inc91:                                        ; preds = %for.inc91.loopexit202, %for.inc91.loopexit201, %vector.body, %sw.epilog17, %sw.default85, %if.end, %lor.lhs.false
+  %indvars.iv.next182 = add nuw nsw i64 %indvars.iv181, 1
+  %incdec.ptr = getelementptr inbounds %struct.jpeg_component_info, %struct.jpeg_component_info* %compptr.0164, i64 1
+  %136 = load i32, i32* %num_components, align 8, !tbaa !17
+  %137 = sext i32 %136 to i64
+  %cmp = icmp slt i64 %indvars.iv.next182, %137
+  br i1 %cmp, label %for.body, label %for.end93.loopexit
+
+for.end93.loopexit:                               ; preds = %for.inc91
+  br label %for.end93
+
+for.end93:                                        ; preds = %for.end93.loopexit, %entry
+  ret void
+}
+
+; Function Attrs: argmemonly nounwind
+declare void @llvm.memset.p0i8.i64(i8* nocapture, i8, i64, i32, i1) #1
+
+declare void @jpeg_idct_1x1(%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32) #2
+
+declare void @jpeg_idct_2x2(%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32) #2
+
+declare void @jpeg_idct_4x4(%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32) #2
+
+declare void @jpeg_idct_islow(%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32) #2
+
+declare void @jpeg_idct_ifast(%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32) #2
+
+declare void @jpeg_idct_float(%struct.jpeg_decompress_struct*, %struct.jpeg_component_info*, i16*, i8**, i32) #2
+
+attributes #0 = { nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #1 = { argmemonly nounwind }
+attributes #2 = { "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #3 = { nounwind }
+
+!llvm.module.flags = !{!0}
+!llvm.ident = !{!1}
+
+!0 = !{i32 1, !"MaxFunctionCount", i32 150581}
+!1 = !{!"clang version 3.8.0 (trunk 257473)"}
+!2 = !{!3, !4, i64 8}
+!3 = !{!"jpeg_decompress_struct", !4, i64 0, !4, i64 8, !4, i64 16, !7, i64 24, !7, i64 28, !4, i64 32, !7, i64 40, !7, i64 44, !7, i64 48, !5, i64 52, !5, i64 56, !7, i64 60, !7, i64 64, !8, i64 72, !7, i64 80, !7, i64 84, !5, i64 88, !7, i64 92, !7, i64 96, !7, i64 100, !5, i64 104, !7, i64 108, !7, i64 112, !7, i64 116, !7, i64 120, !7, i64 124, !7, i64 128, !7, i64 132, !7, i64 136, !7, i64 140, !7, i64 144, !7, i64 148, !4, i64 152, !7, i64 160, !7, i64 164, !7, i64 168, !7, i64 172, !7, i64 176, !4, i64 184, !5, i64 192, !5, i64 224, !5, i64 256, !7, i64 288, !4, i64 296, !7, i64 304, !7, i64 308, !5, i64 312, !5, i64 328, !5, i64 344, !7, i64 360, !7, i64 364, !5, i64 368, !9, i64 370, !9, i64 372, !7, i64 376, !5, i64 380, !7, i64 384, !7, i64 388, !7, i64 392, !7, i64 396, !7, i64 400, !4, i64 408, !7, i64 416, !5, i64 424, !7, i64 456, !7, i64 460, !7, i64 464, !5, i64 468, !7, i64 508, !7, i64 512, !7, i64 516, !7, i64 520, !7, i64 524, !4, i64 528, !4, i64 536, !4, i64 544, !4, i64 552, !4, i64 560, !4, i64 568, !4, i64 576, !4, i64 584, !4, i64 592, !4, i64 600, !4, i64 608}
+!4 = !{!"any pointer", !5, i64 0}
+!5 = !{!"omnipotent char", !6, i64 0}
+!6 = !{!"Simple C/C++ TBAA"}
+!7 = !{!"int", !5, i64 0}
+!8 = !{!"double", !5, i64 0}
+!9 = !{!"short", !5, i64 0}
+!10 = !{!11, !4, i64 0}
+!11 = !{!"jpeg_memory_mgr", !4, i64 0, !4, i64 8, !4, i64 16, !4, i64 24, !4, i64 32, !4, i64 40, !4, i64 48, !4, i64 56, !4, i64 64, !4, i64 72, !4, i64 80, !12, i64 88}
+!12 = !{!"long", !5, i64 0}
+!13 = !{!3, !4, i64 584}
+!14 = !{!15, !4, i64 0}
+!15 = !{!"", !16, i64 0, !5, i64 88}
+!16 = !{!"jpeg_inverse_dct", !4, i64 0, !5, i64 8}
+!17 = !{!3, !7, i64 48}
+!18 = !{!3, !4, i64 296}
+!19 = !{!20, !4, i64 88}
+!20 = !{!"", !7, i64 0, !7, i64 4, !7, i64 8, !7, i64 12, !7, i64 16, !7, i64 20, !7, i64 24, !7, i64 28, !7, i64 32, !7, i64 36, !7, i64 40, !7, i64 44, !7, i64 48, !7, i64 52, !7, i64 56, !7, i64 60, !7, i64 64, !7, i64 68, !7, i64 72, !4, i64 80, !4, i64 88}
+!21 = !{!7, !7, i64 0}
+!22 = !{!20, !7, i64 36}
+!23 = !{!3, !5, i64 88}
+!24 = !{!3, !4, i64 0}
+!25 = !{!26, !7, i64 40}
+!26 = !{!"jpeg_error_mgr", !4, i64 0, !4, i64 8, !4, i64 16, !4, i64 24, !4, i64 32, !7, i64 40, !5, i64 44, !7, i64 124, !12, i64 128, !4, i64 136, !7, i64 144, !4, i64 152, !7, i64 160, !7, i64 164}
+!27 = !{!26, !4, i64 0}
+!28 = !{!4, !4, i64 0}
+!29 = !{!20, !7, i64 48}
+!30 = !{!20, !4, i64 80}
+!31 = !{!9, !9, i64 0}
+!32 = distinct !{!32, !33, !34}
+!33 = !{!"llvm.loop.vectorize.width", i32 1}
+!34 = !{!"llvm.loop.interleave.count", i32 1}
+!35 = !{!36, !36, i64 0}
+!36 = !{!"float", !5, i64 0}

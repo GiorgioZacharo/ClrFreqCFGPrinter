@@ -1,0 +1,10 @@
+digraph "CFG for 'finish_output_tga' function" {
+	label="CFG for 'finish_output_tga' function";
+
+	Node0x6010ff0 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  %output_file = getelementptr inbounds %struct.djpeg_dest_struct,\l... %struct.djpeg_dest_struct* %dinfo, i64 0, i32 3\l  %0 = load %struct._IO_FILE*, %struct._IO_FILE** %output_file, align 8, !tbaa\l... !2\l  %call = tail call i32 @fflush(%struct._IO_FILE* %0)\l  %1 = load %struct._IO_FILE*, %struct._IO_FILE** %output_file, align 8, !tbaa\l... !2\l  %call2 = tail call i32 @ferror(%struct._IO_FILE* %1) #5\l  %tobool = icmp eq i32 %call2, 0\l  br i1 %tobool, label %if.end, label %if.then\l|{<s0>T|<s1>F}}"];
+	Node0x6010ff0:s0 -> Node0x601c370;
+	Node0x6010ff0:s1 -> Node0x601c440;
+	Node0x601c440 [shape=record, style = filled, fillcolor = blue, label="{if.then:                                          \l  %err = getelementptr inbounds %struct.jpeg_decompress_struct,\l... %struct.jpeg_decompress_struct* %cinfo, i64 0, i32 0\l  %2 = load %struct.jpeg_error_mgr*, %struct.jpeg_error_mgr** %err, align 8,\l... !tbaa !8\l  %msg_code = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %2, i64 0, i32 5\l  store i32 36, i32* %msg_code, align 8, !tbaa !12\l  %error_exit = getelementptr inbounds %struct.jpeg_error_mgr,\l... %struct.jpeg_error_mgr* %2, i64 0, i32 0\l  %3 = load void (%struct.jpeg_common_struct*)*, void\l... (%struct.jpeg_common_struct*)** %error_exit, align 8, !tbaa !15\l  %4 = bitcast %struct.jpeg_decompress_struct* %cinfo to\l... %struct.jpeg_common_struct*\l  tail call void %3(%struct.jpeg_common_struct* %4) #5\l  br label %if.end\l}"];
+	Node0x601c440 -> Node0x601c370;
+	Node0x601c370 [shape=record, style = filled, fillcolor = blue, label="{if.end:                                           \l  ret void\l}"];
+}

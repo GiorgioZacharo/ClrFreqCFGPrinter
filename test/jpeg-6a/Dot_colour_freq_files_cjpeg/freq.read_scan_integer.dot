@@ -1,0 +1,47 @@
+digraph "CFG for 'read_scan_integer' function" {
+	label="CFG for 'read_scan_integer' function";
+
+	Node0x5e4dcf0 [shape=record, style = filled, fillcolor = blue, label="{entry:\l  %call = tail call fastcc i32 @read_text_integer(%struct._IO_FILE* %file,\l... i64* %result, i32* %termchar)\l  %tobool = icmp eq i32 %call, 0\l  br i1 %tobool, label %cleanup, label %if.end\l|{<s0>T|<s1>F}}"];
+	Node0x5e4dcf0:s0 -> Node0x5e4df10;
+	Node0x5e4dcf0:s1 -> Node0x5e4df80;
+	Node0x5e4df80 [shape=record, style = filled, fillcolor = blue, label="{if.end:                                           \l  %0 = load i32, i32* %termchar, align 4, !tbaa !3\l  %cmp38 = icmp eq i32 %0, -1\l  %.pre = tail call i16** @__ctype_b_loc() #6\l  br i1 %cmp38, label %while.end, label %land.rhs.preheader\l|{<s0>T|<s1>F}}"];
+	Node0x5e4df80:s0 -> Node0x5e4e2a0;
+	Node0x5e4df80:s1 -> Node0x5e4e350;
+	Node0x5e4e350 [shape=record, style = filled, fillcolor = blue, label="{land.rhs.preheader:                               \l  br label %land.rhs\l}"];
+	Node0x5e4e350 -> Node0x5e4e4e0;
+	Node0x5e4e4e0 [shape=record, style = filled, fillcolor = blue, label="{land.rhs:                                         \l  %ch.039 = phi i32 [ %ch.0.be, %while.cond.backedge ], [ %0,\l... %land.rhs.preheader ]\l  %idxprom = sext i32 %ch.039 to i64\l  %1 = load i16*, i16** %.pre, align 8, !tbaa !7\l  %arrayidx = getelementptr inbounds i16, i16* %1, i64 %idxprom\l  %2 = load i16, i16* %arrayidx, align 2, !tbaa !9\l  %and = and i16 %2, 8192\l  %tobool2 = icmp eq i16 %and, 0\l  br i1 %tobool2, label %while.end.loopexit, label %while.body\l|{<s0>T|<s1>F}}"];
+	Node0x5e4e4e0:s0 -> Node0x5e37630;
+	Node0x5e4e4e0:s1 -> Node0x5e37730;
+	Node0x5e37730 [shape=record, style = filled, fillcolor = blue, label="{while.body:                                       \l  %call.i = tail call i32 @_IO_getc(%struct._IO_FILE* %file) #5\l  %cmp.i = icmp eq i32 %call.i, 35\l  br i1 %cmp.i, label %do.body.i.preheader, label %while.cond.backedge\l|{<s0>T|<s1>F}}"];
+	Node0x5e37730:s0 -> Node0x5e37a60;
+	Node0x5e37730:s1 -> Node0x5e4e700;
+	Node0x5e37a60 [shape=record, style = filled, fillcolor = blue, label="{do.body.i.preheader:                              \l  br label %do.body.i\l}"];
+	Node0x5e37a60 -> Node0x5e37b90;
+	Node0x5e4e5c0 [shape=record, style = filled, fillcolor = blue, label="{while.cond.backedge.loopexit:                     \l  %call1.i.lcssa = phi i32 [ %call1.i, %do.body.i ], [ %call1.i, %do.body.i ]\l  br label %while.cond.backedge\l}"];
+	Node0x5e4e5c0 -> Node0x5e4e700;
+	Node0x5e4e700 [shape=record, style = filled, fillcolor = blue, label="{while.cond.backedge:                              \l  %ch.0.be = phi i32 [ %call.i, %while.body ], [ %call1.i.lcssa,\l... %while.cond.backedge.loopexit ]\l  %cmp = icmp eq i32 %ch.0.be, -1\l  br i1 %cmp, label %while.end.loopexit, label %land.rhs\l|{<s0>T|<s1>F}}"];
+	Node0x5e4e700:s0 -> Node0x5e37630;
+	Node0x5e4e700:s1 -> Node0x5e4e4e0;
+	Node0x5e37b90 [shape=record, style = filled, fillcolor = blue, label="{do.body.i:                                        \l  %call1.i = tail call i32 @_IO_getc(%struct._IO_FILE* %file) #5\l  switch i32 %call1.i, label %do.body.i [\l    i32 -1, label %while.cond.backedge.loopexit\l    i32 10, label %while.cond.backedge.loopexit\l  ]\l|{<s0>def|<s1>-1|<s2>10}}"];
+	Node0x5e37b90:s0 -> Node0x5e37b90;
+	Node0x5e37b90:s1 -> Node0x5e4e5c0;
+	Node0x5e37b90:s2 -> Node0x5e4e5c0;
+	Node0x5e37630 [shape=record, style = filled, fillcolor = blue, label="{while.end.loopexit:                               \l  %ch.0.lcssa.ph = phi i32 [ -1, %while.cond.backedge ], [ %ch.039, %land.rhs ]\l  br label %while.end\l}"];
+	Node0x5e37630 -> Node0x5e4e2a0;
+	Node0x5e4e2a0 [shape=record, style = filled, fillcolor = blue, label="{while.end:                                        \l  %ch.0.lcssa = phi i32 [ -1, %if.end ], [ %ch.0.lcssa.ph, %while.end.loopexit\l... ]\l  %idxprom4 = sext i32 %ch.0.lcssa to i64\l  %3 = load i16*, i16** %.pre, align 8, !tbaa !7\l  %arrayidx6 = getelementptr inbounds i16, i16* %3, i64 %idxprom4\l  %4 = load i16, i16* %arrayidx6, align 2, !tbaa !9\l  %and8 = and i16 %4, 2048\l  %tobool9 = icmp eq i16 %and8, 0\l  br i1 %tobool9, label %if.else, label %if.then10\l|{<s0>T|<s1>F}}"];
+	Node0x5e4e2a0:s0 -> Node0x5e50d70;
+	Node0x5e4e2a0:s1 -> Node0x5e50e20;
+	Node0x5e50e20 [shape=record, style = filled, fillcolor = blue, label="{if.then10:                                        \l  %call11 = tail call i32 @ungetc(i32 %ch.0.lcssa, %struct._IO_FILE* %file)\l  %cmp12 = icmp eq i32 %call11, -1\l  br i1 %cmp12, label %cleanup, label %if.end25\l|{<s0>T|<s1>F}}"];
+	Node0x5e50e20:s0 -> Node0x5e4df10;
+	Node0x5e50e20:s1 -> Node0x5e51220;
+	Node0x5e50d70 [shape=record, style = filled, fillcolor = blue, label="{if.else:                                          \l  switch i32 %ch.0.lcssa, label %if.then23 [\l    i32 -1, label %if.end25\l    i32 59, label %if.end25\l    i32 58, label %if.end25\l  ]\l|{<s0>def|<s1>-1|<s2>59|<s3>58}}"];
+	Node0x5e50d70:s0 -> Node0x5e51390;
+	Node0x5e50d70:s1 -> Node0x5e51220;
+	Node0x5e50d70:s2 -> Node0x5e51220;
+	Node0x5e50d70:s3 -> Node0x5e51220;
+	Node0x5e51390 [shape=record, style = filled, fillcolor = blue, label="{if.then23:                                        \l  br label %if.end25\l}"];
+	Node0x5e51390 -> Node0x5e51220;
+	Node0x5e51220 [shape=record, style = filled, fillcolor = blue, label="{if.end25:                                         \l  %ch.1 = phi i32 [ 32, %if.then23 ], [ %ch.0.lcssa, %if.else ], [ 32,\l... %if.then10 ], [ %ch.0.lcssa, %if.else ], [ %ch.0.lcssa, %if.else ]\l  store i32 %ch.1, i32* %termchar, align 4, !tbaa !3\l  br label %cleanup\l}"];
+	Node0x5e51220 -> Node0x5e4df10;
+	Node0x5e4df10 [shape=record, style = filled, fillcolor = blue, label="{cleanup:                                          \l  %retval.0 = phi i32 [ 1, %if.end25 ], [ 0, %entry ], [ 0, %if.then10 ]\l  ret i32 %retval.0\l}"];
+}
