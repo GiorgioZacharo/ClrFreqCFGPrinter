@@ -1,7 +1,8 @@
 # ClrFreqCFGPrinter
     ClrFreqCFGPrinter is a plug-in of latest LLVM version (3.8) and is included in the 
-    RegionSeeker© framework. It was developed by the HW/SW co-design Research Team at 
-    Universita' della Svizzera italiana (USI Lugano)
+    RegionSeeker© framework. It was developed by Georgios Zacharopoulos, under the supervision 
+    of Prof. Laura Pozzi, within the HW/SW co-design Research Team at Universita' della Svizzera 
+    italiana (USI Lugano).
 
     Under the scope of the research project Magic ISEs: Enlarging the Scope of Automatic 
     Instruction Set Extension, supervised by Prof. Laura Pozzi.
