@@ -1,9 +1,13 @@
 # ClrFreqCFGPrinter
-    ClrFreqCFGPrinter is a plug-in of LLVM version (3.8) or later and is included in the 
+
+    ClrFreqCFGPrinter is an LLVM plug-in (version 3.8 or later) and is included in the 
     RegionSeeker© framework. It was developed by Georgios Zacharopoulos, under the supervision 
     of Prof. Laura Pozzi, within the HW/SW co-design Research Team at Universita' della Svizzera 
     italiana (USI Lugano) and under the scope of the research project Magic ISEs: Enlarging the 
     cope of Automatic Instruction Set Extension, supervised by Prof. Laura Pozzi.
+
+    ClrFreqCFGPrinter is a tool for Color Frequency Annotated Control Flow Graph Generation, as 
+    was presented in EuroLLVM 2017.
 
     It consists of one LLVM Analysis Pass: BBFreqInfo and several shell scripts that load the 
     pass and generate the Colour-annotated with respect to each Basic Block (BB) Execution 
