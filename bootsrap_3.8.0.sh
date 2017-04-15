@@ -8,9 +8,9 @@ if [ -d "llvm-RS-3.8.0" ]; then
         exit 1
 fi
 
-curl -O http://llvm.org/releases/3.8.0/llvm-3.8.0.src.tar.xz 
-curl -O http://llvm.org/releases/3.8.0/cfe-3.8.0.src.tar.xz
-curl -O http://llvm.org/releases/3.8.0/compiler-rt-3.8.0.src.tar.xz 
+curl -O http://releases.llvm.org/3.8.0/llvm-3.8.0.src.tar.xz
+curl -O http://releases.llvm.org/3.8.0/cfe-3.8.0.src.tar.xz
+curl -O http://releases.llvm.org/3.8.0/compiler-rt-3.8.0.src.tar.xz
 
 tar xf llvm-3.8.0.src.tar.xz
 tar xf cfe-3.8.0.src.tar.xz
